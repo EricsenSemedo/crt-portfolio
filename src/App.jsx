@@ -1,8 +1,5 @@
-import { AnimatePresence, motion } from "framer-motion";
 import { useCallback, useMemo, useState } from "react";
-import StaticNoise from "./components/StaticNoise";
 import TVGrid from "./components/TVGrid";
-import TVShell from "./components/TVShell";
 import TVZoomOverlay from "./components/TVZoomOverlay";
 
 export default function App(){
