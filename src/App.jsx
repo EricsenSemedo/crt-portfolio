@@ -23,9 +23,9 @@ export default function App(){
       <ParallaxBackground
         panState={panState}
       >
-        <PanStage onStateChange={setPanState} className="mx-auto min-h-screen flex flex-col items-center justify-center">
+        <PanStage onStateChange={setPanState} className="mx-auto min-h-screen flex items-center justify-center">
             {TVs.map(tv => (
-              <div key={tv.id} panId={tv.id} style={{ width: tv.width }} className="aspect-square">
+              <div key={tv.id} panId={tv.id} className="aspect-square w-[clamp(12rem,24vw,20rem)]">
                 <TVShell className="w-full h-full cursor-pointer">
                   <div className="h-full flex items-center justify-center">
                     <div className="text-white font-semibold text-center text-sm sm:text-base">{tv.title}</div>

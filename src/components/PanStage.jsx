@@ -130,7 +130,7 @@ export default function PanStage({ children, focusScale = 6.5, className = "", o
         ref={containerRef}
         animate={controls}
         transition={{ type: 'spring', duration: 0.5, bounce: 0.2 }}
-        className="origin-top-left flex items-center justify-center gap-8 py-8"
+        className="origin-top-left flex flex-col md:flex-row items-center justify-center gap-6 md:gap-8"
       >
         {childrenArray.map((child) => {
           const id = child?.props?.panId;
