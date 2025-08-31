@@ -1,11 +1,31 @@
-import { motion } from "framer-motion";
+import { motion, useAnimationControls } from "framer-motion";
 import { Children, useEffect, useMemo, useRef, useState } from "react";
 
-export default function PanStage({ children, focusScale = 6, className = "" }) {
+export default function PanStage({ children, focusScale = 6.5, className = "", onStateChange = () => {} }) {
   const containerRef = useRef(null);
   const itemRefs = useRef(new Map());
   const [selectedId, setSelectedId] = useState(null);
   const [transform, setTransform] = useState({ x: 0, y: 0, scale: 1 });
+  const [isAnimating, setIsAnimating] = useState(false);
+  const resizeTimerRef = useRef(null);
+  const controls = useAnimationControls();
+
+  const nearlyEqual = (a, b, eps = 0.5) => Math.abs(a - b) <= eps;
+  const isNoOp = (next) =>
+    nearlyEqual(transform.x, next.x) &&
+    nearlyEqual(transform.y, next.y) &&
+    nearlyEqual(transform.scale, next.scale);
+
+  async function animateTo(next) {
+    if (isNoOp(next)) { setIsAnimating(false); return; }
+    setIsAnimating(true);
+    setTransform(next);
+    try {
+      await controls.start(next, { type: 'spring', duration: 0.5, bounce: 0.2 });
+    } finally {
+      setIsAnimating(false);
+    }
+  }
 
   const setItemRef = (id) => (el) => {
     if (!id) return;
@@ -46,19 +66,61 @@ export default function PanStage({ children, focusScale = 6, className = "" }) {
     const tx1 = vx - origLeft - nextScale * localX;
     const ty1 = vy - origTop  - nextScale * localY;
 
-    setTransform({ x: tx1, y: ty1, scale: nextScale });
+    animateTo({ x: tx1, y: ty1, scale: nextScale });
   }
 
   function resetView() {
     setSelectedId(null);
-    setTransform({ x: 0, y: 0, scale: 1 });
+    animateTo({ x: 0, y: 0, scale: 1 });
+  }
+
+  function recenterContainer(nextScale = transform.scale || 1) {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const contRect = container.getBoundingClientRect();
+    const { x: tx0, y: ty0, scale: s0 } = transform;
+    const sSafe = s0 || 1;
+
+    const vx = window.innerWidth / 2;
+    const vy = window.innerHeight / 2;
+
+    const origLeft = contRect.left - tx0;
+    const origTop  = contRect.top  - ty0;
+
+    const localX = (contRect.width / sSafe) / 2;
+    const localY = (contRect.height / sSafe) / 2;
+
+    const tx1 = vx - origLeft - nextScale * localX;
+    const ty1 = vy - origTop  - nextScale * localY;
+
+    const next = { x: tx1, y: ty1, scale: nextScale };
+    setTransform(next);
+    controls.set(next);
   }
 
   useEffect(() => {
-    function onResize() { if (selectedId) centerOn(selectedId); }
+    function onResize() {
+      if (resizeTimerRef.current) clearTimeout(resizeTimerRef.current);
+      resizeTimerRef.current = setTimeout(() => {
+        if (selectedId) centerOn(selectedId, transform.scale || focusScale);
+        else recenterContainer(transform.scale || 1);
+      }, 100);
+    }
     window.addEventListener('resize', onResize);
     return () => window.removeEventListener('resize', onResize);
-  }, [selectedId]);
+  }, [selectedId, transform.scale]);
+
+  useEffect(() => {
+    return () => {
+      if (resizeTimerRef.current) clearTimeout(resizeTimerRef.current);
+    };
+  }, []);
+
+  // Expose PanStage state to parent (e.g., App) for coordination
+  useEffect(() => {
+    onStateChange?.({ selectedId, scale: transform.scale || 1, isAnimating });
+  }, [selectedId, transform.scale, isAnimating]);
 
   const childrenArray = useMemo(() => Children.toArray(children), [children]);
 
@@ -66,9 +128,9 @@ export default function PanStage({ children, focusScale = 6, className = "" }) {
     <div className={className}>
       <motion.div
         ref={containerRef}
-        animate={transform}
-        transition={{ type: 'spring', stiffness: 140, damping: 18 }}
-        className="origin-top-left flex items-center justify-center gap-8 py-8 bg-red-500"
+        animate={controls}
+        transition={{ type: 'spring', duration: 0.5, bounce: 0.2 }}
+        className="origin-top-left flex items-center justify-center gap-8 py-8"
       >
         {childrenArray.map((child) => {
           const id = child?.props?.panId;
@@ -76,14 +138,14 @@ export default function PanStage({ children, focusScale = 6, className = "" }) {
             <div
               key={id ?? Math.random().toString(36)}
               ref={setItemRef(id)}
-              onClick={(e) => { e.stopPropagation(); if (id) { setSelectedId(id); centerOn(id); } child?.props?.onClick?.(e); }}
+              onClick={(e) => { e.stopPropagation(); if (isAnimating) return; if (id) { setSelectedId(id); centerOn(id); } child?.props?.onClick?.(e); }}
             >
               {child}
             </div>
           );
         })}
       </motion.div>
-      {selectedId && (
+      {selectedId && !isAnimating && (
         <div className="fixed inset-0" onClick={resetView} />
       )}
     </div>
