@@ -1,13 +1,13 @@
 import { motion } from "framer-motion";
 import TVShell from "./TVShell";
 
-export default function TVGrid({ items = [], selectedId = null, onSelect }) {
+export default function TVGrid({ items = [], selectedId = null, onSelect, getItemRef }) {
     return (
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 p-4">
             {items.map((item) => (
                 <motion.div
                     key={item.id}
-                    layoutId={`tv-${item.id}`}
+                    ref={getItemRef?.(item.id)}
                     className="cursor-pointer"
                     onClick={() => onSelect?.(item.id)}
                     whileHover={{ scale: 1.02 }}
