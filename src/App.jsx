@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import PanStage from "./components/PanStage";
 import ParallaxBackground from "./components/ParallaxBackground";
+import StaticNoise from "./components/StaticNoise";
 import TVShell from "./components/TVShell";
 
 // Predetermined TVs (center-anchored). Width is percentage of stage width; height derives from aspect.
@@ -28,6 +29,7 @@ export default function App(){
               <div key={tv.id} panId={tv.id} className="aspect-square w-[clamp(12rem,24vw,20rem)]">
                 <TVShell className="w-full h-full cursor-pointer">
                   <div className="h-full flex items-center justify-center">
+                    <StaticNoise intensity={1} />
                     <div className="text-white font-semibold text-center text-sm sm:text-base">{tv.title}</div>
                   </div>
                 </TVShell>
