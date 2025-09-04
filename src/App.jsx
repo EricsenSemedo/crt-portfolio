@@ -1,8 +1,12 @@
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import PanStage from "./components/PanStage";
 import ParallaxBackground from "./components/ParallaxBackground";
 import StaticNoise from "./components/StaticNoise";
 import TVShell from "./components/TVShell";
+import TVZoomOverlay from "./components/TVZoomOverlay";
+import Contact from "./pages/Contact";
+import Home from "./pages/Home";
+import Portfolio from "./pages/Portfolio";
 
 // Predetermined TVs (center-anchored). Width is percentage of stage width; height derives from aspect.
 const SLOTS = [
@@ -18,13 +22,19 @@ export default function App(){
     { id: 'portfolio', title: 'PORTFOLIO', width: 340 },
     { id: 'contact', title: 'CONTACT', width: 340 },
   ]), []);
+  const byId = {
+    home: <Home />,
+    portfolio: <Portfolio />,
+    contact: <Contact />,
+  };
+  const panRef = useRef(null);
 
   return (
-    <div className="min-h-screen bg-black overflow-hidden">
+    <div className="relative min-h-screen bg-black overflow-hidden">
       <ParallaxBackground
         panState={panState}
       >
-        <PanStage onStateChange={setPanState} className="mx-auto min-h-screen flex items-center justify-center">
+        <PanStage ref={panRef} onStateChange={setPanState} className="mx-auto min-h-screen flex items-center justify-center">
             {TVs.map(tv => (
               <div key={tv.id} panId={tv.id} className="aspect-square w-[clamp(12rem,24vw,20rem)]">
                 <TVShell className="w-full h-full cursor-pointer">
@@ -36,6 +46,16 @@ export default function App(){
                 </div>
               ))}
         </PanStage>
+
+        {panState.selectedId && !panState.isAnimating && (
+          <TVZoomOverlay
+            selectedItem={{id: panState.selectedId, title: panState.selectedId.toUpperCase()}}
+            onClose = {() =>{panRef.current?.reset()}}
+          >
+            {byId[panState.selectedId] ?? null}
+          </TVZoomOverlay>
+        )
+        }
       </ParallaxBackground>
       {/* App center red debug dot */}
       <div className="fixed inset-0 pointer-events-none flex items-center justify-center">

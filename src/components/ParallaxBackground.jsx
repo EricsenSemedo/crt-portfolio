@@ -71,7 +71,7 @@ export default function ParallaxBackground({ children, scale = 1, isAnimating = 
       }, [isAnimating, scale, isParallaxEnabled]);
 
     return (
-        <motion.div className="absolute inset-0" style={{ x: parallaxX, y: parallaxY }}>
+        <motion.div className="absolute inset-0 overflow-hidden" style={{ x: parallaxX, y: parallaxY }}>
             {children}
         </motion.div>
     )
