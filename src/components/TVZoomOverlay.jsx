@@ -1,5 +1,6 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useState } from "react";
+import Navbar from "./Navbar";
 import StaticNoise from "./StaticNoise";
 import TVShell from "./TVShell";
 
@@ -42,6 +43,7 @@ export default function TVZoomOverlay({ selectedItem, onClose, children}) {
                         {!showContent && <StaticNoise intensity={1} />}
                         {showContent && (
                             <div className="absolute inset-0">
+                                <Navbar title={selectedItem.title} onClose={onClose} />
                                 <div className="absolute inset-0">{children}</div>
                                 {sweepVisible && (
                                     <div
