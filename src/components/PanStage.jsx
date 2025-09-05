@@ -1,7 +1,7 @@
 import { motion, useAnimationControls } from "framer-motion";
-import { Children, useEffect, useMemo, useRef, useState } from "react";
+import { Children, forwardRef, useEffect, useImperativeHandle, useMemo, useRef, useState } from "react";
 
-export default function PanStage({ children, focusScale = 6.5, className = "", onStateChange = () => {} }) {
+export default forwardRef(function PanStage({ children, focusScale = 6.5, className = "", onStateChange = () => {} }, ref) {
   const containerRef = useRef(null);
   const itemRefs = useRef(new Map());
   const [selectedId, setSelectedId] = useState(null);
@@ -20,8 +20,14 @@ export default function PanStage({ children, focusScale = 6.5, className = "", o
     if (isNoOp(next)) { setIsAnimating(false); return; }
     setIsAnimating(true);
     setTransform(next);
+    const currentScale = transform.scale || 1;
+    const targetScale = next.scale || 1;
+    const isZoomIn = targetScale > currentScale + 1e-6; // detect zoom direction
+    const transition = isZoomIn
+      ? { type: 'tween', ease: 'easeInOut', duration: 0.2 }
+      : { type: 'spring', duration: 0.5, bounce: 0.2 };
     try {
-      await controls.start(next, { type: 'spring', duration: 0.5, bounce: 0.2 });
+      await controls.start(next, transition);
     } finally {
       setIsAnimating(false);
     }
@@ -122,6 +128,12 @@ export default function PanStage({ children, focusScale = 6.5, className = "", o
     onStateChange?.({ selectedId, scale: transform.scale || 1, isAnimating });
   }, [selectedId, transform.scale, isAnimating]);
 
+  // Expose imperative API to parent via ref
+  useImperativeHandle(ref, () => ({
+    reset: () => resetView(),
+    centerOn: (id, scale = focusScale) => centerOn(id, scale),
+  }), [focusScale, resetView, centerOn]);
+
   const childrenArray = useMemo(() => Children.toArray(children), [children]);
 
   return (
@@ -150,4 +162,4 @@ export default function PanStage({ children, focusScale = 6.5, className = "", o
       )}
     </div>
   );
-}
+})

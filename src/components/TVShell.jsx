@@ -56,12 +56,6 @@ export default function TVShell({children, className="", brightness=1, intensity
 
                         {/* Integrated bezel controls along screen edges */}
                         <div className="pointer-events-none absolute inset-0">
-                            {/* Corner screws */}
-                            <div className="absolute top-2 left-2 w-1.5 h-1.5 rounded-full bg-zinc-700 ring-1 ring-zinc-600"/>
-                            <div className="absolute top-2 right-2 w-1.5 h-1.5 rounded-full bg-zinc-700 ring-1 ring-zinc-600"/>
-                            <div className="absolute bottom-2 left-2 w-1.5 h-1.5 rounded-full bg-zinc-700 ring-1 ring-zinc-600"/>
-                            <div className="absolute bottom-2 right-2 w-1.5 h-1.5 rounded-full bg-zinc-700 ring-1 ring-zinc-600"/>
-
                             {/* Right-edge vents */}
                             <div className="absolute right-1 top-4 bottom-4 flex flex-col justify-between">
                                 {Array.from({length: 7}).map((_, i) => (
