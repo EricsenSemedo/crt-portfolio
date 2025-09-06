@@ -22,12 +22,27 @@ export default function App(){
     { id: 'portfolio', title: 'PORTFOLIO', width: 340 },
     { id: 'contact', title: 'CONTACT', width: 340 },
   ]), []);
-  const byId = {
-    home: <Home />,
-    portfolio: <Portfolio />,
-    contact: <Contact />,
-  };
+  
   const panRef = useRef(null);
+  
+  // Navigation function to smoothly transition between TVs
+  const navigateToTV = (targetId) => {
+    if (!panRef.current || targetId === panState.selectedId) return;
+    
+    // First close current overlay (triggers zoom-out)
+    panRef.current.reset();
+    
+    // After zoom-out completes, zoom into target TV
+    setTimeout(() => {
+      panRef.current.centerOn(targetId);
+    }, 500); // Match the zoom-out duration
+  };
+  
+  const byId = {
+    home: <Home onNavigate={navigateToTV} />,
+    portfolio: <Portfolio onNavigate={navigateToTV} />,
+    contact: <Contact onNavigate={navigateToTV} />,
+  };
 
   return (
     <div className="relative min-h-screen bg-black overflow-hidden">
