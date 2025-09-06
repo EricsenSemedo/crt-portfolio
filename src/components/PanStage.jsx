@@ -1,121 +1,171 @@
 import { motion, useAnimationControls } from "framer-motion";
 import { Children, forwardRef, useEffect, useImperativeHandle, useMemo, useRef, useState } from "react";
 
+/**
+ * Camera control system for TV selection with smooth zoom animations.
+ * Exposes imperative API for external navigation control.
+ */
 export default forwardRef(function PanStage({ children, focusScale = 6.5, className = "", onStateChange = () => {} }, ref) {
+  // ========================================
+  // Refs & State Management
+  // ========================================
+  
+  // DOM references
   const containerRef = useRef(null);
   const itemRefs = useRef(new Map());
-  const [selectedId, setSelectedId] = useState(null);
-  const [transform, setTransform] = useState({ x: 0, y: 0, scale: 1 });
-  const [isAnimating, setIsAnimating] = useState(false);
   const resizeTimerRef = useRef(null);
   const controls = useAnimationControls();
+  
+  // Core state
+  const [selectedTVId, setSelectedTVId] = useState(null);
+  const [cameraTransform, setCameraTransform] = useState({ x: 0, y: 0, scale: 1 });
+  const [isAnimationInProgress, setIsAnimationInProgress] = useState(false);
 
+  // ========================================
+  // Animation Utilities
+  // ========================================
+  
   const nearlyEqual = (a, b, eps = 0.5) => Math.abs(a - b) <= eps;
-  const isNoOp = (next) =>
-    nearlyEqual(transform.x, next.x) &&
-    nearlyEqual(transform.y, next.y) &&
-    nearlyEqual(transform.scale, next.scale);
+  
+  const isTransformUnchanged = (nextTransform) =>
+    nearlyEqual(cameraTransform.x, nextTransform.x) &&
+    nearlyEqual(cameraTransform.y, nextTransform.y) &&
+    nearlyEqual(cameraTransform.scale, nextTransform.scale);
 
-  async function animateTo(next) {
-    if (isNoOp(next)) { setIsAnimating(false); return; }
-    setIsAnimating(true);
-    setTransform(next);
-    const currentScale = transform.scale || 1;
-    const targetScale = next.scale || 1;
-    const isZoomIn = targetScale > currentScale + 1e-6; // detect zoom direction
-    const transition = isZoomIn
-      ? { type: 'tween', ease: 'easeInOut', duration: 0.2 }
-      : { type: 'spring', duration: 0.5, bounce: 0.2 };
+  // Uses different animation types: fast tween for zoom-in, bouncy spring for zoom-out
+  async function animateCameraToPosition(nextTransform) {
+    if (isTransformUnchanged(nextTransform)) { 
+      setIsAnimationInProgress(false); 
+      return; 
+    }
+    
+    setIsAnimationInProgress(true);
+    setCameraTransform(nextTransform);
+    
+    // Choose animation type based on zoom direction
+    const currentZoomLevel = cameraTransform.scale || 1;
+    const targetZoomLevel = nextTransform.scale || 1;
+    const isZoomingIn = targetZoomLevel > currentZoomLevel + 1e-6;
+    
+    const animationConfig = isZoomingIn
+      ? { type: 'tween', ease: 'easeInOut', duration: 0.2 }  // Fast zoom in
+      : { type: 'spring', duration: 0.5, bounce: 0.2 };      // Smooth zoom out
+    
     try {
-      await controls.start(next, transition);
+      await controls.start(nextTransform, animationConfig);
     } finally {
-      setIsAnimating(false);
+      setIsAnimationInProgress(false);
     }
   }
 
+  // ========================================
+  // TV Reference Management
+  // ========================================
+  
   const setItemRef = (id) => (el) => {
     if (!id) return;
-    if (el) itemRefs.current.set(id, el); else itemRefs.current.delete(id);
+    if (el) itemRefs.current.set(id, el); 
+    else itemRefs.current.delete(id);
   };
 
-  function centerOn(id, nextScale = focusScale) {
-    const el = itemRefs.current.get(id);
-    const container = containerRef.current;
-    if (!el || !container) return;
+  // ========================================
+  // Camera Control Functions
+  // ========================================
+  
+  // Complex coordinate transformation to position TV at screen center
+  function centerCameraOnTV(tvId, targetZoomLevel = focusScale) {
+    const tvElement = itemRefs.current.get(tvId);
+    const containerElement = containerRef.current;
+    if (!tvElement || !containerElement) return;
 
-    // Prefer the inner screen element if present
-    const targetEl = el.querySelector('[data-pan-target]') || el;
-    const itemRect = targetEl.getBoundingClientRect();
-    const contRect = container.getBoundingClientRect();
+    // Target the inner screen element for precise centering
+    const screenElement = tvElement.querySelector('[data-pan-target]') || tvElement;
+    const tvBoundingRect = screenElement.getBoundingClientRect();
+    const containerBoundingRect = containerElement.getBoundingClientRect();
 
-    // Current transform
-    const { x: tx0, y: ty0, scale: s0 } = transform;
+    // Current camera transform state
+    const { x: currentX, y: currentY, scale: currentZoom } = cameraTransform;
 
-    // Item center in screen coords
-    const cxScreen = itemRect.left + itemRect.width / 2;
-    const cyScreen = itemRect.top + itemRect.height / 2;
+    // Calculate TV center in screen coordinates
+    const tvCenterX = tvBoundingRect.left + tvBoundingRect.width / 2;
+    const tvCenterY = tvBoundingRect.top + tvBoundingRect.height / 2;
 
-    // Compute local (pre-transform) coordinates of the item center relative to container
-    const sSafe = s0 || 1;
-    const localX = (cxScreen - contRect.left) / sSafe;
-    const localY = (cyScreen - contRect.top) / sSafe;
+    // Convert to local coordinates (before transform) relative to container
+    const safeCurrentZoom = currentZoom || 1;
+    const localTVX = (tvCenterX - containerBoundingRect.left) / safeCurrentZoom;
+    const localTVY = (tvCenterY - containerBoundingRect.top) / safeCurrentZoom;
 
-    // Desired screen center
-    const vx = window.innerWidth / 2;
-    const vy = window.innerHeight / 2;
+    // Target position: center of viewport
+    const viewportCenterX = window.innerWidth / 2;
+    const viewportCenterY = window.innerHeight / 2;
 
-    // Original (pre-transform) top-left of container
-    const origLeft = contRect.left - tx0;
-    const origTop  = contRect.top  - ty0;
+    // Calculate original container position (before any transforms)
+    const originalContainerLeft = containerBoundingRect.left - currentX;
+    const originalContainerTop = containerBoundingRect.top - currentY;
 
-    // Solve for next translate with origin top-left and scale nextScale
-    const tx1 = vx - origLeft - nextScale * localX;
-    const ty1 = vy - origTop  - nextScale * localY;
+    // Solve for new translation to center the TV at viewport center with new scale
+    const newCameraX = viewportCenterX - originalContainerLeft - targetZoomLevel * localTVX;
+    const newCameraY = viewportCenterY - originalContainerTop - targetZoomLevel * localTVY;
 
-    animateTo({ x: tx1, y: ty1, scale: nextScale });
+    animateCameraToPosition({ x: newCameraX, y: newCameraY, scale: targetZoomLevel });
   }
 
-  function resetView() {
-    setSelectedId(null);
-    animateTo({ x: 0, y: 0, scale: 1 });
+  function resetCameraToOverview() {
+    setSelectedTVId(null);
+    animateCameraToPosition({ x: 0, y: 0, scale: 1 });
   }
 
-  function recenterContainer(nextScale = transform.scale || 1) {
-    const container = containerRef.current;
-    if (!container) return;
+  // Maintains zoom level but adjusts position for window resize
+  function recenterContainerInViewport(targetZoomLevel = cameraTransform.scale || 1) {
+    const containerElement = containerRef.current;
+    if (!containerElement) return;
 
-    const contRect = container.getBoundingClientRect();
-    const { x: tx0, y: ty0, scale: s0 } = transform;
-    const sSafe = s0 || 1;
+    const containerRect = containerElement.getBoundingClientRect();
+    const { x: currentX, y: currentY, scale: currentZoom } = cameraTransform;
+    const safeCurrentZoom = currentZoom || 1;
 
-    const vx = window.innerWidth / 2;
-    const vy = window.innerHeight / 2;
+    // Viewport center coordinates
+    const viewportCenterX = window.innerWidth / 2;
+    const viewportCenterY = window.innerHeight / 2;
 
-    const origLeft = contRect.left - tx0;
-    const origTop  = contRect.top  - ty0;
+    // Original container position (before transforms)
+    const originalLeft = containerRect.left - currentX;
+    const originalTop = containerRect.top - currentY;
 
-    const localX = (contRect.width / sSafe) / 2;
-    const localY = (contRect.height / sSafe) / 2;
+    // Container center in local coordinates
+    const containerCenterX = (containerRect.width / safeCurrentZoom) / 2;
+    const containerCenterY = (containerRect.height / safeCurrentZoom) / 2;
 
-    const tx1 = vx - origLeft - nextScale * localX;
-    const ty1 = vy - origTop  - nextScale * localY;
+    // Calculate new translation to center container
+    const newCameraX = viewportCenterX - originalLeft - targetZoomLevel * containerCenterX;
+    const newCameraY = viewportCenterY - originalTop - targetZoomLevel * containerCenterY;
 
-    const next = { x: tx1, y: ty1, scale: nextScale };
-    setTransform(next);
-    controls.set(next);
+    const newTransform = { x: newCameraX, y: newCameraY, scale: targetZoomLevel };
+    setCameraTransform(newTransform);
+    controls.set(newTransform); // Immediate update without animation
   }
 
+  // ========================================
+  // Effect Hooks & Event Handling
+  // ========================================
+  
   useEffect(() => {
-    function onResize() {
+    function handleWindowResize() {
       if (resizeTimerRef.current) clearTimeout(resizeTimerRef.current);
       resizeTimerRef.current = setTimeout(() => {
-        if (selectedId) centerOn(selectedId, transform.scale || focusScale);
-        else recenterContainer(transform.scale || 1);
+        if (selectedTVId) {
+          // Re-center on selected TV
+          centerCameraOnTV(selectedTVId, cameraTransform.scale || focusScale);
+        } else {
+          // Recenter overview
+          recenterContainerInViewport(cameraTransform.scale || 1);
+        }
       }, 100);
     }
-    window.addEventListener('resize', onResize);
-    return () => window.removeEventListener('resize', onResize);
-  }, [selectedId, transform.scale]);
+    
+    window.addEventListener('resize', handleWindowResize);
+    return () => window.removeEventListener('resize', handleWindowResize);
+  }, [selectedTVId, cameraTransform.scale]);
 
   useEffect(() => {
     return () => {
@@ -123,29 +173,40 @@ export default forwardRef(function PanStage({ children, focusScale = 6.5, classN
     };
   }, []);
 
-  // Expose PanStage state to parent (e.g., App) for coordination
   useEffect(() => {
-    onStateChange?.({ selectedId, scale: transform.scale || 1, isAnimating });
-  }, [selectedId, transform.scale, isAnimating]);
+    onStateChange?.({ 
+      selectedId: selectedTVId, 
+      scale: cameraTransform.scale || 1, 
+      isAnimating: isAnimationInProgress 
+    });
+  }, [selectedTVId, cameraTransform.scale, isAnimationInProgress]);
 
-  // Function to select a TV (same as clicking it)
-  function selectTV(id) {
-    if (isAnimating || !id) return;
-    setSelectedId(id);
-    centerOn(id);
+  // ========================================
+  // Imperative API
+  // ========================================
+  
+  function selectTVById(tvId) {
+    if (isAnimationInProgress || !tvId) return;
+    setSelectedTVId(tvId);
+    centerCameraOnTV(tvId);
   }
 
-  // Expose imperative API to parent via ref
   useImperativeHandle(ref, () => ({
-    reset: () => resetView(),
-    centerOn: (id, scale = focusScale) => centerOn(id, scale),
-    selectTV: (id) => selectTV(id),
-  }), [focusScale, resetView, centerOn, selectTV, isAnimating]);
+    reset: () => resetCameraToOverview(),
+    centerOn: (tvId, zoomLevel = focusScale) => centerCameraOnTV(tvId, zoomLevel),
+    selectTV: (tvId) => selectTVById(tvId),
+  }), [focusScale, resetCameraToOverview, centerCameraOnTV, selectTVById, isAnimationInProgress]);
 
+  // ========================================
+  // Render
+  // ========================================
+  
+  // Memoize children array to prevent unnecessary re-renders
   const childrenArray = useMemo(() => Children.toArray(children), [children]);
 
   return (
     <div className={className}>
+      {/* Main animated container that holds all TVs */}
       <motion.div
         ref={containerRef}
         animate={controls}
@@ -153,20 +214,30 @@ export default forwardRef(function PanStage({ children, focusScale = 6.5, classN
         className="origin-top-left flex flex-col md:flex-row items-center justify-center gap-6 md:gap-8"
       >
         {childrenArray.map((child) => {
-          const id = child?.props?.panId;
+          const tvId = child?.props?.panId;
           return (
             <div
-              key={id ?? Math.random().toString(36)}
-              ref={setItemRef(id)}
-              onClick={(e) => { e.stopPropagation(); if (isAnimating) return; if (id) { setSelectedId(id); centerOn(id); } child?.props?.onClick?.(e); }}
+              key={tvId ?? Math.random().toString(36)}
+              ref={setItemRef(tvId)}
+              onClick={(e) => { 
+                e.stopPropagation(); 
+                if (isAnimationInProgress) return; 
+                if (tvId) { 
+                  setSelectedTVId(tvId); 
+                  centerCameraOnTV(tvId); 
+                } 
+                child?.props?.onClick?.(e); 
+              }}
             >
               {child}
             </div>
           );
         })}
       </motion.div>
-      {selectedId && !isAnimating && (
-        <div className="fixed inset-0" onClick={resetView} />
+      
+      {/* Invisible overlay to capture clicks for reset when TV is selected */}
+      {selectedTVId && !isAnimationInProgress && (
+        <div className="fixed inset-0" onClick={resetCameraToOverview} />
       )}
     </div>
   );
