@@ -1,4 +1,4 @@
-export default function Contact(){
+export default function Contact({ onNavigate }){
   return (
     <div className="w-full h-full overflow-y-auto bg-black text-white">
       <div className="min-h-full px-6 py-8 space-y-8">
@@ -98,8 +98,14 @@ export default function Contact(){
             Whether you have a project in mind, want to discuss opportunities, 
             or just want to connect with a fellow developer, I'm always excited to meet new people.
           </p>
-          <div className="pt-4">
-            <div className="inline-block px-6 py-2 bg-gradient-to-r from-cyan-600 to-purple-600 rounded-lg font-medium text-white">
+          <div className="flex justify-center space-x-4 pt-4">
+            <button 
+              onClick={() => onNavigate?.('home')}
+              className="px-6 py-2 bg-transparent border border-gray-600 hover:border-gray-500 rounded-lg font-medium transition-colors"
+            >
+              Back to Home
+            </button>
+            <div className="px-6 py-2 bg-gradient-to-r from-cyan-600 to-purple-600 rounded-lg font-medium text-white">
               Let's build something amazing together! 🚀
             </div>
           </div>

@@ -1,4 +1,4 @@
-export default function Home(){
+export default function Home({ onNavigate }){
   return (
     <div className="w-full h-full overflow-y-auto bg-black text-white">
       <div className="min-h-full px-6 py-8 space-y-8">
@@ -70,10 +70,16 @@ export default function Home(){
             Ready to bring your ideas to life? Let's connect and discuss your next project.
           </p>
           <div className="flex justify-center space-x-4">
-            <button className="px-6 py-2 bg-cyan-600 hover:bg-cyan-700 rounded-lg font-medium transition-colors">
+            <button 
+              onClick={() => onNavigate?.('portfolio')}
+              className="px-6 py-2 bg-cyan-600 hover:bg-cyan-700 rounded-lg font-medium transition-colors"
+            >
               View Portfolio
             </button>
-            <button className="px-6 py-2 bg-transparent border border-gray-600 hover:border-gray-500 rounded-lg font-medium transition-colors">
+            <button 
+              onClick={() => onNavigate?.('contact')}
+              className="px-6 py-2 bg-transparent border border-gray-600 hover:border-gray-500 rounded-lg font-medium transition-colors"
+            >
               Contact Me
             </button>
           </div>
