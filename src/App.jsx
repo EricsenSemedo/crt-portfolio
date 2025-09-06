@@ -57,10 +57,6 @@ export default function App(){
         )
         }
       </ParallaxBackground>
-      {/* App center red debug dot */}
-      <div className="fixed inset-0 pointer-events-none flex items-center justify-center">
-        <div className="w-3 h-3 rounded-full bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.9)]"/>
-      </div>
     </div>
   )
 }
