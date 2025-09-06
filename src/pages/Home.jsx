@@ -24,9 +24,9 @@ export default function Home({ onNavigate }){
           <h3 className="text-2xl font-semibold text-center text-cyan-400">Skills & Technologies</h3>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
             {[
-              'React', 'TypeScript', 'Node.js', 
-              'Python', 'JavaScript', 'Tailwind CSS',
-              'Next.js', 'MongoDB', 'PostgreSQL'
+              'Python', 'Lua', 'C/C++', 
+              'Java', 'AWS', 'OpenTofu',
+              'Docker', 'Git', 'Roblox Studio'
             ].map((skill) => (
               <div key={skill} className="bg-gray-900/50 rounded-lg p-3 text-center border border-gray-700/50 hover:border-cyan-400/30 transition-colors">
                 <span className="text-sm font-medium text-gray-300">{skill}</span>
@@ -35,31 +35,46 @@ export default function Home({ onNavigate }){
           </div>
         </section>
 
-        {/* About Section */}
+        {/* Experience Section */}
         <section className="space-y-4">
-          <h3 className="text-2xl font-semibold text-center text-cyan-400">About Me</h3>
-          <div className="bg-gray-900/30 rounded-lg p-6 border border-gray-700/30">
-            <p className="text-gray-300 leading-relaxed mb-4">
-              I'm a passionate developer who loves creating intuitive and efficient web applications. 
-              With a strong foundation in both frontend and backend technologies, I enjoy tackling 
-              complex problems and turning ideas into reality.
-            </p>
-            <p className="text-gray-300 leading-relaxed">
-              When I'm not coding, you can find me exploring new technologies, contributing to open source, 
-              or working on personal projects that push the boundaries of what's possible on the web.
-            </p>
+          <h3 className="text-2xl font-semibold text-center text-cyan-400">Experience</h3>
+          <div className="space-y-4">
+            <div className="bg-gray-900/30 rounded-lg p-6 border border-gray-700/30">
+              <h4 className="text-lg font-semibold text-cyan-300 mb-2">Infrastructure Engineer - PixelMux</h4>
+              <p className="text-gray-400 text-sm mb-3">Jan 2025 - Present | Remote</p>
+              <p className="text-gray-300 leading-relaxed">
+                Designing IAM role architecture across multiple AWS accounts with granular permission boundaries. 
+                Developing RBAC strategies and implementing integration testing frameworks for core infrastructure modules.
+              </p>
+            </div>
+            <div className="bg-gray-900/30 rounded-lg p-6 border border-gray-700/30">
+              <h4 className="text-lg font-semibold text-cyan-300 mb-2">Freelance Programmer - Fiverr</h4>
+              <p className="text-gray-400 text-sm mb-3">Dec 2023 - Jan 2024 | Remote</p>
+              <p className="text-gray-300 leading-relaxed">
+                Delivered Lua programming for 4 Roblox games with top reviews. Refactored NPC/AI logic 
+                using Simple Path library and optimized game functionality through efficient scripting.
+              </p>
+            </div>
           </div>
         </section>
 
-        {/* Quick Stats */}
-        <section className="grid grid-cols-2 gap-4">
-          <div className="text-center p-4 bg-gray-900/30 rounded-lg border border-gray-700/30">
-            <div className="text-2xl font-bold text-cyan-400">2+</div>
-            <div className="text-sm text-gray-400">Years Experience</div>
+        {/* Education & Stats */}
+        <section className="space-y-4">
+          <div className="bg-gray-900/30 rounded-lg p-6 border border-gray-700/30 text-center">
+            <h4 className="text-lg font-semibold text-purple-400 mb-2">Education</h4>
+            <p className="text-gray-300">University of Rhode Island</p>
+            <p className="text-gray-400 text-sm">Bachelor of Arts in Computer Science</p>
+            <p className="text-gray-400 text-sm">Graduated: May 2025</p>
           </div>
-          <div className="text-center p-4 bg-gray-900/30 rounded-lg border border-gray-700/30">
-            <div className="text-2xl font-bold text-purple-400">3</div>
-            <div className="text-sm text-gray-400">Projects Built</div>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="text-center p-4 bg-gray-900/30 rounded-lg border border-gray-700/30">
+              <div className="text-2xl font-bold text-cyan-400">1+</div>
+              <div className="text-sm text-gray-400">Years Professional</div>
+            </div>
+            <div className="text-center p-4 bg-gray-900/30 rounded-lg border border-gray-700/30">
+              <div className="text-2xl font-bold text-purple-400">3+</div>
+              <div className="text-sm text-gray-400">Projects Built</div>
+            </div>
           </div>
         </section>
 
