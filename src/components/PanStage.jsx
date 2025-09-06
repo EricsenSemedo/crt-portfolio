@@ -128,11 +128,19 @@ export default forwardRef(function PanStage({ children, focusScale = 6.5, classN
     onStateChange?.({ selectedId, scale: transform.scale || 1, isAnimating });
   }, [selectedId, transform.scale, isAnimating]);
 
+  // Function to select a TV (same as clicking it)
+  function selectTV(id) {
+    if (isAnimating || !id) return;
+    setSelectedId(id);
+    centerOn(id);
+  }
+
   // Expose imperative API to parent via ref
   useImperativeHandle(ref, () => ({
     reset: () => resetView(),
     centerOn: (id, scale = focusScale) => centerOn(id, scale),
-  }), [focusScale, resetView, centerOn]);
+    selectTV: (id) => selectTV(id),
+  }), [focusScale, resetView, centerOn, selectTV, isAnimating]);
 
   const childrenArray = useMemo(() => Children.toArray(children), [children]);
 
