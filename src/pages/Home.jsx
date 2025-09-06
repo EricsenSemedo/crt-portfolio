@@ -52,18 +52,14 @@ export default function Home(){
         </section>
 
         {/* Quick Stats */}
-        <section className="grid grid-cols-3 gap-4">
+        <section className="grid grid-cols-2 gap-4">
           <div className="text-center p-4 bg-gray-900/30 rounded-lg border border-gray-700/30">
-            <div className="text-2xl font-bold text-cyan-400">3+</div>
+            <div className="text-2xl font-bold text-cyan-400">2+</div>
             <div className="text-sm text-gray-400">Years Experience</div>
           </div>
           <div className="text-center p-4 bg-gray-900/30 rounded-lg border border-gray-700/30">
-            <div className="text-2xl font-bold text-purple-400">50+</div>
+            <div className="text-2xl font-bold text-purple-400">3</div>
             <div className="text-sm text-gray-400">Projects Built</div>
-          </div>
-          <div className="text-center p-4 bg-gray-900/30 rounded-lg border border-gray-700/30">
-            <div className="text-2xl font-bold text-green-400">24/7</div>
-            <div className="text-sm text-gray-400">Learning Mode</div>
           </div>
         </section>
 
