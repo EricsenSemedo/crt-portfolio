@@ -48,10 +48,6 @@ export default function TVShell({children, className="", brightness=1, intensity
                             {/* Bloom line */}
                             <div className="pointer-events-none absolute inset-x-0 top-12 h-[2px] bg-white/10 blur-[2px]"/>
 
-                            {/* Screen center blue debug dot */}
-                            <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-                                <div className="w-2.5 h-2.5 rounded-full bg-sky-400 shadow-[0_0_8px_rgba(56,189,248,0.8)]"/>
-                            </div>
                         </div>
 
                         {/* Integrated bezel controls along screen edges */}
