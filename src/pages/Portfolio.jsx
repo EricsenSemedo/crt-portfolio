@@ -93,13 +93,13 @@ export default function Portfolio({ onNavigate }) {
           <div className="flex justify-center space-x-4">
             <button 
               onClick={() => onNavigate?.('home')}
-              className="px-6 py-2 bg-transparent border border-gray-600 hover:border-gray-500 rounded-lg font-medium transition-colors"
+              className="px-4 py-2 bg-transparent border border-gray-600 hover:border-gray-500 rounded-lg font-medium text-xs sm:text-base transition-colors"
             >
               Back to Home
             </button>
             <button 
               onClick={() => onNavigate?.('contact')}
-              className="px-6 py-2 bg-cyan-600 hover:bg-cyan-700 rounded-lg font-medium transition-colors"
+              className="px-4 py-2 bg-cyan-600 hover:bg-cyan-700 rounded-lg font-medium text-xs sm:text-base transition-colors"
             >
               Get In Touch
             </button>

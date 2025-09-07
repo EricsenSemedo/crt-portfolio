@@ -101,12 +101,12 @@ export default function Contact({ onNavigate }){
           <div className="flex justify-center space-x-4 pt-4">
             <button 
               onClick={() => onNavigate?.('home')}
-              className="px-6 py-2 bg-transparent border border-gray-600 hover:border-gray-500 rounded-lg font-medium transition-colors"
+              className="px-4 py-2 bg-transparent border border-gray-600 hover:border-gray-500 rounded-lg font-medium text-xs sm:text-base transition-colors"
             >
               Back to Home
             </button>
-            <div className="px-6 py-2 bg-gradient-to-r from-cyan-600 to-purple-600 rounded-lg font-medium text-white">
-              Let's build something amazing together! 🚀
+            <div className="px-3 py-2 bg-gradient-to-r from-cyan-600 to-purple-600 rounded-lg font-medium text-xs sm:text-base text-white">
+              Let's build something amazing! 🚀
             </div>
           </div>
         </section>
