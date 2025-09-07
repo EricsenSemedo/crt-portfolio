@@ -144,7 +144,7 @@ export default function App() {
         </PanStage>
 
         {/* Full-screen TV content overlay (shown when TV is selected and not animating) */}
-        {panState.selectedId && !panState.isAnimating && (
+        {/* {panState.selectedId && !panState.isAnimating && (
           <TVZoomOverlay
             selectedItem={{
               id: panState.selectedId, 
@@ -154,7 +154,7 @@ export default function App() {
           >
             {byId[panState.selectedId] ?? null}
           </TVZoomOverlay>
-        )}
+        )} */}
         
       </ParallaxBackground>
     </div>

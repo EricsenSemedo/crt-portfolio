@@ -58,39 +58,38 @@ export default function ParallaxBackground({
   // ========================================
   
   /**
-   * TEMPORARILY COMMENTED OUT: Parallax effect disabled for debugging
    * Core parallax effect implementation
    * Tracks mouse movement and translates it to subtle background offset
    */
   useEffect(() => {
-    // PARALLAX DISABLED - set to static position
-    parallaxTargetX.set(0);
-    parallaxTargetY.set(0);
-    return;
-    
-    /* ORIGINAL PARALLAX CODE - COMMENTED OUT
     if (!isParallaxEnabled) return;
     
     // Respect user's motion preferences
     const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches;
 
-    // Check if pointer is within viewport bounds
-    // Prevents parallax glitches when resizing from window edges
+    /**
+     * Check if pointer is within viewport bounds
+     * Prevents parallax glitches when resizing from window edges
+     */
     function isInsideViewport(e) {
       return e.clientX >= 0 && e.clientX <= window.innerWidth && 
              e.clientY >= 0 && e.clientY <= window.innerHeight;
     }
 
-    // Reset parallax to center position
-    // Used when focus leaves window or during resize events
+    /**
+     * Reset parallax to center position
+     * Used when focus leaves window or during resize events
+     */
     function resetOffsets() {
       isPointerInsideRef.current = false;
       parallaxTargetX.set(0);
       parallaxTargetY.set(0);
     }
 
-    // Main pointer movement handler
-    // Converts mouse position to normalized parallax offset
+    /**
+     * Main pointer movement handler
+     * Converts mouse position to normalized parallax offset
+     */
     function handlePointerMove(e) {
       if (reduce) return; // Respect reduced motion preference
       if (!isInsideViewport(e)) { 
@@ -138,7 +137,6 @@ export default function ParallaxBackground({
       document.removeEventListener('visibilitychange', handleVisibility);
       document.removeEventListener('mouseleave', handleMouseLeave);
     };
-    */
   }, [isAnimating, scale, isParallaxEnabled]);
 
   // ========================================
