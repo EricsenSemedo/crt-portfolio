@@ -47,9 +47,20 @@ export default forwardRef(function PanStage({ children, focusScale = 6.5, classN
     const targetZoomLevel = nextTransform.scale || 1;
     const isZoomingIn = targetZoomLevel > currentZoomLevel + 1e-6;
     
-    const animationConfig = isZoomingIn
-      ? { type: 'tween', ease: 'easeInOut', duration: 0.2 }  // Fast zoom in
-      : { type: 'spring', duration: 0.5, bounce: 0.2 };      // Smooth zoom out
+  const animationConfig = isZoomingIn
+    ? { 
+        type: 'tween', 
+        ease: 'easeInOut', 
+        duration: 0.2,
+        // Optimize for mobile performance
+        velocity: 0,
+        restDelta: 0.001
+      }  // Fast zoom in
+    : { 
+        type: 'spring', 
+        duration: 0.5, 
+        bounce: 0.2
+      };      // Smooth zoom out
     
     try {
       await controls.start(nextTransform, animationConfig);
@@ -78,36 +89,39 @@ export default forwardRef(function PanStage({ children, focusScale = 6.5, classN
     const containerElement = containerRef.current;
     if (!tvElement || !containerElement) return;
 
-    // Target the inner screen element for precise centering
-    const screenElement = tvElement.querySelector('[data-pan-target]') || tvElement;
-    const tvBoundingRect = screenElement.getBoundingClientRect();
-    const containerBoundingRect = containerElement.getBoundingClientRect();
-
-    // Current camera transform state
-    const { x: currentX, y: currentY, scale: currentZoom } = cameraTransform;
-
-    // Calculate TV center in screen coordinates
-    const tvCenterX = tvBoundingRect.left + tvBoundingRect.width / 2;
-    const tvCenterY = tvBoundingRect.top + tvBoundingRect.height / 2;
-
-    // Convert to local coordinates (before transform) relative to container
-    const safeCurrentZoom = currentZoom || 1;
-    const localTVX = (tvCenterX - containerBoundingRect.left) / safeCurrentZoom;
-    const localTVY = (tvCenterY - containerBoundingRect.top) / safeCurrentZoom;
-
-    // Target position: center of viewport
+    // Cache viewport dimensions to avoid repeated calculations
     const viewportCenterX = window.innerWidth / 2;
     const viewportCenterY = window.innerHeight / 2;
 
-    // Calculate original container position (before any transforms)
-    const originalContainerLeft = containerBoundingRect.left - currentX;
-    const originalContainerTop = containerBoundingRect.top - currentY;
+    // Use requestAnimationFrame to ensure DOM is ready and avoid layout thrashing
+    requestAnimationFrame(() => {
+      // Target the inner screen element for precise centering
+      const screenElement = tvElement.querySelector('[data-pan-target]') || tvElement;
+      const tvBoundingRect = screenElement.getBoundingClientRect();
+      const containerBoundingRect = containerElement.getBoundingClientRect();
 
-    // Solve for new translation to center the TV at viewport center with new scale
-    const newCameraX = viewportCenterX - originalContainerLeft - targetZoomLevel * localTVX;
-    const newCameraY = viewportCenterY - originalContainerTop - targetZoomLevel * localTVY;
+      // Current camera transform state
+      const { x: currentX, y: currentY, scale: currentZoom } = cameraTransform;
 
-    animateCameraToPosition({ x: newCameraX, y: newCameraY, scale: targetZoomLevel });
+      // Calculate TV center in screen coordinates
+      const tvCenterX = tvBoundingRect.left + tvBoundingRect.width / 2;
+      const tvCenterY = tvBoundingRect.top + tvBoundingRect.height / 2;
+
+      // Convert to local coordinates (before transform) relative to container
+      const safeCurrentZoom = currentZoom || 1;
+      const localTVX = (tvCenterX - containerBoundingRect.left) / safeCurrentZoom;
+      const localTVY = (tvCenterY - containerBoundingRect.top) / safeCurrentZoom;
+
+      // Calculate original container position (before any transforms)
+      const originalContainerLeft = containerBoundingRect.left - currentX;
+      const originalContainerTop = containerBoundingRect.top - currentY;
+
+      // Solve for new translation to center the TV at viewport center with new scale
+      const newCameraX = viewportCenterX - originalContainerLeft - targetZoomLevel * localTVX;
+      const newCameraY = viewportCenterY - originalContainerTop - targetZoomLevel * localTVY;
+
+      animateCameraToPosition({ x: newCameraX, y: newCameraY, scale: targetZoomLevel });
+    });
   }
 
   function resetCameraToOverview() {
@@ -120,29 +134,32 @@ export default forwardRef(function PanStage({ children, focusScale = 6.5, classN
     const containerElement = containerRef.current;
     if (!containerElement) return;
 
-    const containerRect = containerElement.getBoundingClientRect();
-    const { x: currentX, y: currentY, scale: currentZoom } = cameraTransform;
-    const safeCurrentZoom = currentZoom || 1;
-
-    // Viewport center coordinates
+    // Cache viewport dimensions
     const viewportCenterX = window.innerWidth / 2;
     const viewportCenterY = window.innerHeight / 2;
 
-    // Original container position (before transforms)
-    const originalLeft = containerRect.left - currentX;
-    const originalTop = containerRect.top - currentY;
+    // Use requestAnimationFrame for smooth recentering
+    requestAnimationFrame(() => {
+      const containerRect = containerElement.getBoundingClientRect();
+      const { x: currentX, y: currentY, scale: currentZoom } = cameraTransform;
+      const safeCurrentZoom = currentZoom || 1;
 
-    // Container center in local coordinates
-    const containerCenterX = (containerRect.width / safeCurrentZoom) / 2;
-    const containerCenterY = (containerRect.height / safeCurrentZoom) / 2;
+      // Original container position (before transforms)
+      const originalLeft = containerRect.left - currentX;
+      const originalTop = containerRect.top - currentY;
 
-    // Calculate new translation to center container
-    const newCameraX = viewportCenterX - originalLeft - targetZoomLevel * containerCenterX;
-    const newCameraY = viewportCenterY - originalTop - targetZoomLevel * containerCenterY;
+      // Container center in local coordinates
+      const containerCenterX = (containerRect.width / safeCurrentZoom) / 2;
+      const containerCenterY = (containerRect.height / safeCurrentZoom) / 2;
 
-    const newTransform = { x: newCameraX, y: newCameraY, scale: targetZoomLevel };
-    setCameraTransform(newTransform);
-    controls.set(newTransform); // Immediate update without animation
+      // Calculate new translation to center container
+      const newCameraX = viewportCenterX - originalLeft - targetZoomLevel * containerCenterX;
+      const newCameraY = viewportCenterY - originalTop - targetZoomLevel * containerCenterY;
+
+      const newTransform = { x: newCameraX, y: newCameraY, scale: targetZoomLevel };
+      setCameraTransform(newTransform);
+      controls.set(newTransform); // Immediate update without animation
+    });
   }
 
   // ========================================
@@ -160,7 +177,7 @@ export default forwardRef(function PanStage({ children, focusScale = 6.5, classN
           // Recenter overview
           recenterContainerInViewport(cameraTransform.scale || 1);
         }
-      }, 100);
+      }, 50); // Reduced debounce time for better responsiveness
     }
     
     window.addEventListener('resize', handleWindowResize);
@@ -212,6 +229,13 @@ export default forwardRef(function PanStage({ children, focusScale = 6.5, classN
         animate={controls}
         transition={{ type: 'spring', duration: 0.5, bounce: 0.2 }}
         className="origin-top-left flex flex-col md:flex-row items-center justify-center gap-6 md:gap-8"
+        style={{
+          // Force GPU acceleration for smooth animations
+          willChange: 'transform',
+          transform: 'translate3d(0, 0, 0)', // Hardware acceleration hint
+          backfaceVisibility: 'hidden',
+          perspective: 1000
+        }}
       >
         {childrenArray.map((child) => {
           const tvId = child?.props?.panId;
