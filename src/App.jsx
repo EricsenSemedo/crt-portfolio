@@ -155,7 +155,6 @@ export default function App() {
             {byId[panState.selectedId] ?? null}
           </TVZoomOverlay>
         )}
-        
       </ParallaxBackground>
     </div>
   );

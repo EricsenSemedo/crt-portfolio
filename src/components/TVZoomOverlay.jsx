@@ -1,12 +1,13 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import Navbar from "./Navbar";
-import TVShell from "./TVShell";
 
 /**
- * TVZoomOverlay - Full-screen overlay that displays TV content with smooth transition
+ * TVZoomOverlay - True full-screen overlay that displays TV content with CRT effects
  * 
  * Features:
+ * - Full-screen content (no TV shell padding/borders)
+ * - Subtle CRT effects (vignette, scanlines)
  * - Direct content display (no static noise phase)
  * - Sweep animation for realistic CRT effect
  * - Navbar with close functionality
@@ -76,20 +77,41 @@ export default function TVZoomOverlay({ selectedItem, onClose, children }) {
           exit={{ opacity: 0 }} 
           onClick={onClose}
         >
-          {/* Full-screen TV container */}
+          {/* Full-screen content container with CRT effects */}
           <motion.div 
-            className="w-full h-full" 
+            className="w-full h-full bg-black relative overflow-hidden" 
             onClick={(e) => e.stopPropagation()}
           >
-            {/* CRT TV Shell */}
-            <TVShell className="w-full h-full">
-              <motion.div 
-                className="relative w-full h-full" 
-                initial={{ opacity: 0 }} 
-                animate={{ opacity: 1 }} 
-                exit={{ opacity: 0 }} 
-                transition={{ duration: 0.2 }}
-              >
+            {/* Subtle CRT vignette effect */}
+            <div 
+              className="absolute inset-0 pointer-events-none"
+              style={{
+                background: "radial-gradient(circle at center, transparent 40%, rgba(0,0,0,0.3) 100%)"
+              }}
+            />
+            
+            {/* Scanlines effect */}
+            <div 
+              className="absolute inset-0 pointer-events-none opacity-20"
+              style={{
+                background: `repeating-linear-gradient(
+                  0deg,
+                  transparent 0px,
+                  transparent 2px,
+                  rgba(255,255,255,0.03) 2px,
+                  rgba(255,255,255,0.03) 4px
+                )`
+              }}
+            />
+            
+            {/* Content */}
+            <motion.div 
+              className="relative w-full h-full" 
+              initial={{ opacity: 0 }} 
+              animate={{ opacity: 1 }} 
+              exit={{ opacity: 0 }} 
+              transition={{ duration: 0.2 }}
+            >
                 {/* Content phase - no static noise, direct transition */}
                 {showContent && (
                   <div className="absolute inset-0">
@@ -179,12 +201,9 @@ export default function TVZoomOverlay({ selectedItem, onClose, children }) {
                   </div>
                 )}
               </motion.div>
-            </TVShell>
-          </motion.div>
+            </motion.div>
         </motion.div>
       )}
     </AnimatePresence>
   );
 }
-
-
