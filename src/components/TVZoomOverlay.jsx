@@ -1,5 +1,7 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useState } from "react";
+import CRTScanlines from "./CRTScanlines";
+import CRTVignette from "./CRTVignette";
 import Navbar from "./Navbar";
 
 /**
@@ -82,27 +84,9 @@ export default function TVZoomOverlay({ selectedItem, onClose, children }) {
             className="w-full h-full bg-black relative overflow-hidden" 
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Subtle CRT vignette effect */}
-            <div 
-              className="absolute inset-0 pointer-events-none"
-              style={{
-                background: "radial-gradient(circle at center, transparent 40%, rgba(0,0,0,0.3) 100%)"
-              }}
-            />
-            
-            {/* Scanlines effect */}
-            <div 
-              className="absolute inset-0 pointer-events-none opacity-20"
-              style={{
-                background: `repeating-linear-gradient(
-                  0deg,
-                  transparent 0px,
-                  transparent 2px,
-                  rgba(255,255,255,0.03) 2px,
-                  rgba(255,255,255,0.03) 4px
-                )`
-              }}
-            />
+            {/* CRT Effects */}
+            <CRTVignette intensity={0.3} innerRadius={40} />
+            <CRTScanlines opacity={0.2} lineHeight={4} lineSpacing={2} />
             
             {/* Content */}
             <motion.div 

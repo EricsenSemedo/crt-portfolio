@@ -1,3 +1,6 @@
+import CRTButton from "../components/CRTButton";
+import CRTScanlines from "../components/CRTScanlines";
+
 export default function Portfolio({ onNavigate }) {
   // Your actual projects based on resume
   const projects = [
@@ -91,18 +94,18 @@ export default function Portfolio({ onNavigate }) {
         {/* Footer Navigation */}
         <section className="text-center space-y-4 pb-8">
           <div className="flex justify-center space-x-4">
-            <button 
+            <CRTButton 
               onClick={() => onNavigate?.('home')}
-              className="px-4 py-2 bg-transparent border border-gray-600 hover:border-gray-500 rounded-lg font-medium text-xs sm:text-base transition-colors"
+              variant="secondary"
             >
               Back to Home
-            </button>
-            <button 
+            </CRTButton>
+            <CRTButton 
               onClick={() => onNavigate?.('contact')}
-              className="px-4 py-2 bg-cyan-600 hover:bg-cyan-700 rounded-lg font-medium text-xs sm:text-base transition-colors"
+              variant="primary"
             >
               Get In Touch
-            </button>
+            </CRTButton>
           </div>
         </section>
       </div>
@@ -155,39 +158,44 @@ function ProjectTV({ project, onNavigate }) {
           {/* CRT Effects */}
           <div className="absolute inset-0 pointer-events-none">
             {/* Scanlines */}
-            <div className="absolute inset-0 bg-scanlines opacity-20"></div>
+            <CRTScanlines opacity={0.15} lineHeight={3} lineSpacing={1} />
             {/* Screen curve effect */}
             <div className="absolute inset-0 bg-gradient-to-br from-transparent via-transparent to-gray-900/10"></div>
           </div>
           
-          {/* Hover Static Effect */}
-          <div className="absolute inset-0 bg-static opacity-0 group-hover:opacity-10 transition-opacity duration-200"></div>
+          {/* Hover Static Effect - using lighter scanlines that become more visible on hover */}
+          <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
+            <CRTScanlines opacity={0.25} lineHeight={2} lineSpacing={1} />
+          </div>
         </div>
         
         {/* TV Controls/Links */}
         <div className="mt-3 flex justify-between items-center">
           <div className="flex space-x-2">
             {project.github && (
-              <a 
-                href={project.github}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="px-3 py-1 bg-gray-700 hover:bg-gray-600 text-xs rounded transition-colors"
-                onClick={(e) => e.stopPropagation()}
+              <CRTButton
+                onClick={(e) => {
+                  e.stopPropagation();
+                  window.open(project.github, '_blank', 'noopener,noreferrer');
+                }}
+                variant="ghost"
+                size="sm"
+                className="bg-gray-700 hover:bg-gray-600"
               >
                 Code
-              </a>
+              </CRTButton>
             )}
             {project.demo && (
-              <a 
-                href={project.demo}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="px-3 py-1 bg-cyan-600 hover:bg-cyan-700 text-xs rounded transition-colors"
-                onClick={(e) => e.stopPropagation()}
+              <CRTButton
+                onClick={(e) => {
+                  e.stopPropagation();
+                  window.open(project.demo, '_blank', 'noopener,noreferrer');
+                }}
+                variant="primary"
+                size="sm"
               >
                 Demo
-              </a>
+              </CRTButton>
             )}
           </div>
           

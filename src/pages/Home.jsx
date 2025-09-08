@@ -1,3 +1,5 @@
+import CRTButton from "../components/CRTButton";
+
 export default function Home({ onNavigate }){
   return (
     <div className="w-full h-full overflow-y-auto bg-black text-white">
@@ -85,18 +87,18 @@ export default function Home({ onNavigate }){
             Ready to bring your ideas to life? Let's connect and discuss your next project.
           </p>
           <div className="flex justify-center space-x-4">
-            <button 
+            <CRTButton 
               onClick={() => onNavigate?.('portfolio')}
-              className="px-4 py-2 bg-cyan-600 hover:bg-cyan-700 rounded-lg font-medium text-xs sm:text-base transition-colors"
+              variant="primary"
             >
               View Portfolio
-            </button>
-            <button 
+            </CRTButton>
+            <CRTButton 
               onClick={() => onNavigate?.('contact')}
-              className="px-4 py-2 bg-transparent border border-gray-600 hover:border-gray-500 rounded-lg font-medium text-xs sm:text-base transition-colors"
+              variant="secondary"
             >
               Contact Me
-            </button>
+            </CRTButton>
           </div>
         </section>
       </div>
