@@ -64,6 +64,15 @@ export default function ParallaxBackground({
   useEffect(() => {
     if (!isParallaxEnabled) return;
     
+    // Disable parallax on mobile devices for better performance
+    const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+    
+    if (isMobile || isTouchDevice) {
+      console.log('📱 Parallax disabled on mobile device');
+      return;
+    }
+    
     // Respect user's motion preferences
     const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches;
 

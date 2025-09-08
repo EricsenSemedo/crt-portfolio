@@ -47,20 +47,50 @@ export default forwardRef(function PanStage({ children, focusScale = 6.5, classN
     const targetZoomLevel = nextTransform.scale || 1;
     const isZoomingIn = targetZoomLevel > currentZoomLevel + 1e-6;
     
-  const animationConfig = isZoomingIn
-    ? { 
-        type: 'tween', 
-        ease: 'easeInOut', 
-        duration: 0.2,
-        // Optimize for mobile performance
-        velocity: 0,
-        restDelta: 0.001
-      }  // Fast zoom in
-    : { 
-        type: 'spring', 
-        duration: 0.5, 
-        bounce: 0.2
-      };      // Smooth zoom out
+    // Detect browsers that benefit from CSS transitions over Framer Motion
+    const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    const isFirefox = /Firefox/i.test(navigator.userAgent);
+    
+    // Use optimized CSS transitions for mobile devices on Firefox
+    if (isMobile && isFirefox) {
+      const containerElement = containerRef.current;
+      if (containerElement) {
+
+        const handleTransitionEnd = (event) => {
+          // Only handle our transform transition, not other potential transitions
+          if (event.propertyName === 'transform' && event.target === containerElement) {
+            containerElement.style.transition = '';
+            containerElement.removeEventListener('transitionend', handleTransitionEnd);
+            setIsAnimationInProgress(false);
+          }
+        };
+        
+        // Add listener before starting animation
+        containerElement.addEventListener('transitionend', handleTransitionEnd);
+        
+        // Apply CSS transition for lightweight, GPU-accelerated animation
+        containerElement.style.transition = 'transform 0.15s ease-out';
+        containerElement.style.transform = `translate(${nextTransform.x}px, ${nextTransform.y}px) scale(${nextTransform.scale})`;
+      }
+      
+      setCameraTransform(nextTransform);
+      return;
+    }
+
+    const animationConfig = isZoomingIn
+      ? { 
+          type: 'tween', 
+          ease: 'easeInOut', 
+          duration: 0.2,
+          // Optimize for mobile performance
+          velocity: 0,
+          restDelta: 0.001
+        }  // Fast zoom in
+      : { 
+          type: 'spring', 
+          duration: 0.5, 
+          bounce: 0.2
+        };      // Smooth zoom out
     
     try {
       await controls.start(nextTransform, animationConfig);
@@ -92,8 +122,45 @@ export default forwardRef(function PanStage({ children, focusScale = 6.5, classN
     // Cache viewport dimensions to avoid repeated calculations
     const viewportCenterX = window.innerWidth / 2;
     const viewportCenterY = window.innerHeight / 2;
+    
+    // Detect browsers that benefit from performance optimizations
+    const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    const isFirefox = /Firefox/i.test(navigator.userAgent);
 
-    // Use requestAnimationFrame to ensure DOM is ready and avoid layout thrashing
+    if (isMobile && isFirefox) {
+      // Optimized path: Use requestAnimationFrame and cache DOM reads
+      requestAnimationFrame(() => {
+        // Target the inner screen element for precise centering
+        const screenElement = tvElement.querySelector('[data-pan-target]') || tvElement;
+        const tvBoundingRect = screenElement.getBoundingClientRect();
+        const containerBoundingRect = containerElement.getBoundingClientRect();
+
+        // Current camera transform state
+        const { x: currentX, y: currentY, scale: currentZoom } = cameraTransform;
+
+        // Calculate TV center in screen coordinates
+        const tvCenterX = tvBoundingRect.left + tvBoundingRect.width / 2;
+        const tvCenterY = tvBoundingRect.top + tvBoundingRect.height / 2;
+
+        // Convert to local coordinates (before transform) relative to container
+        const safeCurrentZoom = currentZoom || 1;
+        const localTVX = (tvCenterX - containerBoundingRect.left) / safeCurrentZoom;
+        const localTVY = (tvCenterY - containerBoundingRect.top) / safeCurrentZoom;
+
+        // Calculate original container position (before any transforms)
+        const originalContainerLeft = containerBoundingRect.left - currentX;
+        const originalContainerTop = containerBoundingRect.top - currentY;
+
+        // Solve for new translation to center the TV at viewport center with new scale
+        const newCameraX = viewportCenterX - originalContainerLeft - targetZoomLevel * localTVX;
+        const newCameraY = viewportCenterY - originalContainerTop - targetZoomLevel * localTVY;
+
+        animateCameraToPosition({ x: newCameraX, y: newCameraY, scale: targetZoomLevel });
+      });
+      return;
+    }
+
+    // Desktop: Full precision calculations
     requestAnimationFrame(() => {
       // Target the inner screen element for precise centering
       const screenElement = tvElement.querySelector('[data-pan-target]') || tvElement;
@@ -230,11 +297,18 @@ export default forwardRef(function PanStage({ children, focusScale = 6.5, classN
         transition={{ type: 'spring', duration: 0.5, bounce: 0.2 }}
         className="origin-top-left flex flex-col md:flex-row items-center justify-center gap-6 md:gap-8"
         style={{
-          // Force GPU acceleration for smooth animations
+          // Aggressive mobile GPU acceleration
           willChange: 'transform',
           transform: 'translate3d(0, 0, 0)', // Hardware acceleration hint
           backfaceVisibility: 'hidden',
-          perspective: 1000
+          perspective: 1000,
+          // Additional mobile optimizations
+          WebkitTransform: 'translate3d(0, 0, 0)',
+          WebkitBackfaceVisibility: 'hidden',
+          WebkitPerspective: 1000,
+          // Prevent layout thrashing
+          contain: 'layout style paint',
+          isolation: 'isolate'
         }}
       >
         {childrenArray.map((child) => {
