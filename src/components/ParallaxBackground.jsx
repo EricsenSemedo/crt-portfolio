@@ -126,7 +126,13 @@ export default function ParallaxBackground({
     }
 
     // Event handlers for resetting parallax state
-    function handleResize() { resetOffsets(); }
+    function handleResize() { 
+      // Don't reset parallax when any TV is selected or during animations
+      if (panState.selectedId || panState.isAnimating) {
+        return;
+      }
+      resetOffsets(); 
+    }
     function handleBlur() { resetOffsets(); }
     function handleVisibility() { if (document.hidden) resetOffsets(); }
     function handleMouseLeave() { resetOffsets(); }
