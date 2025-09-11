@@ -20,6 +20,10 @@ export default forwardRef(function PanStage({ children, focusScale = 6.5, classN
   const [selectedTVId, setSelectedTVId] = useState(null);
   const [cameraTransform, setCameraTransform] = useState({ x: 0, y: 0, scale: 1 });
   const [isAnimationInProgress, setIsAnimationInProgress] = useState(false);
+  
+  // Refs to prevent unnecessary rerenders during resize operations
+  const currentTransformRef = useRef({ x: 0, y: 0, scale: 1 });
+  const selectedTVIdRef = useRef(null);
 
   // ========================================
   // Animation Utilities
@@ -41,6 +45,7 @@ export default forwardRef(function PanStage({ children, focusScale = 6.5, classN
     
     setIsAnimationInProgress(true);
     setCameraTransform(nextTransform);
+    currentTransformRef.current = nextTransform;
     
     // Choose animation type based on zoom direction
     const currentZoomLevel = cameraTransform.scale || 1;
@@ -193,6 +198,7 @@ export default forwardRef(function PanStage({ children, focusScale = 6.5, classN
 
   function resetCameraToOverview() {
     setSelectedTVId(null);
+    selectedTVIdRef.current = null;
     animateCameraToPosition({ x: 0, y: 0, scale: 1 });
   }
 
@@ -225,6 +231,7 @@ export default forwardRef(function PanStage({ children, focusScale = 6.5, classN
 
       const newTransform = { x: newCameraX, y: newCameraY, scale: targetZoomLevel };
       setCameraTransform(newTransform);
+      currentTransformRef.current = newTransform;
       controls.set(newTransform); // Immediate update without animation
     });
   }
@@ -235,27 +242,49 @@ export default forwardRef(function PanStage({ children, focusScale = 6.5, classN
   
   useEffect(() => {
     function handleWindowResize() {
+      // Don't handle resize if animation is in progress or fullscreen API is active
+      if (isAnimationInProgress || document.fullscreenElement || document.webkitFullscreenElement) {
+        return;
+      }
+      
       if (resizeTimerRef.current) clearTimeout(resizeTimerRef.current);
       resizeTimerRef.current = setTimeout(() => {
-        if (selectedTVId) {
-          // Re-center on selected TV
-          centerCameraOnTV(selectedTVId, cameraTransform.scale || focusScale);
+        // Double-check fullscreen state after debounce
+        if (document.fullscreenElement || document.webkitFullscreenElement) {
+          return;
+        }
+        
+        if (selectedTVIdRef.current) {
+          // Re-center on selected TV using ref to avoid stale closure
+          centerCameraOnTV(selectedTVIdRef.current, currentTransformRef.current.scale || focusScale);
         } else {
           // Recenter overview
-          recenterContainerInViewport(cameraTransform.scale || 1);
+          recenterContainerInViewport(currentTransformRef.current.scale || 1);
         }
-      }, 50); // Reduced debounce time for better responsiveness
+      }, 150); // Increased debounce time to prevent excessive updates
     }
     
     window.addEventListener('resize', handleWindowResize);
-    return () => window.removeEventListener('resize', handleWindowResize);
-  }, [selectedTVId, cameraTransform.scale]);
+    return () => {
+      window.removeEventListener('resize', handleWindowResize);
+      if (resizeTimerRef.current) clearTimeout(resizeTimerRef.current);
+    };
+  }, [selectedTVId, cameraTransform.scale, isAnimationInProgress]);
 
   useEffect(() => {
     return () => {
       if (resizeTimerRef.current) clearTimeout(resizeTimerRef.current);
     };
   }, []);
+
+  // Sync refs with state
+  useEffect(() => {
+    selectedTVIdRef.current = selectedTVId;
+  }, [selectedTVId]);
+  
+  useEffect(() => {
+    currentTransformRef.current = cameraTransform;
+  }, [cameraTransform]);
 
   useEffect(() => {
     onStateChange?.({ 
@@ -272,6 +301,7 @@ export default forwardRef(function PanStage({ children, focusScale = 6.5, classN
   function selectTVById(tvId) {
     if (isAnimationInProgress || !tvId) return;
     setSelectedTVId(tvId);
+    selectedTVIdRef.current = tvId;
     centerCameraOnTV(tvId);
   }
 
@@ -322,6 +352,7 @@ export default forwardRef(function PanStage({ children, focusScale = 6.5, classN
                 if (isAnimationInProgress) return; 
                 if (tvId) { 
                   setSelectedTVId(tvId); 
+                  selectedTVIdRef.current = tvId;
                   centerCameraOnTV(tvId); 
                 } 
                 child?.props?.onClick?.(e); 

@@ -126,7 +126,13 @@ export default function ParallaxBackground({
     }
 
     // Event handlers for resetting parallax state
-    function handleResize() { resetOffsets(); }
+    function handleResize() { 
+      // Don't reset parallax during fullscreen mode
+      if (document.fullscreenElement || document.webkitFullscreenElement) {
+        return;
+      }
+      resetOffsets(); 
+    }
     function handleBlur() { resetOffsets(); }
     function handleVisibility() { if (document.hidden) resetOffsets(); }
     function handleMouseLeave() { resetOffsets(); }
