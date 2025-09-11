@@ -127,8 +127,8 @@ export default function ParallaxBackground({
 
     // Event handlers for resetting parallax state
     function handleResize() { 
-      // Don't reset parallax during fullscreen mode
-      if (document.fullscreenElement || document.webkitFullscreenElement) {
+      // Don't reset parallax when any TV is selected or during animations
+      if (panState.selectedId || panState.isAnimating) {
         return;
       }
       resetOffsets(); 

@@ -242,25 +242,20 @@ export default forwardRef(function PanStage({ children, focusScale = 6.5, classN
   
   useEffect(() => {
     function handleWindowResize() {
-      // Don't handle resize if animation is in progress or fullscreen API is active
-      if (isAnimationInProgress || document.fullscreenElement || document.webkitFullscreenElement) {
+      // Don't handle resize if animation is in progress or any TV is selected
+      if (isAnimationInProgress || selectedTVIdRef.current) {
         return;
       }
       
       if (resizeTimerRef.current) clearTimeout(resizeTimerRef.current);
       resizeTimerRef.current = setTimeout(() => {
-        // Double-check fullscreen state after debounce
-        if (document.fullscreenElement || document.webkitFullscreenElement) {
+        // Double-check TV selection state after debounce
+        if (selectedTVIdRef.current) {
           return;
         }
         
-        if (selectedTVIdRef.current) {
-          // Re-center on selected TV using ref to avoid stale closure
-          centerCameraOnTV(selectedTVIdRef.current, currentTransformRef.current.scale || focusScale);
-        } else {
-          // Recenter overview
-          recenterContainerInViewport(currentTransformRef.current.scale || 1);
-        }
+        // Only recenter overview when no TV is selected
+        recenterContainerInViewport(currentTransformRef.current.scale || 1);
       }, 150); // Increased debounce time to prevent excessive updates
     }
     
@@ -269,7 +264,7 @@ export default forwardRef(function PanStage({ children, focusScale = 6.5, classN
       window.removeEventListener('resize', handleWindowResize);
       if (resizeTimerRef.current) clearTimeout(resizeTimerRef.current);
     };
-  }, [selectedTVId, cameraTransform.scale, isAnimationInProgress]);
+  }, [isAnimationInProgress]);
 
   useEffect(() => {
     return () => {
