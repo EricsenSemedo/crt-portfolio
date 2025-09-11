@@ -16,6 +16,21 @@ export default function ProjectDetailView({ project, currentChannel, onChannelCh
     };
   }, []);
 
+  useEffect(() => {
+    function handleKeyDown(event) {
+      if (event.key === 'Escape') {
+        event.stopPropagation();
+        event.preventDefault();
+        onClose?.();
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown, true);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown, true);
+    };
+  }, [onClose])
+
   return (
     <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm">
       {/* Animated TV Card - iOS App Store style */}
