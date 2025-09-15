@@ -1,4 +1,5 @@
 import CRTButton from "../components/CRTButton";
+import projects from "../data/projects";
 
 export default function Home({ onNavigate }){
   return (
@@ -74,7 +75,7 @@ export default function Home({ onNavigate }){
               <div className="text-sm text-gray-400">Years Professional</div>
             </div>
             <div className="text-center p-4 bg-gray-900/30 rounded-lg border border-gray-700/30">
-              <div className="text-2xl font-bold text-purple-400">3+</div>
+              <div className="text-2xl font-bold text-purple-400">{projects.length}+</div>
               <div className="text-sm text-gray-400">Projects Built</div>
             </div>
           </div>
