@@ -66,7 +66,7 @@ export const projects = [
     github: "https://github.com/EricsenSemedo/project_manager_pro",
     demo: {
       type: "video",
-      src: "/api/placeholder/800/600",
+      src: "/crt-portfolio/videos/project-manager-pro-demo.mp4",
       alt: "Project Manager Pro interface",
     },
     detailedDescription: {
