@@ -37,7 +37,7 @@ export const projects = [
     image: "/api/placeholder/300/200",
     demo: {
       type: "video",
-      src: "/api/placeholder/800/600",
+      src: "/crt-portfolio/videos/zombies-game-demo.mp4",
       alt: "Zombies multiplayer gameplay",
     },
     detailedDescription: {
