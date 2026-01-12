@@ -99,7 +99,7 @@ export default function App() {
           {TVs.map(tv => (
             <div 
               key={tv.id} 
-              panId={tv.id} 
+              data-pan-id={tv.id} 
               className="aspect-square w-[clamp(12rem,24vw,20rem)]"
             >
               <TVShell className="w-full h-full cursor-pointer">

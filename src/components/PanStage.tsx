@@ -34,7 +34,7 @@ export interface PanStageRef {
 
 interface ChildWithPanId {
   props: {
-    panId?: string;
+    'data-pan-id'?: string;
     onClick?: (e: MouseEvent<HTMLDivElement>) => void;
   };
 }
@@ -335,7 +335,7 @@ const PanStage = forwardRef<PanStageRef, PanStageProps>(function PanStage(
         }}
       >
         {childrenArray.map((child) => {
-          const tvId = child?.props?.panId;
+          const tvId = child?.props?.['data-pan-id'];
           return (
             <div
               key={tvId ?? Math.random().toString(36)}
