@@ -306,8 +306,7 @@ const PanStage = forwardRef<PanStageRef, PanStageProps>(function PanStage(
     reset: () => resetCameraToOverview(),
     centerOn: (tvId: string, zoomLevel = focusScale) => centerCameraOnTV(tvId, zoomLevel),
     selectTV: (tvId: string) => selectTVById(tvId),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }), [focusScale]);
+  }), [focusScale, cameraTransform, isAnimationInProgress]);
 
   // ========================================
   // Render
