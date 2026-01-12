@@ -2,6 +2,7 @@ import { motion, useAnimationControls } from "framer-motion";
 import { 
   Children, 
   forwardRef, 
+  useCallback,
   useEffect, 
   useImperativeHandle, 
   useMemo, 
@@ -207,11 +208,12 @@ const PanStage = forwardRef<PanStageRef, PanStageProps>(function PanStage(
     });
   }
 
-  function resetCameraToOverview() {
+  const resetCameraToOverview = useCallback(() => {
     setSelectedTVId(null);
     selectedTVIdRef.current = null;
     animateCameraToPosition({ x: 0, y: 0, scale: 1 });
-  }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   function recenterContainerInViewport(targetZoomLevel = cameraTransform.scale || 1) {
     const containerElement = containerRef.current;
@@ -295,18 +297,24 @@ const PanStage = forwardRef<PanStageRef, PanStageProps>(function PanStage(
   // Imperative API
   // ========================================
   
-  function selectTVById(tvId: string) {
+  const selectTVById = useCallback((tvId: string) => {
     if (isAnimationInProgress || !tvId) return;
     setSelectedTVId(tvId);
     selectedTVIdRef.current = tvId;
     centerCameraOnTV(tvId);
-  }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAnimationInProgress, cameraTransform, focusScale]);
+
+  const centerOn = useCallback((tvId: string, zoomLevel = focusScale) => {
+    centerCameraOnTV(tvId, zoomLevel);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [cameraTransform, focusScale]);
 
   useImperativeHandle(ref, () => ({
-    reset: () => resetCameraToOverview(),
-    centerOn: (tvId: string, zoomLevel = focusScale) => centerCameraOnTV(tvId, zoomLevel),
-    selectTV: (tvId: string) => selectTVById(tvId),
-  }), [focusScale, cameraTransform, isAnimationInProgress]);
+    reset: resetCameraToOverview,
+    centerOn,
+    selectTV: selectTVById,
+  }), [resetCameraToOverview, centerOn, selectTVById]);
 
   // ========================================
   // Render
