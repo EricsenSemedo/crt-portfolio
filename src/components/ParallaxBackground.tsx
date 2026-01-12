@@ -1,5 +1,13 @@
 import { motion, useMotionValue, useSpring } from "framer-motion";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
+import type { PanState } from "../types";
+
+interface ParallaxBackgroundProps {
+  children?: ReactNode;
+  scale?: number;
+  isAnimating?: boolean;
+  panState?: PanState;
+}
 
 /**
  * Subtle mouse-following background effect with spring animations.
@@ -10,7 +18,7 @@ export default function ParallaxBackground({
   scale = 1, 
   isAnimating = false, 
   panState = { selectedId: null, scale: 1, isAnimating: false } 
-}) {
+}: ParallaxBackgroundProps) {
   // ========================================
   // State & Motion Values
   // ========================================
@@ -23,7 +31,6 @@ export default function ParallaxBackground({
   const parallaxTargetY = useMotionValue(0);
   
   // Smooth spring-animated values for actual parallax offset
-  // Higher damping = less bounce, more subtle movement
   const parallaxX = useSpring(parallaxTargetX, { stiffness: 160, damping: 30 });
   const parallaxY = useSpring(parallaxTargetY, { stiffness: 160, damping: 30 });
   
@@ -35,16 +42,12 @@ export default function ParallaxBackground({
   // ========================================
   
   // Clamp value to [-1, 1] range
-  const clamp = (v) => Math.max(-1, Math.min(1, v));
+  const clamp = (v: number) => Math.max(-1, Math.min(1, v));
 
   // ========================================
   // Effect: Enable/Disable Parallax Based on TV State
   // ========================================
   
-  /**
-   * Disable parallax when viewing a TV or during animations
-   * This improves performance and prevents conflicting motion
-   */
   useEffect(() => {
     if (panState.selectedId !== null || panState.scale > 1 || panState.isAnimating) {
       setIsParallaxEnabled(false);
@@ -57,10 +60,6 @@ export default function ParallaxBackground({
   // Effect: Main Parallax Mouse Tracking
   // ========================================
   
-  /**
-   * Core parallax effect implementation
-   * Tracks mouse movement and translates it to subtle background offset
-   */
   useEffect(() => {
     if (!isParallaxEnabled) return;
     
@@ -69,65 +68,46 @@ export default function ParallaxBackground({
     const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
     
     if (isMobile || isTouchDevice) {
-      console.log('📱 Parallax disabled on mobile device');
       return;
     }
     
     // Respect user's motion preferences
     const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches;
 
-    /**
-     * Check if pointer is within viewport bounds
-     * Prevents parallax glitches when resizing from window edges
-     */
-    function isInsideViewport(e) {
+    function isInsideViewport(e: PointerEvent) {
       return e.clientX >= 0 && e.clientX <= window.innerWidth && 
              e.clientY >= 0 && e.clientY <= window.innerHeight;
     }
 
-    /**
-     * Reset parallax to center position
-     * Used when focus leaves window or during resize events
-     */
     function resetOffsets() {
       isPointerInsideRef.current = false;
       parallaxTargetX.set(0);
       parallaxTargetY.set(0);
     }
 
-    /**
-     * Main pointer movement handler
-     * Converts mouse position to normalized parallax offset
-     */
-    function handlePointerMove(e) {
-      if (reduce) return; // Respect reduced motion preference
+    function handlePointerMove(e: PointerEvent) {
+      if (reduce) return;
       if (!isInsideViewport(e)) { 
         isPointerInsideRef.current = false; 
         return; 
       }
       isPointerInsideRef.current = true;
 
-      // Calculate viewport center
       const viewportCenterX = window.innerWidth / 2;
       const viewportCenterY = window.innerHeight / 2;
       
-      // Normalize pointer position to [-1, 1] range
       const normalizedPointerX = (e.clientX - viewportCenterX) / viewportCenterX;
       const normalizedPointerY = (e.clientY - viewportCenterY) / viewportCenterY;
 
-      // Calculate parallax amplitude with scale and animation factors
-      const base = 10; // Base parallax strength (adjustable: 8-12 range)
-      const animFactor = isAnimating ? 0.4 : 1; // Reduce during animations
+      const base = 10;
+      const animFactor = isAnimating ? 0.4 : 1;
       const amp = (base / Math.max(1, scale)) * animFactor;
 
-      // Apply clamped offset to motion values
       parallaxTargetX.set(clamp(normalizedPointerX) * amp);
       parallaxTargetY.set(clamp(normalizedPointerY) * amp);
     }
 
-    // Event handlers for resetting parallax state
     function handleResize() { 
-      // Don't reset parallax when any TV is selected or during animations
       if (panState.selectedId || panState.isAnimating) {
         return;
       }
@@ -137,14 +117,12 @@ export default function ParallaxBackground({
     function handleVisibility() { if (document.hidden) resetOffsets(); }
     function handleMouseLeave() { resetOffsets(); }
 
-    // Add event listeners
     window.addEventListener('pointermove', handlePointerMove);
     window.addEventListener('resize', handleResize);
     window.addEventListener('blur', handleBlur);
     document.addEventListener('visibilitychange', handleVisibility);
     document.addEventListener('mouseleave', handleMouseLeave);
     
-    // Cleanup on unmount or dependency change
     return () => {
       window.removeEventListener('pointermove', handlePointerMove);
       window.removeEventListener('resize', handleResize);
@@ -152,7 +130,7 @@ export default function ParallaxBackground({
       document.removeEventListener('visibilitychange', handleVisibility);
       document.removeEventListener('mouseleave', handleMouseLeave);
     };
-  }, [isAnimating, scale, isParallaxEnabled]);
+  }, [isAnimating, scale, isParallaxEnabled, panState.selectedId, panState.isAnimating, parallaxTargetX, parallaxTargetY]);
 
   // ========================================
   // Render
