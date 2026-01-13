@@ -216,7 +216,7 @@ const PanStage = forwardRef<PanStageRef, PanStageProps>(function PanStage(
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  function recenterContainerInViewport(targetZoomLevel = cameraTransform.scale || 1) {
+  const recenterContainerInViewport = useCallback((targetZoomLevel = currentTransformRef.current.scale || 1) => {
     const containerElement = containerRef.current;
     if (!containerElement) return;
 
@@ -225,7 +225,7 @@ const PanStage = forwardRef<PanStageRef, PanStageProps>(function PanStage(
 
     requestAnimationFrame(() => {
       const containerRect = containerElement.getBoundingClientRect();
-      const { x: currentX, y: currentY, scale: currentZoom } = cameraTransform;
+      const { x: currentX, y: currentY, scale: currentZoom } = currentTransformRef.current;
       const safeCurrentZoom = currentZoom || 1;
 
       const originalLeft = containerRect.left - currentX;
@@ -242,7 +242,7 @@ const PanStage = forwardRef<PanStageRef, PanStageProps>(function PanStage(
       currentTransformRef.current = newTransform;
       controls.set(newTransform);
     });
-  }
+  }, [controls]);
 
   // ========================================
   // Effect Hooks & Event Handling
@@ -269,8 +269,7 @@ const PanStage = forwardRef<PanStageRef, PanStageProps>(function PanStage(
       window.removeEventListener('resize', handleWindowResize);
       if (resizeTimerRef.current) clearTimeout(resizeTimerRef.current);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isAnimationInProgress]);
+  }, [isAnimationInProgress, recenterContainerInViewport]);
 
   useEffect(() => {
     return () => {
