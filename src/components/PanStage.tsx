@@ -70,12 +70,14 @@ const PanStage = forwardRef<PanStageRef, PanStageProps>(function PanStage(
   
   const nearlyEqual = (a: number, b: number, eps = 0.5) => Math.abs(a - b) <= eps;
   
-  const isTransformUnchanged = (nextTransform: CameraTransform) =>
-    nearlyEqual(cameraTransform.x, nextTransform.x) &&
-    nearlyEqual(cameraTransform.y, nextTransform.y) &&
-    nearlyEqual(cameraTransform.scale, nextTransform.scale);
+  const isTransformUnchanged = useCallback((nextTransform: CameraTransform) => {
+    const current = currentTransformRef.current;
+    return nearlyEqual(current.x, nextTransform.x) &&
+      nearlyEqual(current.y, nextTransform.y) &&
+      nearlyEqual(current.scale, nextTransform.scale);
+  }, []);
 
-  async function animateCameraToPosition(nextTransform: CameraTransform) {
+  const animateCameraToPosition = useCallback(async (nextTransform: CameraTransform) => {
     if (isTransformUnchanged(nextTransform)) { 
       setIsAnimationInProgress(false); 
       return; 
@@ -85,7 +87,7 @@ const PanStage = forwardRef<PanStageRef, PanStageProps>(function PanStage(
     setCameraTransform(nextTransform);
     currentTransformRef.current = nextTransform;
     
-    const currentZoomLevel = cameraTransform.scale || 1;
+    const currentZoomLevel = currentTransformRef.current.scale || 1;
     const targetZoomLevel = nextTransform.scale || 1;
     const isZoomingIn = targetZoomLevel > currentZoomLevel + 1e-6;
     
@@ -131,7 +133,7 @@ const PanStage = forwardRef<PanStageRef, PanStageProps>(function PanStage(
     } finally {
       setIsAnimationInProgress(false);
     }
-  }
+  }, [controls, isTransformUnchanged]);
 
   // ========================================
   // TV Reference Management
@@ -206,15 +208,13 @@ const PanStage = forwardRef<PanStageRef, PanStageProps>(function PanStage(
 
       animateCameraToPosition({ x: newCameraX, y: newCameraY, scale: targetZoomLevel });
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [focusScale]);
+  }, [focusScale, animateCameraToPosition]);
 
   const resetCameraToOverview = useCallback(() => {
     setSelectedTVId(null);
     selectedTVIdRef.current = null;
     animateCameraToPosition({ x: 0, y: 0, scale: 1 });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [animateCameraToPosition]);
 
   const recenterContainerInViewport = useCallback((targetZoomLevel = currentTransformRef.current.scale || 1) => {
     const containerElement = containerRef.current;
