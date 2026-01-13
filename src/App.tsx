@@ -13,16 +13,6 @@ import type { PanState, TVConfig } from "./types";
  * App - Main application component for CRT Portfolio
  */
 
-// TV layout positions (currently unused but kept for future positioning)
-const SLOTS = [
-  { id: 'home', title: 'HOME', cxPct: 25, cyPct: 55, wPct: 26 },
-  { id: 'portfolio', title: 'PORTFOLIO', cxPct: 50, cyPct: 35, wPct: 28 },
-  { id: 'contact', title: 'CONTACT', cxPct: 75, cyPct: 58, wPct: 24 },
-] as const;
-
-// Suppress unused variable warning
-void SLOTS;
-
 export default function App() {
   // ========================================
   // State Management
