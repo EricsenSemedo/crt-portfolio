@@ -147,7 +147,7 @@ const PanStage = forwardRef<PanStageRef, PanStageProps>(function PanStage(
   // Camera Control Functions
   // ========================================
   
-  function centerCameraOnTV(tvId: string, targetZoomLevel = focusScale) {
+  const centerCameraOnTV = useCallback((tvId: string, targetZoomLevel = focusScale) => {
     const tvElement = itemRefs.current.get(tvId);
     const containerElement = containerRef.current;
     if (!tvElement || !containerElement) return;
@@ -164,7 +164,7 @@ const PanStage = forwardRef<PanStageRef, PanStageProps>(function PanStage(
         const tvBoundingRect = screenElement.getBoundingClientRect();
         const containerBoundingRect = containerElement.getBoundingClientRect();
 
-        const { x: currentX, y: currentY, scale: currentZoom } = cameraTransform;
+        const { x: currentX, y: currentY, scale: currentZoom } = currentTransformRef.current;
 
         const tvCenterX = tvBoundingRect.left + tvBoundingRect.width / 2;
         const tvCenterY = tvBoundingRect.top + tvBoundingRect.height / 2;
@@ -189,7 +189,7 @@ const PanStage = forwardRef<PanStageRef, PanStageProps>(function PanStage(
       const tvBoundingRect = screenElement.getBoundingClientRect();
       const containerBoundingRect = containerElement.getBoundingClientRect();
 
-      const { x: currentX, y: currentY, scale: currentZoom } = cameraTransform;
+      const { x: currentX, y: currentY, scale: currentZoom } = currentTransformRef.current;
 
       const tvCenterX = tvBoundingRect.left + tvBoundingRect.width / 2;
       const tvCenterY = tvBoundingRect.top + tvBoundingRect.height / 2;
@@ -206,7 +206,8 @@ const PanStage = forwardRef<PanStageRef, PanStageProps>(function PanStage(
 
       animateCameraToPosition({ x: newCameraX, y: newCameraY, scale: targetZoomLevel });
     });
-  }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [focusScale]);
 
   const resetCameraToOverview = useCallback(() => {
     setSelectedTVId(null);
@@ -302,13 +303,11 @@ const PanStage = forwardRef<PanStageRef, PanStageProps>(function PanStage(
     setSelectedTVId(tvId);
     selectedTVIdRef.current = tvId;
     centerCameraOnTV(tvId);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isAnimationInProgress, cameraTransform, focusScale]);
+  }, [isAnimationInProgress, centerCameraOnTV]);
 
   const centerOn = useCallback((tvId: string, zoomLevel = focusScale) => {
     centerCameraOnTV(tvId, zoomLevel);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [cameraTransform, focusScale]);
+  }, [focusScale, centerCameraOnTV]);
 
   useImperativeHandle(ref, () => ({
     reset: resetCameraToOverview,
