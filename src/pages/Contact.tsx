@@ -1,6 +1,11 @@
 import CRTButton from "../components/CRTButton";
+import type { NavigateFunction } from "../types";
 
-export default function Contact({ onNavigate }){
+interface ContactProps {
+  onNavigate?: NavigateFunction;
+}
+
+export default function Contact({ onNavigate }: ContactProps) {
   return (
     <div className="w-full h-full overflow-y-auto bg-black text-white">
       <div className="min-h-full px-6 py-8 space-y-8">
@@ -114,7 +119,5 @@ export default function Contact({ onNavigate }){
         </section>
       </div>
     </div>
-  )
+  );
 }
-
-

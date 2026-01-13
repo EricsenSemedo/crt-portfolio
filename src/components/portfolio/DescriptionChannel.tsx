@@ -1,6 +1,11 @@
 import { motion } from "framer-motion";
+import type { Project } from "../../types";
 
-export default function DescriptionChannel({ project }) {
+interface DescriptionChannelProps {
+  project: Project;
+}
+
+export default function DescriptionChannel({ project }: DescriptionChannelProps) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}

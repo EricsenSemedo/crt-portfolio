@@ -1,5 +1,7 @@
+import type { Project } from '../types';
+
 // Centralized projects data used by Portfolio and Home pages
-export const projects = [
+export const projects: Project[] = [
   {
     id: "maze-generator",
     title: "Maze Generator",
@@ -111,5 +113,3 @@ export const projects = [
 ];
 
 export default projects;
-
-

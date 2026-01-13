@@ -3,10 +3,17 @@ import { useState } from "react";
 import CRTButton from "../components/CRTButton";
 import { ProjectDetailView, ProjectTV } from "../components/portfolio";
 import projects from "../data/projects";
+import type { NavigateFunction, Project } from "../types";
 
-export default function Portfolio({ onNavigate }) {
-  const [selectedProject, setSelectedProject] = useState(null);
-  const [currentChannel, setCurrentChannel] = useState('demo');
+type ChannelType = 'demo' | 'description';
+
+interface PortfolioProps {
+  onNavigate?: NavigateFunction;
+}
+
+export default function Portfolio({ onNavigate }: PortfolioProps) {
+  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+  const [currentChannel, setCurrentChannel] = useState<ChannelType>('demo');
 
   return (
     <div className="w-full h-full overflow-y-auto text-white bg-black">

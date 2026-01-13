@@ -1,8 +1,15 @@
 import { motion } from "framer-motion";
+import type { Project } from "../../types";
 import CRTButton from "../CRTButton";
 import CRTScanlines from "../CRTScanlines";
 
-export default function ProjectTV({ project, onClick, isSelected }) {
+interface ProjectTVProps {
+  project: Project;
+  onClick?: () => void;
+  isSelected?: boolean;
+}
+
+export default function ProjectTV({ project, onClick, isSelected }: ProjectTVProps) {
   // Don't render the card if it's selected (it's now in the detail view)
   if (isSelected) return null;
   
@@ -66,7 +73,7 @@ export default function ProjectTV({ project, onClick, isSelected }) {
             <div className="absolute inset-0 bg-gradient-to-br from-transparent via-transparent to-gray-900/10"></div>
           </div>
           
-          {/* Hover Static Effect - using lighter scanlines that become more visible on hover */}
+          {/* Hover Static Effect */}
           <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
             <CRTScanlines opacity={0.25} lineHeight={2} lineSpacing={1} />
           </div>

@@ -1,4 +1,9 @@
-export default function StaticNoise({ intensity = 1, className = "" }) {
+interface StaticNoiseProps {
+  intensity?: number;
+  className?: string;
+}
+
+export default function StaticNoise({ intensity = 1, className = "" }: StaticNoiseProps) {
   return (
     <div className={`absolute inset-0 pointer-events-none ${className}`}>
       {/* CRT static fizz effect */}

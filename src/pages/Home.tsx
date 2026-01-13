@@ -1,7 +1,12 @@
 import CRTButton from "../components/CRTButton";
 import projects from "../data/projects";
+import type { NavigateFunction } from "../types";
 
-export default function Home({ onNavigate }){
+interface HomeProps {
+  onNavigate?: NavigateFunction;
+}
+
+export default function Home({ onNavigate }: HomeProps) {
   return (
     <div className="w-full h-full overflow-y-auto bg-black text-white">
       <div className="min-h-full px-6 py-8 space-y-8">
@@ -104,7 +109,5 @@ export default function Home({ onNavigate }){
         </section>
       </div>
     </div>
-  )
+  );
 }
-
-

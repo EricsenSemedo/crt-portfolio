@@ -1,6 +1,11 @@
 import { motion } from "framer-motion";
+import type { Project } from "../../types";
 
-export default function DemoChannel({ project }) {
+interface DemoChannelProps {
+  project: Project;
+}
+
+export default function DemoChannel({ project }: DemoChannelProps) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -20,7 +25,6 @@ export default function DemoChannel({ project }) {
           {project.demo.type === 'video' ? (
             <video
               src={project.demo.src}
-              alt={project.demo.alt}
               className="w-full h-full object-cover"
               autoPlay
               loop

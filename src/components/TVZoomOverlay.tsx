@@ -1,21 +1,24 @@
 import { AnimatePresence, motion } from "framer-motion";
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import CRTScanlines from "./CRTScanlines";
 import CRTVignette from "./CRTVignette";
 import Navbar from "./Navbar";
 
+interface SelectedItem {
+  id: string;
+  title: string;
+}
+
+interface TVZoomOverlayProps {
+  selectedItem: SelectedItem | null;
+  onClose?: () => void;
+  children?: ReactNode;
+}
+
 /**
  * TVZoomOverlay - True full-screen overlay that displays TV content with CRT effects
- * 
- * Features:
- * - Full-screen content (no TV shell padding/borders)
- * - Subtle CRT effects (vignette, scanlines)
- * - Direct content display (no static noise phase)
- * - Sweep animation for realistic CRT effect
- * - Navbar with close functionality
- * - Escape key support for closing
  */
-export default function TVZoomOverlay({ selectedItem, onClose, children }) {
+export default function TVZoomOverlay({ selectedItem, onClose, children }: TVZoomOverlayProps) {
   // ========================================
   // State Management
   // ========================================
@@ -30,7 +33,7 @@ export default function TVZoomOverlay({ selectedItem, onClose, children }) {
    * Handle keyboard events (Escape key to close)
    */
   useEffect(() => {
-    function handleKeyDown(e) {
+    function handleKeyDown(e: KeyboardEvent) {
       if (e.key === "Escape") onClose?.();
     }
     
@@ -42,7 +45,6 @@ export default function TVZoomOverlay({ selectedItem, onClose, children }) {
 
   /**
    * Handle content visibility and sweep animation timing
-   * Shows content immediately with sweep effect (no static noise phase)
    */
   useEffect(() => {
     if (!selectedItem) return;
@@ -55,12 +57,12 @@ export default function TVZoomOverlay({ selectedItem, onClose, children }) {
     const contentTimer = setTimeout(() => {
       setShowContent(true);
       setSweepVisible(true);
-    }, 50); // Minimal delay for smooth transition
+    }, 50);
     
     // Hide sweep after animation completes
     const sweepTimer = setTimeout(() => {
       setSweepVisible(false);
-    }, 50 + 400); // 50ms delay + 400ms sweep duration
+    }, 50 + 400);
     
     return () => {
       clearTimeout(contentTimer);

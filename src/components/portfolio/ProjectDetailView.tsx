@@ -1,11 +1,26 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect } from "react";
+import type { Project } from "../../types";
 import CRTButton from "../CRTButton";
 import CRTScanlines from "../CRTScanlines";
 import DemoChannel from "./DemoChannel";
 import DescriptionChannel from "./DescriptionChannel";
 
-export default function ProjectDetailView({ project, currentChannel, onChannelChange, onClose }) {
+type ChannelType = 'demo' | 'description';
+
+interface ProjectDetailViewProps {
+  project: Project;
+  currentChannel: ChannelType;
+  onChannelChange: (channel: ChannelType) => void;
+  onClose?: () => void;
+}
+
+export default function ProjectDetailView({ 
+  project, 
+  currentChannel, 
+  onChannelChange, 
+  onClose 
+}: ProjectDetailViewProps) {
   // Lock body scroll when project detail is open
   useEffect(() => {
     const originalStyle = window.getComputedStyle(document.body).overflow;
@@ -17,7 +32,7 @@ export default function ProjectDetailView({ project, currentChannel, onChannelCh
   }, []);
 
   useEffect(() => {
-    function handleKeyDown(event) {
+    function handleKeyDown(event: KeyboardEvent) {
       if (event.key === 'Escape') {
         event.stopPropagation();
         event.preventDefault();
@@ -29,7 +44,7 @@ export default function ProjectDetailView({ project, currentChannel, onChannelCh
     return () => {
       window.removeEventListener('keydown', handleKeyDown, true);
     };
-  }, [onClose])
+  }, [onClose]);
 
   return (
     <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm">
