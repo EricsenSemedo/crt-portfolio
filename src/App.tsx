@@ -47,8 +47,12 @@ export default function App() {
         panState.selectedId === null && 
         !panState.isAnimating && 
         panRef.current) {
-      panRef.current.selectTV(pendingNavigation);
+      const targetId = pendingNavigation;
       setPendingNavigation(null);
+      // Execute navigation in next tick to avoid cascading setState
+      requestAnimationFrame(() => {
+        panRef.current?.selectTV(targetId);
+      });
     }
   }, [panState.selectedId, panState.isAnimating, pendingNavigation]);
   

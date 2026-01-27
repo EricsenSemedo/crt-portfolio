@@ -113,7 +113,7 @@ export default function Contact({ onNavigate }: ContactProps) {
               Back to Home
             </CRTButton>
             <div className="px-3 py-2 bg-gradient-to-r from-cyan-600 to-purple-600 rounded-lg font-medium text-xs sm:text-base text-white flex items-center">
-              Let's build something amazing! 🚀
+              Let's build something amazing!
             </div>
           </div>
         </section>

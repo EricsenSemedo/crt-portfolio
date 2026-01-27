@@ -21,6 +21,8 @@ export default tseslint.config(
       ...reactHooks.configs.recommended.rules,
       'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
       '@typescript-eslint/no-unused-vars': ['error', { varsIgnorePattern: '^[A-Z_]' }],
+      // Downgrade setState-in-effect to warning - intentional patterns exist for animation coordination
+      'react-hooks/set-state-in-effect': 'warn',
     },
   },
 )

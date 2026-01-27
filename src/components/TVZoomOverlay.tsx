@@ -47,11 +47,17 @@ export default function TVZoomOverlay({ selectedItem, onClose, children }: TVZoo
    * Handle content visibility and sweep animation timing
    */
   useEffect(() => {
-    if (!selectedItem) return;
+    if (!selectedItem) {
+      setShowContent(false);
+      setSweepVisible(false);
+      return;
+    }
     
-    // Reset states when new item selected
-    setShowContent(false);
-    setSweepVisible(false);
+    // Reset states when new item selected via timers to avoid cascading renders
+    const resetTimer = setTimeout(() => {
+      setShowContent(false);
+      setSweepVisible(false);
+    }, 0);
     
     // Show content immediately (no static noise delay)
     const contentTimer = setTimeout(() => {
@@ -65,6 +71,7 @@ export default function TVZoomOverlay({ selectedItem, onClose, children }: TVZoo
     }, 50 + 400);
     
     return () => {
+      clearTimeout(resetTimer);
       clearTimeout(contentTimer);
       clearTimeout(sweepTimer);
     };

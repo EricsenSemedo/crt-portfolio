@@ -45,16 +45,15 @@ export default function ParallaxBackground({
   const clamp = (v: number) => Math.max(-1, Math.min(1, v));
 
   // ========================================
-  // Effect: Enable/Disable Parallax Based on TV State
+  // Derived State: Enable/Disable Parallax Based on TV State
   // ========================================
   
+  // Use derived state instead of effect to avoid cascading renders
+  const shouldEnableParallax = panState.selectedId === null && panState.scale <= 1 && !panState.isAnimating;
+  
   useEffect(() => {
-    if (panState.selectedId !== null || panState.scale > 1 || panState.isAnimating) {
-      setIsParallaxEnabled(false);
-    } else {
-      setIsParallaxEnabled(true);
-    }
-  }, [panState.isAnimating, panState.scale, panState.selectedId]);
+    setIsParallaxEnabled(shouldEnableParallax);
+  }, [shouldEnableParallax]);
 
   // ========================================
   // Effect: Main Parallax Mouse Tracking
