@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import PanStage, { type PanStageRef } from "./components/PanStage";
 import ParallaxBackground from "./components/ParallaxBackground";
 import StaticNoise from "./components/StaticNoise";
+import ThemeToggle from "./components/ThemeToggle";
 import TVShell from "./components/TVShell";
 import TVZoomOverlay from "./components/TVZoomOverlay";
 import Contact from "./pages/Contact";
@@ -79,6 +80,7 @@ export default function App() {
   
   return (
     <div className="relative min-h-screen bg-crt-base overflow-hidden">
+      <ThemeToggle />
       <ParallaxBackground panState={panState}>
         
         <PanStage 

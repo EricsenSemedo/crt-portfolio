@@ -16,13 +16,13 @@ export default function Portfolio({ onNavigate }: PortfolioProps) {
   const [currentChannel, setCurrentChannel] = useState<ChannelType>('demo');
 
   return (
-    <div className="w-full h-full overflow-y-auto text-white bg-black">
+    <div className="w-full h-full overflow-y-auto text-crt-text bg-crt-base">
       {/* Header */}
       <section className="text-center space-y-4 pt-8 px-6">
-        <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent leading-tight pb-2">
+        <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-crt-gradient-from to-crt-gradient-to bg-clip-text text-transparent leading-tight pb-2">
           Project Gallery
         </h1>
-        <p className="text-gray-400 max-w-2xl mx-auto">
+        <p className="text-crt-text-tertiary max-w-2xl mx-auto">
           Browse through my project channels. Click any TV to tune in and explore the details.
         </p>
       </section>
