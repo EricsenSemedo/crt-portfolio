@@ -5,6 +5,10 @@ interface DescriptionChannelProps {
   project: Project;
 }
 
+/**
+ * DescriptionChannel - Project description tab with Problem/Solution/Impact cards.
+ * Uses theme tokens for card backgrounds, borders, semantic colors, and text.
+ */
 export default function DescriptionChannel({ project }: DescriptionChannelProps) {
   return (
     <motion.div
@@ -16,37 +20,37 @@ export default function DescriptionChannel({ project }: DescriptionChannelProps)
     >
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-8">
-          <h2 className="text-3xl font-bold text-cyan-400 mb-2">{project.title}</h2>
-          <p className="text-gray-400 text-lg">{project.category}</p>
+          <h2 className="text-3xl font-bold text-crt-accent mb-2">{project.title}</h2>
+          <p className="text-crt-text-tertiary text-lg">{project.category}</p>
         </div>
         
         <div className="space-y-8">
           {/* Problem/Solution/Impact */}
           <div className="grid md:grid-cols-3 gap-6">
-            <div className="bg-gray-900/50 p-6 rounded-lg border border-gray-700">
-              <h3 className="text-xl font-bold text-red-400 mb-3">Problem</h3>
-              <p className="text-gray-300">{project.detailedDescription.problem}</p>
+            <div className="bg-crt-surface-primary/50 p-6 rounded-lg border border-crt-border">
+              <h3 className="text-xl font-bold text-crt-danger mb-3">Problem</h3>
+              <p className="text-crt-text-secondary">{project.detailedDescription.problem}</p>
             </div>
             
-            <div className="bg-gray-900/50 p-6 rounded-lg border border-gray-700">
-              <h3 className="text-xl font-bold text-yellow-400 mb-3">Solution</h3>
-              <p className="text-gray-300">{project.detailedDescription.solution}</p>
+            <div className="bg-crt-surface-primary/50 p-6 rounded-lg border border-crt-border">
+              <h3 className="text-xl font-bold text-crt-warning mb-3">Solution</h3>
+              <p className="text-crt-text-secondary">{project.detailedDescription.solution}</p>
             </div>
             
-            <div className="bg-gray-900/50 p-6 rounded-lg border border-gray-700">
-              <h3 className="text-xl font-bold text-green-400 mb-3">Impact</h3>
-              <p className="text-gray-300">{project.detailedDescription.impact}</p>
+            <div className="bg-crt-surface-primary/50 p-6 rounded-lg border border-crt-border">
+              <h3 className="text-xl font-bold text-crt-success mb-3">Impact</h3>
+              <p className="text-crt-text-secondary">{project.detailedDescription.impact}</p>
             </div>
           </div>
           
           {/* Key Highlights */}
-          <div className="bg-gray-900/30 p-6 rounded-lg border border-gray-700">
-            <h3 className="text-xl font-bold text-cyan-400 mb-4">Key Highlights</h3>
+          <div className="bg-crt-surface-primary/30 p-6 rounded-lg border border-crt-border">
+            <h3 className="text-xl font-bold text-crt-accent mb-4">Key Highlights</h3>
             <ul className="space-y-2">
               {project.detailedDescription.highlights.map((highlight, index) => (
                 <li key={index} className="flex items-start">
-                  <span className="text-cyan-400 mr-3 mt-1">•</span>
-                  <span className="text-gray-300">{highlight}</span>
+                  <span className="text-crt-accent mr-3 mt-1">•</span>
+                  <span className="text-crt-text-secondary">{highlight}</span>
                 </li>
               ))}
             </ul>
@@ -54,12 +58,12 @@ export default function DescriptionChannel({ project }: DescriptionChannelProps)
           
           {/* Tech Stack */}
           <div className="text-center">
-            <h3 className="text-xl font-bold text-cyan-400 mb-4">Technologies Used</h3>
+            <h3 className="text-xl font-bold text-crt-accent mb-4">Technologies Used</h3>
             <div className="flex flex-wrap justify-center gap-2">
               {project.tech.map((tech) => (
                 <span
                   key={tech}
-                  className="px-4 py-2 bg-cyan-400/20 text-cyan-300 rounded-lg border border-cyan-400/30"
+                  className="px-4 py-2 bg-crt-accent/20 text-crt-accent-hover rounded-lg border border-crt-accent/30"
                 >
                   {tech}
                 </span>
