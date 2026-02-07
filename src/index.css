@@ -1,1 +1,231 @@
 @import "tailwindcss";
+
+/* ========================================
+ * Tailwind v4 Theme Extension
+ * Maps CSS variables to utility classes:
+ *   bg-crt-base, text-crt-primary, border-crt-subtle, etc.
+ * ======================================== */
+@theme {
+  /* Backgrounds */
+  --color-crt-base: rgb(var(--crt-bg-base));
+  --color-crt-elevated: rgb(var(--crt-bg-elevated));
+  --color-crt-surface: rgb(var(--crt-bg-surface));
+  --color-crt-overlay: rgb(var(--crt-bg-overlay));
+
+  /* Surfaces */
+  --color-crt-surface-primary: rgb(var(--crt-surface-primary));
+  --color-crt-surface-secondary: rgb(var(--crt-surface-secondary));
+  --color-crt-surface-tertiary: rgb(var(--crt-surface-tertiary));
+
+  /* Text */
+  --color-crt-text: rgb(var(--crt-text-primary));
+  --color-crt-text-secondary: rgb(var(--crt-text-secondary));
+  --color-crt-text-tertiary: rgb(var(--crt-text-tertiary));
+  --color-crt-text-muted: rgb(var(--crt-text-muted));
+
+  /* Borders */
+  --color-crt-border: rgb(var(--crt-border-primary));
+  --color-crt-border-secondary: rgb(var(--crt-border-secondary));
+  --color-crt-border-subtle: rgb(var(--crt-border-subtle));
+
+  /* Accent: Primary */
+  --color-crt-accent: rgb(var(--crt-accent-primary));
+  --color-crt-accent-hover: rgb(var(--crt-accent-primary-hover));
+  --color-crt-accent-muted: rgb(var(--crt-accent-primary-muted));
+  --color-crt-accent-deep: rgb(var(--crt-accent-primary-deep));
+
+  /* Accent: Secondary */
+  --color-crt-secondary: rgb(var(--crt-accent-secondary));
+  --color-crt-secondary-hover: rgb(var(--crt-accent-secondary-hover));
+
+  /* Semantic */
+  --color-crt-info: rgb(var(--crt-accent-info));
+  --color-crt-info-hover: rgb(var(--crt-accent-info-hover));
+  --color-crt-danger: rgb(var(--crt-accent-danger));
+  --color-crt-warning: rgb(var(--crt-accent-warning));
+  --color-crt-success: rgb(var(--crt-accent-success));
+
+  /* Shell */
+  --color-crt-shell: rgb(var(--crt-shell-body));
+  --color-crt-shell-bezel: rgb(var(--crt-shell-bezel));
+  --color-crt-shell-screen: rgb(var(--crt-shell-screen));
+  --color-crt-shell-detail: rgb(var(--crt-shell-detail));
+  --color-crt-shell-indicator: rgb(var(--crt-shell-indicator));
+
+  /* Gradient */
+  --color-crt-gradient-from: rgb(var(--crt-gradient-from));
+  --color-crt-gradient-to: rgb(var(--crt-gradient-to));
+}
+
+/*
+ * CRT Portfolio Design Tokens
+ *
+ * Theme strategy: class-based toggling on <html>.
+ * Dark = CRT in a dim room (phosphor glow, deep blacks).
+ * Light = CRT in a bright room (washed phosphor, warm plastic casing).
+ *
+ * Token naming follows the pattern:
+ *   --crt-{category}-{role}
+ *
+ * Categories: bg, text, border, accent, surface, crt
+ */
+
+/* ========================================
+ * Dark Theme (default)
+ * ======================================== */
+:root {
+  color-scheme: dark;
+
+  /* Backgrounds */
+  --crt-bg-base: 0 0 0;             /* #000000 - deep black */
+  --crt-bg-elevated: 24 24 27;      /* zinc-900 */
+  --crt-bg-surface: 17 17 17;       /* near-black surface */
+  --crt-bg-overlay: 0 0 0;          /* overlay base */
+
+  /* Surfaces (cards, panels) */
+  --crt-surface-primary: 23 23 23;   /* gray-900 equivalent */
+  --crt-surface-secondary: 38 38 38; /* gray-800 equivalent */
+  --crt-surface-tertiary: 50 50 50;  /* gray-700 equivalent */
+
+  /* Text */
+  --crt-text-primary: 255 255 255;   /* white */
+  --crt-text-secondary: 209 213 219; /* gray-300 */
+  --crt-text-tertiary: 156 163 175;  /* gray-400 */
+  --crt-text-muted: 107 114 128;     /* gray-500 */
+
+  /* Borders */
+  --crt-border-primary: 63 63 70;    /* zinc-700 */
+  --crt-border-secondary: 82 82 91;  /* zinc-600 */
+  --crt-border-subtle: 39 39 42;     /* zinc-800 */
+
+  /* Accent: Primary (phosphor green-cyan glow) */
+  --crt-accent-primary: 34 211 238;    /* cyan-400 */
+  --crt-accent-primary-hover: 103 232 249; /* cyan-300 */
+  --crt-accent-primary-muted: 8 145 178;  /* cyan-600 */
+  --crt-accent-primary-deep: 14 116 144;  /* cyan-700 */
+
+  /* Accent: Secondary (phosphor purple) */
+  --crt-accent-secondary: 192 132 252;   /* purple-400 */
+  --crt-accent-secondary-hover: 216 180 254; /* purple-300 */
+
+  /* Semantic accents */
+  --crt-accent-info: 96 165 250;     /* blue-400 */
+  --crt-accent-info-hover: 147 197 253; /* blue-300 */
+  --crt-accent-danger: 239 68 68;    /* red-500 */
+  --crt-accent-warning: 250 204 21;  /* yellow-400 */
+  --crt-accent-success: 74 222 128;  /* green-400 */
+
+  /* TV Shell (the physical hardware) */
+  --crt-shell-body: 63 63 70;       /* zinc-700 */
+  --crt-shell-bezel: 24 24 27;      /* zinc-900 */
+  --crt-shell-screen: 9 9 11;       /* zinc-950 */
+  --crt-shell-detail: 113 113 122;  /* zinc-500 */
+  --crt-shell-indicator: 161 161 170; /* zinc-400 */
+
+  /* CRT Effects (glow, scanlines, vignette) */
+  --crt-glow-color: 255 255 255;     /* white glow */
+  --crt-glow-accent: 34 211 238;     /* cyan glow for accented elements */
+  --crt-scanline-color: 255 255 255;  /* white scanlines */
+  --crt-vignette-color: 0 0 0;       /* black vignette */
+  --crt-noise-light: 255 255 255;    /* noise bright */
+  --crt-noise-dark: 0 0 0;           /* noise dark */
+
+  /* Gradient endpoints */
+  --crt-gradient-from: 34 211 238;   /* cyan-400 */
+  --crt-gradient-to: 192 132 252;    /* purple-400 */
+}
+
+/* ========================================
+ * Light Theme
+ * ======================================== */
+.light {
+  color-scheme: light;
+
+  /* Backgrounds */
+  --crt-bg-base: 244 244 245;        /* zinc-100 */
+  --crt-bg-elevated: 255 255 255;    /* white */
+  --crt-bg-surface: 250 250 250;     /* zinc-50 */
+  --crt-bg-overlay: 244 244 245;     /* zinc-100 */
+
+  /* Surfaces (cards, panels) */
+  --crt-surface-primary: 241 241 241;  /* warm light gray */
+  --crt-surface-secondary: 228 228 231; /* zinc-200 */
+  --crt-surface-tertiary: 212 212 216; /* zinc-300 */
+
+  /* Text */
+  --crt-text-primary: 24 24 27;      /* zinc-900 */
+  --crt-text-secondary: 63 63 70;    /* zinc-700 */
+  --crt-text-tertiary: 82 82 91;     /* zinc-600 */
+  --crt-text-muted: 113 113 122;     /* zinc-500 */
+
+  /* Borders */
+  --crt-border-primary: 212 212 216;  /* zinc-300 */
+  --crt-border-secondary: 161 161 170; /* zinc-400 */
+  --crt-border-subtle: 228 228 231;  /* zinc-200 */
+
+  /* Accent: Primary (deeper for contrast on light bg) */
+  --crt-accent-primary: 8 145 178;     /* cyan-600 */
+  --crt-accent-primary-hover: 6 182 212; /* cyan-500 */
+  --crt-accent-primary-muted: 14 116 144; /* cyan-700 */
+  --crt-accent-primary-deep: 21 94 117;  /* cyan-800 */
+
+  /* Accent: Secondary */
+  --crt-accent-secondary: 147 51 234;   /* purple-600 */
+  --crt-accent-secondary-hover: 168 85 247; /* purple-500 */
+
+  /* Semantic accents (deeper for light mode) */
+  --crt-accent-info: 37 99 235;       /* blue-600 */
+  --crt-accent-info-hover: 59 130 246; /* blue-500 */
+  --crt-accent-danger: 220 38 38;     /* red-600 */
+  --crt-accent-warning: 202 138 4;    /* yellow-600 */
+  --crt-accent-success: 22 163 74;    /* green-600 */
+
+  /* TV Shell (warm beige/gray plastic in daylight) */
+  --crt-shell-body: 200 200 204;     /* warm light plastic */
+  --crt-shell-bezel: 161 161 170;    /* zinc-400 */
+  --crt-shell-screen: 30 30 34;      /* dark screen even in light mode */
+  --crt-shell-detail: 113 113 122;   /* zinc-500 */
+  --crt-shell-indicator: 82 82 91;   /* zinc-600 */
+
+  /* CRT Effects (subdued in bright room) */
+  --crt-glow-color: 0 0 0;           /* inverted: dark glow on light */
+  --crt-glow-accent: 8 145 178;      /* cyan-600 */
+  --crt-scanline-color: 0 0 0;       /* dark scanlines on light screen */
+  --crt-vignette-color: 0 0 0;       /* still dark vignette */
+  --crt-noise-light: 0 0 0;          /* inverted noise */
+  --crt-noise-dark: 255 255 255;     /* inverted noise */
+
+  /* Gradient endpoints */
+  --crt-gradient-from: 8 145 178;    /* cyan-600 */
+  --crt-gradient-to: 147 51 234;     /* purple-600 */
+}
+
+/* ========================================
+ * Global base styles
+ * ======================================== */
+html {
+  background-color: rgb(var(--crt-bg-base));
+  color: rgb(var(--crt-text-primary));
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+}
+
+/* Smooth theme transitions for key properties */
+*,
+*::before,
+*::after {
+  transition-property: background-color, border-color, color, fill, stroke, box-shadow;
+  transition-duration: 0s;
+  transition-timing-function: ease;
+}
+
+/* Only animate theme transitions when the theme-transition class is present */
+html.theme-transition *,
+html.theme-transition *::before,
+html.theme-transition *::after {
+  transition-duration: 0.3s;
+}

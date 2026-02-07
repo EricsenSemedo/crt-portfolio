@@ -41,3 +41,6 @@ export interface TVConfig {
 
 // Navigation function type
 export type NavigateFunction = (targetId: string) => void;
+
+// Theme
+export type Theme = "dark" | "light";
