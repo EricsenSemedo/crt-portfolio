@@ -130,13 +130,26 @@ public/                 -- Public static files (videos, favicon)
 - Use inline JSX comments for visual effects: `{/* Glass curvature highlight */}`.
 - Update README when adding new features.
 
-## Code Review with CodeRabbit
+## Agent Skills
+
+Skills are installed at `.agents/skills/<name>/SKILL.md` and are auto-discovered by compatible agents (Claude Code, OpenCode, Cursor, Codex, etc.).
+
+### Code Review with CodeRabbit
 
 This project uses [CodeRabbit](https://coderabbit.ai) for automated code review.
 
-- The CodeRabbit **agent skill** is installed at `.agents/skills/code-review/SKILL.md` and is self-documenting.
+- Skill: `.agents/skills/code-review/SKILL.md`
 - CodeRabbit **automatically reviews PRs** on GitHub when they are opened or updated.
 - For local reviews, ask your AI agent to "review my code" or use the `cr` CLI directly.
+
+### Frontend Design
+
+Guides creation of distinctive, production-grade frontend interfaces with high design quality.
+
+- Skill: `.agents/skills/frontend-design/SKILL.md`
+- Use when building or restyling web components, pages, or UI elements.
+- Enforces bold aesthetic direction, avoids generic "AI slop" aesthetics.
+- Source: [anthropics/skills](https://github.com/anthropics/skills)
 
 ## PR Workflow & Development Strategy
 
