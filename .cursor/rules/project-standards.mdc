@@ -1,6 +1,12 @@
+---
+description: Project standards and code conventions for CRT Portfolio
+globs:
+alwaysApply: true
+---
+
 # CRT Portfolio Project Rules
 
-> **SYNC REQUIREMENT**: This file must be kept in sync with `.cursor/rules/project-standards.mdc`.
+> **SYNC REQUIREMENT**: This file must be kept in sync with `AGENTS.md`.
 > When updating rules, update BOTH files to maintain consistency across Cursor and Claude Code.
 
 ## About This Project
@@ -163,15 +169,15 @@ For every PR:
 
 **CRITICAL**: When modifying project rules:
 
-1. **For Claude Code users**: Edit this `AGENTS.md` file, then copy changes to `.cursor/rules/project-standards.mdc` (preserving frontmatter)
-2. **For Cursor users**: Edit `.cursor/rules/project-standards.mdc`, then copy changes to this `AGENTS.md` (removing frontmatter)
+1. **For Claude Code users**: Edit `AGENTS.md`, then copy changes to `.cursor/rules/project-standards.mdc` (preserving frontmatter)
+2. **For Cursor users**: Edit `.cursor/rules/project-standards.mdc`, then copy changes to `AGENTS.md` (removing frontmatter)
 3. **Content must match**: The main content body should be identical in both files
 4. **Version control**: Commit both files together when making rule changes
 
 ### File Locations
 
-- **Claude Code**: `/AGENTS.md` (this file)
-- **Cursor**: `/.cursor/rules/project-standards.mdc`
+- **Claude Code**: `/AGENTS.md`
+- **Cursor**: `/.cursor/rules/project-standards.mdc` (this file)
 
 ## External File References
 
