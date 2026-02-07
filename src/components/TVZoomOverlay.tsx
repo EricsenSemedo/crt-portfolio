@@ -16,7 +16,8 @@ interface TVZoomOverlayProps {
 }
 
 /**
- * TVZoomOverlay - True full-screen overlay that displays TV content with CRT effects
+ * TVZoomOverlay - True full-screen overlay that displays TV content with CRT effects.
+ * Uses theme tokens for background, glow, and noise colors.
  */
 export default function TVZoomOverlay({ selectedItem, onClose, children }: TVZoomOverlayProps) {
   // ========================================
@@ -74,7 +75,8 @@ export default function TVZoomOverlay({ selectedItem, onClose, children }: TVZoo
     <AnimatePresence>
       {selectedItem && (
         <motion.div 
-          className="fixed inset-0 z-40 flex items-center justify-center bg-black/60"
+          className="fixed inset-0 z-40 flex items-center justify-center"
+          style={{ backgroundColor: "rgb(var(--crt-bg-overlay) / 0.6)" }}
           initial={{ opacity: 0 }} 
           animate={{ opacity: 1 }} 
           transition={{ duration: 0 }} 
@@ -83,7 +85,7 @@ export default function TVZoomOverlay({ selectedItem, onClose, children }: TVZoo
         >
           {/* Full-screen content container with CRT effects */}
           <motion.div 
-            className="w-full h-full bg-black relative overflow-hidden" 
+            className="w-full h-full bg-crt-base relative overflow-hidden" 
             onClick={(e) => e.stopPropagation()}
           >
             {/* CRT Effects */}
@@ -132,8 +134,8 @@ export default function TVZoomOverlay({ selectedItem, onClose, children }: TVZoo
                       <div
                         className="pointer-events-none absolute inset-x-0 h-8 -top-8"
                         style={{
-                          background: "linear-gradient(to bottom, rgba(255,255,255,0.15), rgba(255,255,255,0.05), transparent)",
-                          boxShadow: "0 0 20px rgba(255,255,255,0.3)",
+                          background: "linear-gradient(to bottom, rgb(var(--crt-glow-color) / 0.15), rgb(var(--crt-glow-color) / 0.05), transparent)",
+                          boxShadow: "0 0 20px rgb(var(--crt-glow-color) / 0.3)",
                           mixBlendMode: "screen",
                           animation: "sweepLine 0.4s linear forwards",
                         }}
@@ -148,15 +150,15 @@ export default function TVZoomOverlay({ selectedItem, onClose, children }: TVZoo
                           background: `
                             repeating-linear-gradient(
                               0deg,
-                              rgba(255,255,255,0.02) 0px,
-                              rgba(0,0,0,0.02) 1px,
+                              rgb(var(--crt-noise-light) / 0.02) 0px,
+                              rgb(var(--crt-noise-dark) / 0.02) 1px,
                               transparent 2px,
                               transparent 3px
                             ),
                             repeating-linear-gradient(
                               90deg,
-                              rgba(255,255,255,0.01) 0px,
-                              rgba(0,0,0,0.01) 1px,
+                              rgb(var(--crt-noise-light) / 0.01) 0px,
+                              rgb(var(--crt-noise-dark) / 0.01) 1px,
                               transparent 2px,
                               transparent 4px
                             )
