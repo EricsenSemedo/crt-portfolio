@@ -24,5 +24,6 @@ dist-ssr
 *.sw?
 
 # Cursor AI configuration
-.cursor/
+.cursor/*
+!.cursor/rules/
 .cursorrules
