@@ -13,10 +13,10 @@ export default function Home({ onNavigate }: HomeProps) {
         {/* Hero Section */}
         <section className="text-center space-y-4 pt-8">
           <div className="space-y-2">
-            <h1 className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-crt-gradient-from to-crt-gradient-to bg-clip-text text-transparent">
+            <h1 className="text-4xl md:text-6xl font-display font-bold bg-gradient-to-r from-crt-gradient-from to-crt-gradient-to bg-clip-text text-transparent tracking-wide">
               Ericsen Semedo
             </h1>
-            <h2 className="text-xl md:text-2xl text-crt-text-secondary font-light">
+            <h2 className="text-xl md:text-2xl text-crt-text-secondary font-light tracking-wide">
               Computer Science Graduate | Software Developer
             </h2>
           </div>
@@ -29,7 +29,7 @@ export default function Home({ onNavigate }: HomeProps) {
 
         {/* Skills Section */}
         <section className="space-y-6">
-          <h3 className="text-2xl font-semibold text-center text-crt-accent">Skills & Technologies</h3>
+          <h3 className="text-2xl font-display font-semibold text-center text-crt-accent tracking-wide">Skills & Technologies</h3>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
             {[
               'Python', 'Lua', 'C/C++', 
@@ -37,7 +37,7 @@ export default function Home({ onNavigate }: HomeProps) {
               'Docker', 'Git', 'Roblox Studio'
             ].map((skill) => (
               <div key={skill} className="bg-crt-surface-primary/50 rounded-lg p-3 text-center border border-crt-border/50 hover:border-crt-accent/30 transition-colors">
-                <span className="text-sm font-medium text-crt-text-secondary">{skill}</span>
+                <span className="text-sm font-mono font-medium text-crt-text-secondary">{skill}</span>
               </div>
             ))}
           </div>
@@ -45,7 +45,7 @@ export default function Home({ onNavigate }: HomeProps) {
 
         {/* Experience Section */}
         <section className="space-y-4">
-          <h3 className="text-2xl font-semibold text-center text-crt-accent">Experience</h3>
+          <h3 className="text-2xl font-display font-semibold text-center text-crt-accent tracking-wide">Experience</h3>
           <div className="space-y-4">
             <div className="bg-crt-surface-primary/30 rounded-lg p-6 border border-crt-border/30">
               <h4 className="text-lg font-semibold text-crt-accent-hover mb-2">Infrastructure Engineer - PixelMux</h4>
@@ -69,18 +69,18 @@ export default function Home({ onNavigate }: HomeProps) {
         {/* Education & Stats */}
         <section className="space-y-4">
           <div className="bg-crt-surface-primary/30 rounded-lg p-6 border border-crt-border/30 text-center">
-            <h4 className="text-lg font-semibold text-crt-secondary mb-2">Education</h4>
+            <h4 className="text-lg font-display font-semibold text-crt-secondary mb-2 tracking-wide">Education</h4>
             <p className="text-crt-text-secondary">University of Rhode Island</p>
             <p className="text-crt-text-tertiary text-sm">Bachelor of Arts in Computer Science</p>
             <p className="text-crt-text-tertiary text-sm">Graduated: May 2025</p>
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div className="text-center p-4 bg-crt-surface-primary/30 rounded-lg border border-crt-border/30">
-              <div className="text-2xl font-bold text-crt-accent">1+</div>
+              <div className="text-2xl font-display font-bold text-crt-accent">1+</div>
               <div className="text-sm text-crt-text-tertiary">Years Professional</div>
             </div>
             <div className="text-center p-4 bg-crt-surface-primary/30 rounded-lg border border-crt-border/30">
-              <div className="text-2xl font-bold text-crt-secondary">{projects.length}+</div>
+              <div className="text-2xl font-display font-bold text-crt-secondary">{projects.length}+</div>
               <div className="text-sm text-crt-text-tertiary">Projects Built</div>
             </div>
           </div>
@@ -88,7 +88,7 @@ export default function Home({ onNavigate }: HomeProps) {
 
         {/* Call to Action */}
         <section className="text-center space-y-4 pb-8">
-          <h3 className="text-xl font-semibold text-crt-text-secondary">Let's Build Something Amazing</h3>
+          <h3 className="text-xl font-display font-semibold text-crt-text-secondary tracking-wide">Let's Build Something Amazing</h3>
           <p className="text-crt-text-tertiary">
             Ready to bring your ideas to life? Let's connect and discuss your next project.
           </p>

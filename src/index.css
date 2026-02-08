@@ -6,6 +6,11 @@
  *   bg-crt-base, text-crt-primary, border-crt-subtle, etc.
  * ======================================== */
 @theme {
+  /* Typography */
+  --font-display: "Orbitron", ui-sans-serif, system-ui, sans-serif;
+  --font-body: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+
   /* Backgrounds */
   --color-crt-base: rgb(var(--crt-bg-base));
   --color-crt-elevated: rgb(var(--crt-bg-elevated));
@@ -213,6 +218,9 @@ html {
 body {
   margin: 0;
   min-height: 100vh;
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 /* Only animate theme transitions when the theme-transition class is present */
