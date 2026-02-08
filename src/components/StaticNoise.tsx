@@ -3,6 +3,10 @@ interface StaticNoiseProps {
   className?: string;
 }
 
+/**
+ * StaticNoise - Animated TV static with fizz and noise layers.
+ * Uses --crt-noise-light/dark tokens so noise adapts to theme.
+ */
 export default function StaticNoise({ intensity = 1, className = "" }: StaticNoiseProps) {
   return (
     <div className={`absolute inset-0 pointer-events-none ${className}`}>
@@ -12,7 +16,7 @@ export default function StaticNoise({ intensity = 1, className = "" }: StaticNoi
         style={{
           opacity: 0.7 * intensity,
           background:
-            "repeating-conic-gradient(from 0deg, rgba(255,255,255,0.04) 0deg 10deg, rgba(0,0,0,0.06) 10deg 20deg)",
+            "repeating-conic-gradient(from 0deg, rgb(var(--crt-noise-light) / 0.04) 0deg 10deg, rgb(var(--crt-noise-dark) / 0.06) 10deg 20deg)",
         }}
       />
       {/* CRT scanline noise */}
@@ -21,7 +25,7 @@ export default function StaticNoise({ intensity = 1, className = "" }: StaticNoi
         style={{
           opacity: 0.3 * intensity,
           background:
-            "repeating-linear-gradient(180deg, rgba(255,255,255,0.09) 0px, rgba(255,255,255,0.09) 2px, transparent 2px, transparent 4px)",
+            "repeating-linear-gradient(180deg, rgb(var(--crt-noise-light) / 0.09) 0px, rgb(var(--crt-noise-light) / 0.09) 2px, transparent 2px, transparent 4px)",
         }}
       />
       <style>{`

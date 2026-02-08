@@ -15,6 +15,10 @@ interface ProjectDetailViewProps {
   onClose?: () => void;
 }
 
+/**
+ * ProjectDetailView - Expanded project view as a full-screen CRT modal.
+ * Uses theme tokens for backdrop, bezel, screen, and accent colors.
+ */
 export default function ProjectDetailView({ 
   project, 
   currentChannel, 
@@ -47,11 +51,11 @@ export default function ProjectDetailView({
   }, [onClose]);
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm">
+    <div className="fixed inset-0 z-50 bg-crt-base/50 backdrop-blur-sm">
       {/* Animated TV Card - iOS App Store style */}
       <motion.div
         layoutId={`project-${project.id}`}
-        className="absolute inset-4 bg-gray-800 rounded-lg p-4 border-2 border-cyan-400/50 shadow-lg shadow-cyan-400/20 overflow-hidden"
+        className="absolute inset-4 bg-crt-surface-secondary rounded-lg p-4 border-2 border-crt-accent/50 shadow-lg shadow-crt-accent/20 overflow-hidden"
         transition={{ 
           type: "spring", 
           damping: 20, 
@@ -59,7 +63,7 @@ export default function ProjectDetailView({
         }}
       >
         {/* TV Screen Area */}
-        <div className="relative bg-black rounded border border-gray-600 overflow-hidden h-full">
+        <div className="relative bg-crt-shell-screen rounded border border-crt-border-secondary overflow-hidden h-full">
           
           {/* Channel Controls */}
           <motion.div 
@@ -89,7 +93,7 @@ export default function ProjectDetailView({
               onClick={onClose}
               variant="ghost"
               size="sm"
-              className="text-gray-400 hover:text-white"
+              className="text-crt-text-tertiary hover:text-crt-text"
             >
               ✕
             </CRTButton>
@@ -130,7 +134,7 @@ export default function ProjectDetailView({
           {/* CRT Effects */}
           <div className="absolute inset-0 pointer-events-none">
             <CRTScanlines opacity={0.1} lineHeight={2} lineSpacing={1} />
-            <div className="absolute inset-0 bg-gradient-to-br from-transparent via-transparent to-gray-900/5"></div>
+            <div className="absolute inset-0 bg-gradient-to-br from-transparent via-transparent to-crt-surface-primary/5"></div>
           </div>
         </div>
       </motion.div>

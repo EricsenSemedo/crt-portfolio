@@ -9,6 +9,10 @@ interface ProjectTVProps {
   isSelected?: boolean;
 }
 
+/**
+ * ProjectTV - Individual project card styled as a mini CRT TV.
+ * Uses theme tokens for bezel, screen, and accent colors.
+ */
 export default function ProjectTV({ project, onClick, isSelected }: ProjectTVProps) {
   // Don't render the card if it's selected (it's now in the detail view)
   if (isSelected) return null;
@@ -22,10 +26,10 @@ export default function ProjectTV({ project, onClick, isSelected }: ProjectTVPro
       layoutId={`project-${project.id}`}
     >
       {/* CRT TV Bezel */}
-      <div className="bg-gray-800 rounded-lg p-4 border-2 border-gray-700 hover:border-cyan-400/50 transition-all duration-300 group-hover:shadow-lg group-hover:shadow-cyan-400/20">
+      <div className="bg-crt-surface-secondary rounded-lg p-4 border-2 border-crt-border hover:border-crt-accent/50 transition-all duration-300 group-hover:shadow-lg group-hover:shadow-crt-accent/20">
         
         {/* TV Screen */}
-        <div className="relative bg-black rounded border border-gray-600 overflow-hidden aspect-[4/3]">
+        <div className="relative bg-crt-shell-screen rounded border border-crt-border-secondary overflow-hidden aspect-[4/3]">
           
           {/* Screen Content */}
           <div className="absolute inset-0 p-4 flex flex-col justify-between">
@@ -33,9 +37,9 @@ export default function ProjectTV({ project, onClick, isSelected }: ProjectTVPro
             {/* Project Preview "Channel" */}
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <span className="text-cyan-400 text-sm font-mono">{project.category}</span>
+                <span className="text-crt-accent text-sm font-mono">{project.category}</span>
                 <div 
-                  className="w-2 h-2 bg-red-500 rounded-full animate-pulse"
+                  className="w-2 h-2 bg-crt-danger rounded-full animate-pulse"
                   style={{
                     animationDelay: `${(project.id.charCodeAt(0) % 5) * 0.5}s`,
                     animationDuration: `${1.5 + (project.id.charCodeAt(1) % 3) * 0.5}s`
@@ -43,11 +47,11 @@ export default function ProjectTV({ project, onClick, isSelected }: ProjectTVPro
                 ></div>
               </div>
               
-              <h3 className="text-xl font-bold text-white group-hover:text-cyan-300 transition-colors">
+              <h3 className="text-xl font-bold text-crt-text group-hover:text-crt-accent-hover transition-colors">
                 {project.title}
               </h3>
               
-              <p className="text-gray-300 text-sm leading-relaxed">
+              <p className="text-crt-text-secondary text-sm leading-relaxed">
                 {project.description}
               </p>
             </div>
@@ -57,7 +61,7 @@ export default function ProjectTV({ project, onClick, isSelected }: ProjectTVPro
               {project.tech.slice(0, 3).map((tech) => (
                 <span 
                   key={tech} 
-                  className="px-2 py-1 bg-gray-900/80 text-xs rounded border border-gray-600 text-gray-300"
+                  className="px-2 py-1 bg-crt-surface-primary/80 text-xs rounded border border-crt-border-secondary text-crt-text-secondary"
                 >
                   {tech}
                 </span>
@@ -70,7 +74,7 @@ export default function ProjectTV({ project, onClick, isSelected }: ProjectTVPro
             {/* Scanlines */}
             <CRTScanlines opacity={0.15} lineHeight={3} lineSpacing={1} />
             {/* Screen curve effect */}
-            <div className="absolute inset-0 bg-gradient-to-br from-transparent via-transparent to-gray-900/10"></div>
+            <div className="absolute inset-0 bg-gradient-to-br from-transparent via-transparent to-crt-surface-primary/10"></div>
           </div>
           
           {/* Hover Static Effect */}
@@ -92,7 +96,7 @@ export default function ProjectTV({ project, onClick, isSelected }: ProjectTVPro
           </div>
           
           {/* Channel Number */}
-          <span className="text-gray-500 text-xs font-mono">
+          <span className="text-crt-text-muted text-xs font-mono">
             CH {project.id.slice(-2).toUpperCase()}
           </span>
         </div>

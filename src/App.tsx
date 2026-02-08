@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import PanStage, { type PanStageRef } from "./components/PanStage";
 import ParallaxBackground from "./components/ParallaxBackground";
 import StaticNoise from "./components/StaticNoise";
+import ThemeToggle from "./components/ThemeToggle";
 import TVShell from "./components/TVShell";
 import TVZoomOverlay from "./components/TVZoomOverlay";
 import Contact from "./pages/Contact";
@@ -78,7 +79,8 @@ export default function App() {
   // ========================================
   
   return (
-    <div className="relative min-h-screen bg-black overflow-hidden">
+    <div className="relative min-h-screen bg-crt-base overflow-hidden">
+      <ThemeToggle />
       <ParallaxBackground panState={panState}>
         
         <PanStage 
@@ -95,7 +97,7 @@ export default function App() {
               <TVShell className="w-full h-full cursor-pointer">
                 <div className="h-full flex items-center justify-center">
                   <StaticNoise intensity={1} />
-                  <div className="text-white font-semibold text-center text-sm sm:text-base">
+                  <div className="text-crt-text font-semibold text-center text-sm sm:text-base">
                     {tv.title}
                   </div>
                 </div>

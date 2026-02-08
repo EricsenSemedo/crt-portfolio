@@ -5,6 +5,10 @@ interface NavbarProps {
   onClose?: () => void;
 }
 
+/**
+ * Navbar - Top bar overlay inside TVZoomOverlay with title and close button.
+ * Uses theme tokens for gradient background and text colors.
+ */
 export default function Navbar({ title, onClose }: NavbarProps) {
   const handleMouseEnter = (e: MouseEvent<HTMLButtonElement>) => {
     e.currentTarget.style.filter = 'contrast(1.1) brightness(1.1)';
@@ -22,13 +26,16 @@ export default function Navbar({ title, onClose }: NavbarProps) {
   };
 
   return (
-    <div className="absolute top-0 left-0 right-0 z-10 flex items-center justify-between p-4 bg-gradient-to-b from-black/60 to-transparent pointer-events-none">
-      <div className="text-white font-semibold text-lg tracking-wide pointer-events-auto">
+    <div
+      className="absolute top-0 left-0 right-0 z-10 flex items-center justify-between p-4 pointer-events-none"
+      style={{ background: "linear-gradient(to bottom, rgb(var(--crt-bg-overlay) / 0.6), transparent)" }}
+    >
+      <div className="text-crt-text font-semibold text-lg tracking-wide pointer-events-auto">
         {title}
       </div>
       <button
         onClick={onClose}
-        className="text-white/80 hover:text-white transition-all duration-200 pointer-events-auto focus:outline-none focus:ring-2 focus:ring-white/50 rounded p-1 cursor-pointer group relative overflow-hidden"
+        className="text-crt-text/80 hover:text-crt-text transition-all duration-200 pointer-events-auto focus:outline-none focus:ring-2 focus:ring-crt-text/50 rounded p-1 cursor-pointer group relative overflow-hidden"
         aria-label="Close"
         style={{
           filter: 'none',

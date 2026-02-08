@@ -13,7 +13,8 @@ interface CRTButtonProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, '
 }
 
 /**
- * CRTButton - Button component with nostalgic CRT TV-themed hover and click animations
+ * CRTButton - Button component with nostalgic CRT TV-themed hover and click animations.
+ * Uses theme tokens for colors so variants adapt to dark/light mode.
  */
 export default function CRTButton({ 
   children, 
@@ -31,17 +32,17 @@ export default function CRTButton({
     lg: 'px-6 py-3 text-base sm:text-lg'
   };
 
-  // Color variants
+  // Color variants using theme tokens
   const variantClasses: Record<ButtonVariant, string> = {
-    primary: 'bg-cyan-600 hover:bg-cyan-700 text-white',
-    secondary: 'bg-transparent border border-gray-600 hover:border-gray-500 text-white',
-    ghost: 'bg-transparent hover:bg-gray-800/30 text-white'
+    primary: 'bg-crt-accent-muted hover:bg-crt-accent-deep text-crt-text',
+    secondary: 'bg-transparent border border-crt-border-secondary hover:border-crt-border text-crt-text',
+    ghost: 'bg-transparent hover:bg-crt-surface-secondary/30 text-crt-text'
   };
 
   const baseClasses = `
     font-medium rounded-lg transition-all duration-200 cursor-pointer
     relative overflow-hidden group
-    focus:outline-none focus:ring-2 focus:ring-cyan-400/50
+    focus:outline-none focus:ring-2 focus:ring-crt-accent/50
     disabled:opacity-50 disabled:cursor-not-allowed
     ${sizeClasses[size]}
     ${variantClasses[variant]}
@@ -99,8 +100,8 @@ export default function CRTButton({
               0deg,
               transparent 0px,
               transparent 2px,
-              rgba(255,255,255,0.1) 2px,
-              rgba(255,255,255,0.1) 3px
+              rgb(var(--crt-scanline-color) / 0.1) 2px,
+              rgb(var(--crt-scanline-color) / 0.1) 3px
             )`
           }}
         />
