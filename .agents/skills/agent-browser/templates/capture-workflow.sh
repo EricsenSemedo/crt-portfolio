@@ -30,8 +30,8 @@ agent-browser open "$TARGET_URL"
 agent-browser wait --load networkidle
 
 # Get metadata
-TITLE=$(agent-browser get title)
-URL=$(agent-browser get url)
+TITLE="$(agent-browser get title)"
+URL="$(agent-browser get url)"
 echo "Title: $TITLE"
 echo "URL: $URL"
 
