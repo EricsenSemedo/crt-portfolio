@@ -37,12 +37,18 @@ function applyTheme(theme: Theme) {
     root.classList.remove("light");
   }
 
-  // Remove transition class once the root element's transition ends
-  function handleTransitionEnd(e: TransitionEvent) {
-    // Only respond to transitions on the root element itself
-    if (e.target !== root) return;
+  // Clean up transition class -- whichever fires first (event or fallback) wins
+  const fallbackTimer = setTimeout(cleanup, 400);
+
+  function cleanup() {
+    clearTimeout(fallbackTimer);
     root.removeEventListener("transitionend", handleTransitionEnd);
     root.classList.remove(TRANSITION_CLASS);
+  }
+
+  function handleTransitionEnd(e: TransitionEvent) {
+    if (e.target !== root) return;
+    cleanup();
   }
 
   root.addEventListener("transitionend", handleTransitionEnd);
