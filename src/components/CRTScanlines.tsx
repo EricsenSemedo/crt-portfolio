@@ -6,7 +6,8 @@ interface CRTScanlinesProps {
 }
 
 /**
- * CRTScanlines - Horizontal scanlines effect that mimics CRT display technology
+ * CRTScanlines - Horizontal scanlines effect that mimics CRT display technology.
+ * Uses --crt-scanline-color token so lines adapt to dark/light theme.
  */
 export default function CRTScanlines({ 
   opacity = 0.2, 
@@ -23,8 +24,8 @@ export default function CRTScanlines({
           0deg,
           transparent 0px,
           transparent ${lineSpacing}px,
-          rgba(255,255,255,0.03) ${lineSpacing}px,
-          rgba(255,255,255,0.03) ${lineHeight}px
+          rgb(var(--crt-scanline-color) / 0.03) ${lineSpacing}px,
+          rgb(var(--crt-scanline-color) / 0.03) ${lineHeight}px
         )`
       }}
     />
