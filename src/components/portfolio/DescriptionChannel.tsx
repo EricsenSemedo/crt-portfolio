@@ -63,7 +63,7 @@ export default function DescriptionChannel({ project }: DescriptionChannelProps)
               {project.tech.map((tech) => (
                 <span
                   key={tech}
-                  className="px-4 py-2 bg-crt-accent/20 text-crt-accent-hover rounded-lg border border-crt-accent/30"
+                  className="px-4 py-2 bg-crt-accent/20 text-crt-accent rounded-lg border border-crt-accent/30"
                 >
                   {tech}
                 </span>

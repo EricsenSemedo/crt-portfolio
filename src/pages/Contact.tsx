@@ -112,7 +112,7 @@ export default function Contact({ onNavigate }: ContactProps) {
             >
               Back to Home
             </CRTButton>
-            <div className="px-3 py-2 bg-gradient-to-r from-crt-accent-muted to-crt-secondary rounded-lg font-medium text-xs sm:text-base text-crt-text flex items-center">
+            <div className="px-3 py-2 bg-gradient-to-r from-crt-accent-muted to-crt-secondary rounded-lg font-medium text-xs sm:text-base text-white flex items-center">
               Let's build something amazing!
             </div>
           </div>

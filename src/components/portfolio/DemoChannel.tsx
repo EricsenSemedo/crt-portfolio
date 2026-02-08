@@ -68,7 +68,7 @@ export default function DemoChannel({ project }: DemoChannelProps) {
           {project.tech.map((tech) => (
             <span
               key={tech}
-              className="px-3 py-1 bg-crt-accent/20 text-crt-accent-hover text-sm rounded border border-crt-accent/30"
+              className="px-3 py-1 bg-crt-accent/20 text-crt-accent text-sm rounded border border-crt-accent/30"
             >
               {tech}
             </span>
