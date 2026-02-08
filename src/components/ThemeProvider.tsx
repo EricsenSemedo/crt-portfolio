@@ -21,7 +21,8 @@ function getInitialTheme(): Theme {
 
 /**
  * Applies the theme class to <html>.
- * Briefly enables transition class for smooth visual switch.
+ * Briefly enables transition class for smooth visual switch,
+ * then removes it once the transition completes.
  */
 function applyTheme(theme: Theme) {
   const root = document.documentElement;
@@ -36,10 +37,15 @@ function applyTheme(theme: Theme) {
     root.classList.remove("light");
   }
 
-  // Remove transition class after animations finish
-  setTimeout(() => {
+  // Remove transition class once the root element's transition ends
+  function handleTransitionEnd(e: TransitionEvent) {
+    // Only respond to transitions on the root element itself
+    if (e.target !== root) return;
+    root.removeEventListener("transitionend", handleTransitionEnd);
     root.classList.remove(TRANSITION_CLASS);
-  }, 350);
+  }
+
+  root.addEventListener("transitionend", handleTransitionEnd);
 }
 
 interface ThemeProviderProps {
