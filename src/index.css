@@ -204,9 +204,10 @@
  * Global base styles
  * ======================================== */
 html {
+  --crt-theme-transition-duration: 0.3s;
+
   background-color: rgb(var(--crt-bg-base));
   color: rgb(var(--crt-text-primary));
-  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 body {
@@ -214,18 +215,15 @@ body {
   min-height: 100vh;
 }
 
-/* Smooth theme transitions for key properties */
-*,
-*::before,
-*::after {
-  transition-property: background-color, border-color, color, fill, stroke, box-shadow;
-  transition-duration: 0s;
-  transition-timing-function: ease;
-}
-
 /* Only animate theme transitions when the theme-transition class is present */
+html.theme-transition,
 html.theme-transition *,
 html.theme-transition *::before,
 html.theme-transition *::after {
-  transition-duration: 0.3s;
+  transition: background-color var(--crt-theme-transition-duration) ease,
+    border-color var(--crt-theme-transition-duration) ease,
+    color var(--crt-theme-transition-duration) ease,
+    fill var(--crt-theme-transition-duration) ease,
+    stroke var(--crt-theme-transition-duration) ease,
+    box-shadow var(--crt-theme-transition-duration) ease;
 }
