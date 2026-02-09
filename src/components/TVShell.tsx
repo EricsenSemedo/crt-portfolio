@@ -51,7 +51,7 @@ export default function TVShell({
                 style={{
                   background: "radial-gradient(120% 100% at 50% 50%, rgb(var(--crt-glow-color) / 0.18), rgb(var(--crt-glow-color) / 0) 60%)",
                   mixBlendMode: "screen",
-                  opacity: 0.6,
+                  opacity: `calc(0.6 * var(--crt-glow-opacity))`,
                 }}
               />
 
@@ -61,7 +61,7 @@ export default function TVShell({
                 style={{
                   background: "radial-gradient(120% 100% at 50% 50%, rgb(var(--crt-glow-color) / 0.66), rgb(var(--crt-vignette-color) / 0.15) 60%, rgb(var(--crt-vignette-color) / 0.65) 100%)",
                   mixBlendMode: "overlay",
-                  opacity: .9 * intensity,
+                  opacity: `calc(${.9 * intensity} * var(--crt-vignette-opacity))`,
                 }}
               />
 
@@ -70,14 +70,17 @@ export default function TVShell({
                 className="pointer-events-none absolute inset-0"
                 style={{
                   background: "repeating-linear-gradient(180deg, rgb(var(--crt-scanline-color) / 0.04) 0px, rgb(var(--crt-scanline-color) / 0.04) 1px, transparent 2px, transparent 3px)",
-                  opacity: .2 * intensity,
+                  opacity: `calc(${.2 * intensity} * var(--crt-scanline-opacity))`,
                 }}
               />
 
               {/* Bloom line */}
               <div
                 className="pointer-events-none absolute inset-x-0 top-12 h-[2px] blur-[2px]"
-                style={{ backgroundColor: "rgb(var(--crt-glow-color) / 0.1)" }}
+                style={{
+                  backgroundColor: "rgb(var(--crt-glow-color) / 0.1)",
+                  opacity: `var(--crt-bloom-opacity)`,
+                }}
               />
 
             </div>

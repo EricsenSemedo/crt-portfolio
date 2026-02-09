@@ -91,11 +91,12 @@ export default function CRTButton({
       onMouseUp={handleMouseUp}
       {...props}
     >
-      {/* CRT scanline overlay effect */}
+      {/* CRT scanline overlay effect - scales with theme scanline intensity */}
       <div className="absolute inset-0 opacity-0 group-hover:opacity-20 transition-opacity duration-200 pointer-events-none">
         <div 
           className="w-full h-full"
           style={{
+            opacity: "var(--crt-scanline-opacity)",
             background: `repeating-linear-gradient(
               0deg,
               transparent 0px,
