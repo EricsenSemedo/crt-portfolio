@@ -19,7 +19,7 @@ export default function Portfolio({ onNavigate }: PortfolioProps) {
     <div className="w-full h-full overflow-y-auto text-crt-text bg-crt-base">
       {/* Header */}
       <section className="text-center space-y-4 pt-8 px-6">
-        <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-crt-gradient-from to-crt-gradient-to bg-clip-text text-transparent leading-tight pb-2">
+        <h1 className="text-4xl md:text-5xl font-display font-bold bg-gradient-to-r from-crt-gradient-from to-crt-gradient-to bg-clip-text text-transparent leading-tight pb-2 tracking-wide">
           Project Gallery
         </h1>
         <p className="text-crt-text-tertiary max-w-2xl mx-auto">

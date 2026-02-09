@@ -31,7 +31,7 @@ export default function TVGrid({
         >
           <TVShell className="w-full aspect-[4/3]">
             <div className="h-full flex items-center justify-center">
-              <div className="text-crt-text font-semibold text-center text-sm sm:text-base">
+              <div className="text-crt-text font-display font-semibold text-center text-sm sm:text-base tracking-wider">
                 {item.title}
               </div>
             </div>
