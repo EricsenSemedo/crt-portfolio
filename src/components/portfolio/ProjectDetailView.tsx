@@ -51,7 +51,12 @@ export default function ProjectDetailView({
   }, [onClose]);
 
   return (
-    <div className="fixed inset-0 z-50 bg-crt-base/50 backdrop-blur-sm">
+    <div 
+      className="fixed inset-0 z-50 bg-crt-base/50 backdrop-blur-sm"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby={`project-detail-title-${project.id}`}
+    >
       {/* Animated TV Card - iOS App Store style */}
       <motion.div
         layoutId={`project-${project.id}`}
@@ -62,6 +67,11 @@ export default function ProjectDetailView({
           stiffness: 300
         }}
       >
+        {/* Accessible title for aria-labelledby */}
+        <h2 id={`project-detail-title-${project.id}`} className="sr-only">
+          {project.title}
+        </h2>
+        
         {/* TV Screen Area */}
         <div className="relative bg-crt-shell-screen rounded border border-crt-border-secondary overflow-hidden h-full">
           
