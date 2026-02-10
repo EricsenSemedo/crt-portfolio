@@ -19,23 +19,57 @@ export function getInitialTheme(): Theme {
     : "dark";
 }
 
+/** Track whether applyTheme has been called before (skip transition on first call). */
+let isFirstApply = true;
+
+/** Reset first-apply flag (for testing only). */
+export function resetFirstApply() {
+  isFirstApply = true;
+}
+
 /**
- * Applies the theme class to <html>.
- * Briefly enables transition class for smooth visual switch,
- * then removes it once the transition completes.
+ * Toggles the .light class on <html>.
  */
-export function applyTheme(theme: Theme) {
+function setThemeClass(theme: Theme) {
   const root = document.documentElement;
-
-  // Enable transitions
-  root.classList.add(TRANSITION_CLASS);
-
-  // Toggle .light class (dark is default, no class needed)
   if (theme === "light") {
     root.classList.add("light");
   } else {
     root.classList.remove("light");
   }
+}
+
+/**
+ * Applies the theme class to <html> with a smooth visual transition.
+ *
+ * Uses the View Transitions API when available for a crossfade effect.
+ * Falls back to the CSS transition-class approach for older browsers.
+ * Skips animation entirely on the initial page load.
+ */
+export function applyTheme(theme: Theme) {
+  // On first call (page load), apply immediately without animation
+  if (isFirstApply) {
+    isFirstApply = false;
+    setThemeClass(theme);
+    return;
+  }
+
+  // Respect prefers-reduced-motion
+  const prefersReduced = window.matchMedia(
+    "(prefers-reduced-motion: reduce)"
+  ).matches;
+
+  // Use View Transitions API if available and motion is allowed
+  if ("startViewTransition" in document && !prefersReduced) {
+    (document as Document & { startViewTransition: (cb: () => void) => void })
+      .startViewTransition(() => setThemeClass(theme));
+    return;
+  }
+
+  // Fallback: CSS transition-class approach
+  const root = document.documentElement;
+  root.classList.add(TRANSITION_CLASS);
+  setThemeClass(theme);
 
   // Clean up transition class -- whichever fires first (event or fallback) wins
   const fallbackTimer = setTimeout(cleanup, 400);

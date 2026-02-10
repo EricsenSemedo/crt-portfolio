@@ -237,7 +237,22 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Only animate theme transitions when the theme-transition class is present */
+/* View Transitions API -- smooth crossfade for theme switches */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: var(--crt-theme-transition-duration);
+  animation-timing-function: ease-in-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation-duration: 0.01s !important;
+  }
+}
+
+/* Fallback: animate theme transitions when View Transitions API is unavailable */
 html.theme-transition,
 html.theme-transition *,
 html.theme-transition *::before,
