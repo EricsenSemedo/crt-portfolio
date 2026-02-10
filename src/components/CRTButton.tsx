@@ -34,7 +34,7 @@ export default function CRTButton({
 
   // Color variants using theme tokens
   const variantClasses: Record<ButtonVariant, string> = {
-    primary: 'bg-crt-accent-muted hover:bg-crt-accent-deep text-crt-text',
+    primary: 'bg-crt-accent-muted hover:bg-crt-accent-deep text-white',
     secondary: 'bg-transparent border border-crt-border-secondary hover:border-crt-border text-crt-text',
     ghost: 'bg-transparent hover:bg-crt-surface-secondary/30 text-crt-text'
   };

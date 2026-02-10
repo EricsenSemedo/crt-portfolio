@@ -13,7 +13,7 @@ export default function Home({ onNavigate }: HomeProps) {
         {/* Hero Section */}
         <section className="text-center space-y-4 pt-8">
           <div className="space-y-2">
-            <h1 className="text-4xl md:text-6xl font-display font-bold bg-gradient-to-r from-crt-gradient-from to-crt-gradient-to bg-clip-text text-transparent tracking-wide">
+            <h1 className="text-4xl md:text-6xl font-display font-bold bg-linear-to-r from-crt-gradient-from to-crt-gradient-to bg-clip-text text-transparent tracking-wide">
               Ericsen Semedo
             </h1>
             <h2 className="text-xl md:text-2xl text-crt-text-secondary font-light tracking-wide">

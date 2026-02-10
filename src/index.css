@@ -189,13 +189,13 @@
   --crt-accent-info: 37 99 235;       /* blue-600 */
   --crt-accent-info-hover: 59 130 246; /* blue-500 */
   --crt-accent-danger: 220 38 38;     /* red-600 */
-  --crt-accent-warning: 202 138 4;    /* yellow-600 */
-  --crt-accent-success: 22 163 74;    /* green-600 */
+  --crt-accent-warning: 161 98 7;     /* amber-700 - better contrast on light */
+  --crt-accent-success: 21 128 61;    /* green-700 - better contrast on light */
 
   /* TV Shell (warm beige/gray plastic in daylight) */
   --crt-shell-body: 200 200 204;     /* warm light plastic */
   --crt-shell-bezel: 161 161 170;    /* zinc-400 */
-  --crt-shell-screen: 30 30 34;      /* dark screen even in light mode */
+  --crt-shell-screen: 240 240 243;    /* light screen for readability */
   --crt-shell-detail: 113 113 122;   /* zinc-500 */
   --crt-shell-indicator: 82 82 91;   /* zinc-600 */
 
