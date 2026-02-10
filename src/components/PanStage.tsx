@@ -11,7 +11,7 @@ import {
   type ReactNode,
   type ReactElement,
   type MouseEvent,
-  type KeyboardEvent
+  type KeyboardEvent,
 } from "react";
 import type { PanState } from "../types";
 
@@ -381,16 +381,8 @@ const PanStage = forwardRef<PanStageRef, PanStageProps>(function PanStage(
       {selectedTVId && !isAnimationInProgress && (
         <div 
           className="fixed inset-0"
-          role="button"
-          tabIndex={-1}
-          aria-label="Return to overview"
+          aria-hidden="true"
           onClick={resetCameraToOverview}
-          onKeyDown={(e: KeyboardEvent<HTMLDivElement>) => {
-            if (e.key === "Enter" || e.key === " ") {
-              e.preventDefault();
-              resetCameraToOverview();
-            }
-          }}
         />
       )}
     </div>
