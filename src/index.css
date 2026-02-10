@@ -6,6 +6,11 @@
  *   bg-crt-base, text-crt-primary, border-crt-subtle, etc.
  * ======================================== */
 @theme {
+  /* Typography */
+  --font-display: "Orbitron", ui-sans-serif, system-ui, sans-serif;
+  --font-body: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+
   /* Backgrounds */
   --color-crt-base: rgb(var(--crt-bg-base));
   --color-crt-elevated: rgb(var(--crt-bg-elevated));
@@ -130,6 +135,13 @@
   --crt-noise-light: 255 255 255;    /* noise bright */
   --crt-noise-dark: 0 0 0;           /* noise dark */
 
+  /* CRT Effect Intensities (multipliers for dark room) */
+  --crt-scanline-opacity: 1;
+  --crt-vignette-opacity: 1;
+  --crt-noise-opacity: 1;
+  --crt-glow-opacity: 1;
+  --crt-bloom-opacity: 1;
+
   /* Gradient endpoints */
   --crt-gradient-from: 34 211 238;   /* cyan-400 */
   --crt-gradient-to: 192 132 252;    /* purple-400 */
@@ -177,13 +189,13 @@
   --crt-accent-info: 37 99 235;       /* blue-600 */
   --crt-accent-info-hover: 59 130 246; /* blue-500 */
   --crt-accent-danger: 220 38 38;     /* red-600 */
-  --crt-accent-warning: 202 138 4;    /* yellow-600 */
-  --crt-accent-success: 22 163 74;    /* green-600 */
+  --crt-accent-warning: 161 98 7;     /* amber-700 - better contrast on light */
+  --crt-accent-success: 21 128 61;    /* green-700 - better contrast on light */
 
   /* TV Shell (warm beige/gray plastic in daylight) */
   --crt-shell-body: 200 200 204;     /* warm light plastic */
   --crt-shell-bezel: 161 161 170;    /* zinc-400 */
-  --crt-shell-screen: 30 30 34;      /* dark screen even in light mode */
+  --crt-shell-screen: 240 240 243;    /* light screen for readability */
   --crt-shell-detail: 113 113 122;   /* zinc-500 */
   --crt-shell-indicator: 82 82 91;   /* zinc-600 */
 
@@ -194,6 +206,13 @@
   --crt-vignette-color: 0 0 0;       /* still dark vignette */
   --crt-noise-light: 0 0 0;          /* inverted noise */
   --crt-noise-dark: 255 255 255;     /* inverted noise */
+
+  /* CRT Effect Intensities (subdued for bright room) */
+  --crt-scanline-opacity: 0.5;
+  --crt-vignette-opacity: 0.6;
+  --crt-noise-opacity: 0.4;
+  --crt-glow-opacity: 0.3;
+  --crt-bloom-opacity: 0.4;
 
   /* Gradient endpoints */
   --crt-gradient-from: 8 145 178;    /* cyan-600 */
@@ -213,6 +232,9 @@ html {
 body {
   margin: 0;
   min-height: 100vh;
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 /* View Transitions API -- smooth crossfade for theme switches */

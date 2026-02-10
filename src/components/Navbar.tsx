@@ -30,7 +30,7 @@ export default function Navbar({ title, onClose }: NavbarProps) {
       className="absolute top-0 left-0 right-0 z-10 flex items-center justify-between p-4 pointer-events-none"
       style={{ background: "linear-gradient(to bottom, rgb(var(--crt-bg-overlay) / 0.6), transparent)" }}
     >
-      <div className="text-crt-text font-semibold text-lg tracking-wide pointer-events-auto">
+      <div className="text-crt-text font-display font-semibold text-lg tracking-wider pointer-events-auto">
         {title}
       </div>
       <button
