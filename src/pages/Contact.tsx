@@ -11,7 +11,7 @@ export default function Contact({ onNavigate }: ContactProps) {
       <div className="min-h-full px-6 py-8 space-y-8">
         {/* Header */}
         <section className="text-center space-y-4 pt-8">
-          <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-crt-gradient-from to-crt-gradient-to bg-clip-text text-transparent">
+          <h1 className="text-4xl md:text-5xl font-bold bg-linear-to-r from-crt-gradient-from to-crt-gradient-to bg-clip-text text-transparent">
             Let's Connect
           </h1>
           <p className="text-crt-text-tertiary max-w-xl mx-auto leading-relaxed">
@@ -112,7 +112,7 @@ export default function Contact({ onNavigate }: ContactProps) {
             >
               Back to Home
             </CRTButton>
-            <div className="px-3 py-2 bg-gradient-to-r from-crt-accent-muted to-crt-secondary rounded-lg font-medium text-xs sm:text-base text-white flex items-center">
+            <div className="px-3 py-2 bg-linear-to-r from-crt-accent-muted to-crt-secondary rounded-lg font-medium text-xs sm:text-base text-white flex items-center">
               Let's build something amazing!
             </div>
           </div>
