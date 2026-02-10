@@ -132,24 +132,26 @@ export default function TVZoomOverlay({ selectedItem, onClose, children }: TVZoo
                       </div>
                     )}
                     
-                    {/* CRT sweep line */}
+                    {/* CRT sweep line - scales with theme glow intensity */}
                     {sweepVisible && (
                       <div
                         className="pointer-events-none absolute inset-x-0 h-8 -top-8"
                         style={{
                           background: "linear-gradient(to bottom, rgb(var(--crt-glow-color) / 0.15), rgb(var(--crt-glow-color) / 0.05), transparent)",
                           boxShadow: "0 0 20px rgb(var(--crt-glow-color) / 0.3)",
+                          opacity: "var(--crt-glow-opacity)",
                           mixBlendMode: "screen",
                           animation: "sweepLine 0.4s linear forwards",
                         }}
                       />
                     )}
                     
-                    {/* Static noise overlay in unswept area */}
+                    {/* Static noise overlay in unswept area - scales with theme noise intensity */}
                     {sweepVisible && (
                       <div
-                        className="pointer-events-none absolute inset-0 opacity-40"
+                        className="pointer-events-none absolute inset-0"
                         style={{
+                          opacity: "calc(0.4 * var(--crt-noise-opacity))",
                           background: `
                             repeating-linear-gradient(
                               0deg,

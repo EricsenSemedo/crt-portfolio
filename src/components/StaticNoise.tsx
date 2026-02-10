@@ -6,10 +6,14 @@ interface StaticNoiseProps {
 /**
  * StaticNoise - Animated TV static with fizz and noise layers.
  * Uses --crt-noise-light/dark tokens so noise adapts to theme.
+ * Scales with --crt-noise-opacity for theme-aware intensity.
  */
 export default function StaticNoise({ intensity = 1, className = "" }: StaticNoiseProps) {
   return (
-    <div className={`absolute inset-0 pointer-events-none ${className}`}>
+    <div
+      className={`absolute inset-0 pointer-events-none ${className}`}
+      style={{ opacity: `var(--crt-noise-opacity)` }}
+    >
       {/* CRT static fizz effect */}
       <div
         className="absolute inset-0 mix-blend-screen animate-[fizz_0.5s_steps(6)_infinite]"

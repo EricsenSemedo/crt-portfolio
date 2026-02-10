@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { applyTheme, getInitialTheme } from "../themeUtils";
+import { applyTheme, getInitialTheme, resetFirstApply } from "../themeUtils";
 
 describe("applyTheme", () => {
   let root: HTMLElement;
@@ -7,6 +7,12 @@ describe("applyTheme", () => {
   beforeEach(() => {
     vi.useFakeTimers();
     root = document.documentElement;
+    root.classList.remove("light", "theme-transition");
+    // Mock matchMedia for prefers-reduced-motion check
+    window.matchMedia = vi.fn().mockReturnValue({ matches: false });
+    // Reset and burn the first-apply skip so tests exercise transition logic
+    resetFirstApply();
+    applyTheme("dark"); // consumes the first-apply (no transition)
     root.classList.remove("light", "theme-transition");
   });
 
@@ -28,7 +34,7 @@ describe("applyTheme", () => {
     expect(root.classList.contains("light")).toBe(false);
   });
 
-  it("adds .theme-transition class during theme switch", () => {
+  it("adds .theme-transition class during theme switch (fallback path)", () => {
     applyTheme("light");
 
     expect(root.classList.contains("theme-transition")).toBe(true);
@@ -120,6 +126,38 @@ describe("applyTheme", () => {
     );
 
     removeListenerSpy.mockRestore();
+  });
+});
+
+describe("applyTheme - first apply", () => {
+  let root: HTMLElement;
+
+  beforeEach(() => {
+    root = document.documentElement;
+    root.classList.remove("light", "theme-transition");
+    // Mock matchMedia for prefers-reduced-motion check
+    window.matchMedia = vi.fn().mockReturnValue({ matches: false });
+    resetFirstApply();
+  });
+
+  afterEach(() => {
+    root.classList.remove("light", "theme-transition");
+  });
+
+  it("skips transition on first call (page load)", () => {
+    applyTheme("light");
+
+    expect(root.classList.contains("light")).toBe(true);
+    // No transition class should be added on first apply
+    expect(root.classList.contains("theme-transition")).toBe(false);
+  });
+
+  it("applies transition on second call", () => {
+    applyTheme("dark"); // first call -- no transition
+    applyTheme("light"); // second call -- should add transition
+
+    expect(root.classList.contains("light")).toBe(true);
+    expect(root.classList.contains("theme-transition")).toBe(true);
   });
 });
 
