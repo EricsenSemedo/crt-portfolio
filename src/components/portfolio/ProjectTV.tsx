@@ -47,7 +47,7 @@ export default function ProjectTV({ project, onClick, isSelected }: ProjectTVPro
                 ></div>
               </div>
               
-              <h3 className="text-xl font-bold text-crt-text group-hover:text-crt-accent-hover transition-colors">
+              <h3 className="text-xl font-display font-bold text-crt-text group-hover:text-crt-accent-hover transition-colors tracking-wide">
                 {project.title}
               </h3>
               
@@ -61,7 +61,7 @@ export default function ProjectTV({ project, onClick, isSelected }: ProjectTVPro
               {project.tech.slice(0, 3).map((tech) => (
                 <span 
                   key={tech} 
-                  className="px-2 py-1 bg-crt-surface-primary/80 text-xs rounded border border-crt-border-secondary text-crt-text-secondary"
+                  className="px-2 py-1 bg-crt-surface-primary/80 text-xs font-mono rounded border border-crt-border-secondary text-crt-text-secondary"
                 >
                   {tech}
                 </span>

@@ -34,7 +34,7 @@ export default function CRTButton({
 
   // Color variants using theme tokens
   const variantClasses: Record<ButtonVariant, string> = {
-    primary: 'bg-crt-accent-muted hover:bg-crt-accent-deep text-crt-text',
+    primary: 'bg-crt-accent-muted hover:bg-crt-accent-deep text-white',
     secondary: 'bg-transparent border border-crt-border-secondary hover:border-crt-border text-crt-text',
     ghost: 'bg-transparent hover:bg-crt-surface-secondary/30 text-crt-text'
   };
@@ -91,11 +91,12 @@ export default function CRTButton({
       onMouseUp={handleMouseUp}
       {...props}
     >
-      {/* CRT scanline overlay effect */}
+      {/* CRT scanline overlay effect - scales with theme scanline intensity */}
       <div className="absolute inset-0 opacity-0 group-hover:opacity-20 transition-opacity duration-200 pointer-events-none">
         <div 
           className="w-full h-full"
           style={{
+            opacity: "var(--crt-scanline-opacity)",
             background: `repeating-linear-gradient(
               0deg,
               transparent 0px,
