@@ -97,7 +97,7 @@ export default function App() {
               <TVShell className="w-full h-full cursor-pointer">
                 <div className="h-full flex items-center justify-center">
                   <StaticNoise intensity={1} />
-                  <div className="text-crt-text font-semibold text-center text-sm sm:text-base">
+                  <div className="text-crt-text font-display font-semibold text-center text-sm sm:text-base tracking-wider">
                     {tv.title}
                   </div>
                 </div>

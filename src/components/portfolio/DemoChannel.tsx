@@ -20,8 +20,8 @@ export default function DemoChannel({ project }: DemoChannelProps) {
     >
       <div className="max-w-4xl w-full">
         <div className="text-center mb-8">
-          <h2 className="text-3xl font-bold text-crt-accent mb-2">{project.title}</h2>
-          <p className="text-crt-text-tertiary text-lg">{project.category}</p>
+          <h2 className="text-3xl font-display font-bold text-crt-accent mb-2 tracking-wide">{project.title}</h2>
+          <p className="text-crt-text-tertiary font-mono text-lg">{project.category}</p>
         </div>
         
         {/* Demo Media */}
@@ -68,7 +68,7 @@ export default function DemoChannel({ project }: DemoChannelProps) {
           {project.tech.map((tech) => (
             <span
               key={tech}
-              className="px-3 py-1 bg-crt-accent/20 text-crt-accent text-sm rounded border border-crt-accent/30"
+              className="px-3 py-1 font-mono bg-crt-accent/20 text-crt-accent-hover text-sm rounded border border-crt-accent/30"
             >
               {tech}
             </span>

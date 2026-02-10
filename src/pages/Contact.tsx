@@ -11,7 +11,7 @@ export default function Contact({ onNavigate }: ContactProps) {
       <div className="min-h-full px-6 py-8 space-y-8">
         {/* Header */}
         <section className="text-center space-y-4 pt-8">
-          <h1 className="text-4xl md:text-5xl font-bold bg-linear-to-r from-crt-gradient-from to-crt-gradient-to bg-clip-text text-transparent">
+          <h1 className="text-4xl md:text-5xl font-display font-bold bg-linear-to-r from-crt-gradient-from to-crt-gradient-to bg-clip-text text-transparent tracking-wide">
             Let's Connect
           </h1>
           <p className="text-crt-text-tertiary max-w-xl mx-auto leading-relaxed">
@@ -22,7 +22,7 @@ export default function Contact({ onNavigate }: ContactProps) {
 
         {/* Contact Links */}
         <section className="space-y-6">
-          <h2 className="text-2xl font-semibold text-center text-crt-accent">Get In Touch</h2>
+          <h2 className="text-2xl font-display font-semibold text-center text-crt-accent tracking-wide">Get In Touch</h2>
           
           <div className="max-w-md mx-auto space-y-4">
             {/* LinkedIn */}
@@ -83,7 +83,7 @@ export default function Contact({ onNavigate }: ContactProps) {
 
         {/* Professional Info */}
         <section className="space-y-4">
-          <h3 className="text-xl font-semibold text-center text-crt-accent">Professional Focus</h3>
+          <h3 className="text-xl font-display font-semibold text-center text-crt-accent tracking-wide">Professional Focus</h3>
           <div className="max-w-md mx-auto bg-crt-surface-primary/30 rounded-lg p-6 border border-crt-border/30">
             <div className="text-center space-y-3">
               <div className="text-crt-text-secondary">
@@ -100,7 +100,7 @@ export default function Contact({ onNavigate }: ContactProps) {
 
         {/* Call to Action */}
         <section className="text-center space-y-4 pb-8">
-          <h3 className="text-xl font-semibold text-crt-text-secondary">Ready to Start Something Great?</h3>
+          <h3 className="text-xl font-display font-semibold text-crt-text-secondary tracking-wide">Ready to Start Something Great?</h3>
           <p className="text-crt-text-tertiary max-w-lg mx-auto">
             Whether you have a project in mind, want to discuss opportunities, 
             or just want to connect with a fellow developer, I'm always excited to meet new people.
