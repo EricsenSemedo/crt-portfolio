@@ -193,3 +193,11 @@ When referencing project files in rules, use the `@filename` syntax:
 @package.json
 @tsconfig.json
 ```
+
+## Cursor Cloud specific instructions
+
+- **Single service:** This is a purely static frontend app with no backend, no database, no Docker, and no environment variables. The only service to run is the Vite dev server.
+- **Dev server:** `yarn dev --host 0.0.0.0 --port 5173` starts the server. The app is served at `http://localhost:5173/crt-portfolio/` (note the base path — the root `/` returns a 302 redirect).
+- **Tests:** `yarn test` runs Vitest (currently 1 test file, 16 tests). `yarn test:watch` for watch mode.
+- **Lint / type-check / build:** See the commands table at the top of this file.
+- **No secrets or external services are required.**
