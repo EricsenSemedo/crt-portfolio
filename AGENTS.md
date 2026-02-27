@@ -37,6 +37,6 @@ Keep PRs small (100–300 lines, max 500). Run `cr review --plain --base main` b
 
 ## Cursor Cloud specific instructions
 
-- **Frontend-only SPA.** No backend, database, or Docker.
+- **Frontend-only SPA.** No backend, database, Docker, secrets, or external services required.
 - **Base path gotcha**: Dev server serves at `/crt-portfolio/`, not `/`. Navigate to `http://localhost:5173/crt-portfolio/` when testing.
 - Start dev server with `yarn dev --host 0.0.0.0 --port 5173` for remote access.
