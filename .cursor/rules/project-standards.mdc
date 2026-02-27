@@ -22,7 +22,8 @@ A personal portfolio website styled as a retro CRT television interface. Built w
 | `yarn lint`        | Run ESLint across the project      |
 | `yarn preview`     | Preview production build locally   |
 
-**No test framework is configured.** There are no test files, no test runner (Vitest, Jest, Playwright, etc.), and no `test` script. If tests are added in the future, use Vitest (it integrates naturally with Vite).
+| `yarn test`        | Run Vitest tests (single run)      |
+| `yarn test:watch`  | Run Vitest in watch mode           |
 
 **Type-checking:** TypeScript errors surface during `yarn build` (via `vite build`). There is no standalone `tsc --noEmit` script; run `npx tsc --noEmit` manually to type-check without building.
 
@@ -191,6 +192,13 @@ For every PR:
 
 - **Claude Code**: `/AGENTS.md`
 - **Cursor**: `/.cursor/rules/project-standards.mdc` (this file)
+
+## Cursor Cloud specific instructions
+
+- **Single service**: This is a frontend-only SPA. The only service is the Vite dev server (`yarn dev --host 0.0.0.0 --port 5173`). No backend, database, or Docker required.
+- **Base path**: The app is configured with base `/crt-portfolio/`, so the dev server redirects `/` to `/crt-portfolio/`. Always navigate to `http://localhost:5173/crt-portfolio/` when testing.
+- **Dev commands**: See the "Build / Lint / Test Commands" table above. All commands use `yarn`.
+- **Vitest**: Tests exist at `src/components/__tests__/` using jsdom environment. Run `yarn test` for a single run.
 
 ## External File References
 
