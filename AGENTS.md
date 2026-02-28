@@ -1,203 +1,42 @@
-# CRT Portfolio Project Rules
+# CRT Portfolio
 
-> **SYNC REQUIREMENT**: This file must be kept in sync with `.cursor/rules/project-standards.mdc`.
-> When updating rules, update BOTH files to maintain consistency across Cursor and Claude Code.
+Retro CRT television portfolio site. React 19, TypeScript, Vite 7, Tailwind CSS v4, Framer Motion v12. Deployed to GitHub Pages at `/crt-portfolio/`.
 
-## About This Project
+## Commands
 
-A personal portfolio website styled as a retro CRT television interface. Built with React 19, TypeScript, Vite 7, Tailwind CSS v4, and Framer Motion v12. The app renders three TV sets (Home, Portfolio, Contact) on a pannable/zoomable stage; clicking a TV zooms in to display page content with CRT visual effects (scanlines, vignette, static noise). Deployed to GitHub Pages at `/crt-portfolio/`.
+| Command | Description |
+| --- | --- |
+| `yarn dev` | Vite dev server with HMR |
+| `yarn build` | Production build (also type-checks) |
+| `yarn lint` | ESLint |
+| `yarn test` | Vitest (single run) |
+| `yarn test:watch` | Vitest (watch mode) |
 
-## Build / Lint / Test Commands
+Type-check without building: `npx tsc --noEmit`
 
-| Command            | Description                        |
-| ------------------ | ---------------------------------- |
-| `yarn dev`         | Start Vite dev server with HMR     |
-| `yarn build`       | Production build (TypeScript + Vite) to `dist/` |
-| `yarn lint`        | Run ESLint across the project      |
-| `yarn preview`     | Preview production build locally   |
+## Non-obvious conventions
 
-**No test framework is configured.** There are no test files, no test runner (Vitest, Jest, Playwright, etc.), and no `test` script. If tests are added in the future, use Vitest (it integrates naturally with Vite).
-
-**Type-checking:** TypeScript errors surface during `yarn build` (via `vite build`). There is no standalone `tsc --noEmit` script; run `npx tsc --noEmit` manually to type-check without building.
-
-## Code Standards
-
-### TypeScript
-- **Strict mode** is enabled (`strict: true`, `noUnusedLocals`, `noUnusedParameters`, `noFallthroughCasesInSwitch`).
-- Target ES2020. JSX mode is `react-jsx` (automatic runtime -- do not import React for JSX).
-- Path alias `@/*` maps to `src/*` in `tsconfig.json`, but the codebase currently uses **relative imports** everywhere. Stay consistent with relative imports unless the project migrates.
-- Prefer **interfaces** for object shapes and **type aliases** for unions/function types. No enums -- use string literal unions instead.
-- Use inline `type` keyword in imports when importing only types: `import { useState, type ReactNode } from "react"` or `import type { Project } from "../types"`.
-
-### ESLint
-- Flat config format (ESLint 9+) in `eslint.config.js`.
-- Extends `@eslint/js` recommended + `typescript-eslint` recommended.
-- Plugins: `react-hooks` (recommended rules), `react-refresh`.
-- Custom rule: `@typescript-eslint/no-unused-vars` errors but ignores variables matching `^[A-Z_]`.
-
-### Formatting
-- **No Prettier is configured.** Follow the existing style:
-  - 2-space indentation
-  - Double quotes for import paths and JSX attributes
-  - Trailing commas in multi-line arrays, objects, and parameter lists
-  - Semicolons are inconsistent; match the file you are editing
-
-### Naming Conventions
-- **Files:** PascalCase for components (`CRTButton.tsx`, `TVShell.tsx`), camelCase for data/utility files (`projects.ts`).
-- **Components:** PascalCase, use `function` declarations with `export default` (not arrow functions).
-- **Interfaces/Types:** PascalCase. Props interfaces named `{ComponentName}Props`.
-- **Variables/functions:** camelCase.
-- **Type aliases:** PascalCase (`ButtonVariant`, `ChannelType`, `NavigateFunction`).
-
-### Imports
-- Order: external libraries first (react, framer-motion, howler), then local components, then data/types.
-- No auto-sort tool configured; follow existing order in each file.
-- Use barrel exports where they exist (`src/components/portfolio/index.ts`).
-
-### Component Patterns
-- **Function declarations** exclusively: `export default function ComponentName(...)`.
-- Props interface defined immediately above the component in the same file.
-- Default exports for all page/component files. Barrel files re-export: `export { default as ProjectTV } from './ProjectTV'`.
-- For extending HTML element props: `interface Props extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'onClick'>`.
-- `forwardRef` with named function: `forwardRef<RefType, PropsType>(function Name(props, ref) { ... })`.
-
-### Code Organization Within Components
-Use section comment blocks to organize long components:
-```tsx
-// ========================================
-// State Management
-// ========================================
-
-// ========================================
-// Memoized Values & Refs
-// ========================================
-
-// ========================================
-// Navigation Logic
-// ========================================
-
-// ========================================
-// Render
-// ========================================
-```
-
-### Error Handling
-- Use **guard clauses / early returns** as the primary defensive pattern.
-- Use **optional chaining** for nullable callbacks: `onClose?.()`.
-- Use `try/finally` for animation cleanup (ensure state resets even on failure).
-- No global error boundary is currently set up.
-
-### Styling
-- **Tailwind CSS v4** utility classes for all styling (via `@tailwindcss/postcss`).
-- Inline `style` objects for dynamic CSS (gradients, filters, computed values).
-- Inline `<style>` tags for keyframe animations defined within components.
-- String concatenation for conditional classes: `` className={`relative ${className}`} `` (no `clsx` utility).
-
-### State Management
-- React `useState` and `useRef` only -- no external state library.
-- Lift state up to parent components; pass callbacks down as props.
-- `useImperativeHandle` for parent-to-child imperative APIs.
-
-### Types
-- Shared types live in `src/types/index.ts`. Component-specific props stay in their component file.
-- Data files export both named and default exports (`export const projects` + `export default projects`).
-
-## File Organization
-
-```text
-src/
-  main.tsx              -- React entry point
-  App.tsx               -- Root component, navigation state
-  index.css             -- Tailwind v4 import
-  types/index.ts        -- Shared TypeScript interfaces
-  data/projects.ts      -- Static project data
-  components/           -- Reusable UI components
-    portfolio/          -- Portfolio feature components (barrel-exported)
-  pages/                -- Page-level components (Home, Portfolio, Contact)
-  assets/               -- Static assets (images, SVGs)
-public/                 -- Public static files (videos, favicon)
-```
-
-## Documentation
-
-- Use JSDoc block comments on major components describing purpose.
-- Use inline JSX comments for visual effects: `{/* Glass curvature highlight */}`.
-- Update README when adding new features.
+- **No Prettier.** Semicolons are inconsistent across files — match the file you're editing.
+- **Relative imports only.** `@/*` alias exists in tsconfig but is unused — stay consistent with relative paths.
+- **Function declarations** for components, not arrow functions: `export default function Name(...)`.
+- **No enums.** Use string literal unions.
+- **No clsx.** Use string concatenation for conditional classes.
+- **No external state library.** `useState`/`useRef` only.
+- **Inline `type` keyword** in imports: `import { useState, type ReactNode } from "react"`.
 
 ## Agent Skills
 
-Skills are installed at `.agents/skills/<name>/SKILL.md` and are auto-discovered by compatible agents (Claude Code, OpenCode, Cursor, Codex, etc.).
+Skills at `.agents/skills/<name>/SKILL.md` are auto-discovered.
 
-### Code Review with CodeRabbit
+- **Code Review**: `.agents/skills/code-review/SKILL.md` — CodeRabbit auto-reviews PRs; use `cr` CLI for local reviews.
+- **Frontend Design**: `.agents/skills/frontend-design/SKILL.md` — use when building/restyling UI.
 
-This project uses [CodeRabbit](https://coderabbit.ai) for automated code review.
+## PRs
 
-- Skill: `.agents/skills/code-review/SKILL.md`
-- CodeRabbit **automatically reviews PRs** on GitHub when they are opened or updated.
-- For local reviews, ask your AI agent to "review my code" or use the `cr` CLI directly.
-
-### Frontend Design
-
-Guides creation of distinctive, production-grade frontend interfaces with high design quality.
-
-- Skill: `.agents/skills/frontend-design/SKILL.md`
-- Use when building or restyling web components, pages, or UI elements.
-- Enforces bold aesthetic direction, avoids generic "AI slop" aesthetics.
-- Source: [anthropics/skills](https://github.com/anthropics/skills)
-
-## PR Workflow & Development Strategy
-
-### Small, Focused PRs
-
-**Size Guidelines:**
-- **Ideal**: 100-300 lines of changes
-- **Maximum**: 500 lines (if larger, split into multiple PRs)
-- **Goal**: Each PR should be reviewable in 15-30 minutes
-
-**Breaking Down Features:** Use vertical splits (full-stack per feature) for small features, or horizontal splits (layer by layer) for large features. Stack PRs -- don't wait for PR #1 to merge before starting PR #2.
-
-### Review Checklist
-
-For every PR:
-1. **Self-review first** -- read your own diff, check for obvious issues
-2. **Run CodeRabbit** -- `cr review --plain --base main`; fix Critical/Warning issues
-3. **Manual review** -- design, edge cases, security, tests, readability
-
-```markdown
-- [ ] Overall design makes sense
-- [ ] Edge cases handled (null, empty, boundaries)
-- [ ] Error handling is robust
-- [ ] Security considerations addressed
-- [ ] Code is readable and maintainable
-- [ ] I understand what the code does and why
-```
-
-## Rules Synchronization
-
-**CRITICAL**: When modifying project rules:
-
-1. **For Claude Code users**: Edit this `AGENTS.md` file, then copy changes to `.cursor/rules/project-standards.mdc` (preserving frontmatter)
-2. **For Cursor users**: Edit `.cursor/rules/project-standards.mdc`, then copy changes to this `AGENTS.md` (removing frontmatter)
-3. **Content must match**: The main content body should be identical in both files
-4. **Version control**: Commit both files together when making rule changes
-
-### File Locations
-
-- **Claude Code**: `/AGENTS.md` (this file)
-- **Cursor**: `/.cursor/rules/project-standards.mdc`
-
-## External File References
-
-When referencing project files in rules, use the `@filename` syntax:
-```text
-@package.json
-@tsconfig.json
-```
+Keep PRs small (100–300 lines, max 500). Run `cr review --plain --base main` before submitting.
 
 ## Cursor Cloud specific instructions
 
-- **Single service:** This is a purely static frontend app with no backend, no database, no Docker, and no environment variables. The only service to run is the Vite dev server.
-- **Dev server:** `yarn dev --host 0.0.0.0 --port 5173` starts the server. The app is served at `http://localhost:5173/crt-portfolio/` (note the base path — the root `/` returns a 302 redirect).
-- **Tests:** `yarn test` runs Vitest (currently 1 test file, 16 tests). `yarn test:watch` for watch mode.
-- **Lint / type-check / build:** See the commands table at the top of this file.
-- **No secrets or external services are required.**
+- **Frontend-only SPA.** No backend, database, Docker, secrets, or external services required.
+- **Base path gotcha**: Dev server serves at `/crt-portfolio/`, not `/`. Navigate to `http://localhost:5173/crt-portfolio/` when testing.
+- Start dev server with `yarn dev --host 0.0.0.0 --port 5173` for remote access.
