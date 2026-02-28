@@ -1,10 +1,11 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import PanStage, { type PanStageRef } from "./components/PanStage";
 import ParallaxBackground from "./components/ParallaxBackground";
 import StaticNoise from "./components/StaticNoise";
 import ThemeToggle from "./components/ThemeToggle";
 import TVShell from "./components/TVShell";
 import TVZoomOverlay from "./components/TVZoomOverlay";
+import useKeyboardNav from "./hooks/useKeyboardNav";
 import Contact from "./pages/Contact";
 import Home from "./pages/Home";
 import Portfolio from "./pages/Portfolio";
@@ -53,7 +54,7 @@ export default function App() {
     }
   }, [panState.selectedId, panState.isAnimating, pendingNavigation]);
   
-  const navigateToTV = (targetId: string) => {
+  const navigateToTV = useCallback((targetId: string) => {
     if (!panRef.current || targetId === panState.selectedId) return;
     
     if (panState.selectedId) {
@@ -62,7 +63,25 @@ export default function App() {
     } else {
       panRef.current.selectTV(targetId);
     }
-  };
+  }, [panState.selectedId]);
+  
+  const closeTV = useCallback(() => {
+    panRef.current?.reset();
+  }, []);
+  
+  // ========================================
+  // Keyboard Navigation
+  // ========================================
+  
+  const tvIds = useMemo(() => TVs.map(tv => tv.id), [TVs]);
+  
+  useKeyboardNav({
+    tvIds,
+    selectedId: panState.selectedId,
+    isAnimating: panState.isAnimating,
+    onSelect: navigateToTV,
+    onClose: closeTV,
+  });
   
   // ========================================
   // Page Content Mapping
@@ -112,7 +131,7 @@ export default function App() {
               id: panState.selectedId, 
               title: panState.selectedId.toUpperCase()
             }}
-            onClose={() => panRef.current?.reset()}
+            onClose={closeTV}
           >
             {byId[panState.selectedId] ?? null}
           </TVZoomOverlay>
