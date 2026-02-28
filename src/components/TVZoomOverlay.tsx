@@ -82,6 +82,10 @@ export default function TVZoomOverlay({ selectedItem, onClose, children }: TVZoo
           transition={{ duration: 0 }} 
           exit={{ opacity: 0 }} 
           onClick={onClose}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby={showContent ? "tv-overlay-title" : undefined}
+          aria-label={showContent ? undefined : "TV overlay"}
         >
           {/* Full-screen content container with CRT effects */}
           <motion.div 

@@ -10,7 +10,8 @@ import {
   useState,
   type ReactNode,
   type ReactElement,
-  type MouseEvent
+  type MouseEvent,
+  type KeyboardEvent,
 } from "react";
 import type { PanState } from "../types";
 
@@ -341,20 +342,35 @@ const PanStage = forwardRef<PanStageRef, PanStageProps>(function PanStage(
       >
         {childrenArray.map((child) => {
           const tvId = child?.props?.['data-pan-id'];
+          
+          const handleSelect = () => {
+            if (isAnimationInProgress) return;
+            if (tvId) {
+              setSelectedTVId(tvId);
+              selectedTVIdRef.current = tvId;
+              centerCameraOnTV(tvId);
+            }
+          };
+          
           return (
             <div
               key={tvId ?? Math.random().toString(36)}
               ref={setItemRef(tvId)}
+              role="button"
+              tabIndex={0}
+              aria-label={`Open ${tvId ?? "item"} TV`}
               onClick={(e: MouseEvent<HTMLDivElement>) => { 
                 e.stopPropagation(); 
-                if (isAnimationInProgress) return; 
-                if (tvId) { 
-                  setSelectedTVId(tvId); 
-                  selectedTVIdRef.current = tvId;
-                  centerCameraOnTV(tvId); 
-                } 
+                handleSelect();
                 child?.props?.onClick?.(e); 
               }}
+              onKeyDown={(e: KeyboardEvent<HTMLDivElement>) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  handleSelect();
+                }
+              }}
+              className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-crt-accent/50 rounded-lg"
             >
               {child}
             </div>
@@ -363,7 +379,11 @@ const PanStage = forwardRef<PanStageRef, PanStageProps>(function PanStage(
       </motion.div>
       
       {selectedTVId && !isAnimationInProgress && (
-        <div className="fixed inset-0" onClick={resetCameraToOverview} />
+        <div 
+          className="fixed inset-0"
+          aria-hidden="true"
+          onClick={resetCameraToOverview}
+        />
       )}
     </div>
   );
