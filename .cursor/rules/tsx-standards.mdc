@@ -1,0 +1,13 @@
+---
+description: "React/TypeScript code standards for CRT Portfolio"
+globs: ["**/*.tsx", "**/*.ts"]
+alwaysApply: false
+---
+
+- Function declarations for components, not arrow functions: `export default function Name(...)`.
+- No enums — use string literal unions.
+- No clsx — use string concatenation for conditional classes.
+- No external state library — `useState`/`useRef` only.
+- Inline `type` keyword in imports: `import { useState, type ReactNode } from "react"`.
+- Relative imports only — `@/*` alias exists but is unused.
+- No Prettier — semicolons are inconsistent, match the file you're editing.
