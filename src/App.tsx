@@ -1,4 +1,5 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import CRTBootScreen from "./components/CRTBootScreen";
 import PanStage, { type PanStageRef } from "./components/PanStage";
 import ParallaxBackground from "./components/ParallaxBackground";
 import StaticNoise from "./components/StaticNoise";
@@ -26,6 +27,9 @@ export default function App() {
   });
   
   const [pendingNavigation, setPendingNavigation] = useState<string | null>(null);
+  const [booted, setBooted] = useState(false);
+  
+  const handleBootComplete = useCallback(() => setBooted(true), []);
   
   // ========================================
   // Memoized Values & Refs
@@ -80,6 +84,7 @@ export default function App() {
   
   return (
     <div className="relative min-h-screen bg-crt-base overflow-hidden">
+      {!booted && <CRTBootScreen onComplete={handleBootComplete} />}
       <ThemeToggle />
       <ParallaxBackground panState={panState}>
         
