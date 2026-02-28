@@ -30,6 +30,11 @@ Skills at `.agents/skills/<name>/SKILL.md` are auto-discovered.
 
 - **Code Review**: `.agents/skills/code-review/SKILL.md` — CodeRabbit auto-reviews PRs; use `cr` CLI for local reviews.
 - **Frontend Design**: `.agents/skills/frontend-design/SKILL.md` — use when building/restyling UI.
+- **Vercel React Best Practices**: `.agents/skills/vercel-react-best-practices/SKILL.md` — 57 React/Next.js perf rules from Vercel Engineering.
+- **Requesting Code Review**: `.agents/skills/requesting-code-review/SKILL.md` — dispatch code-reviewer subagent before merging.
+- **Continual Learning**: `.agents/skills/continual-learning/SKILL.md` — mine transcripts for recurring corrections, update AGENTS.md.
+- **Find Skills**: `.agents/skills/find-skills/SKILL.md` — discover and install skills via `npx skills find`.
+- **Agent Browser**: `.agents/skills/agent-browser/SKILL.md` — browser automation CLI for web testing.
 
 ## PRs
 
