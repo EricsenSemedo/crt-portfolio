@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import CRTAmbient from "./components/CRTAmbient";
 import PanStage, { type PanStageRef } from "./components/PanStage";
 import ParallaxBackground from "./components/ParallaxBackground";
 import StaticNoise from "./components/StaticNoise";
@@ -80,6 +81,7 @@ export default function App() {
   
   return (
     <div className="relative min-h-screen bg-crt-base overflow-hidden">
+      <CRTAmbient />
       <ThemeToggle />
       <ParallaxBackground panState={panState}>
         
@@ -88,20 +90,25 @@ export default function App() {
           onStateChange={setPanState} 
           className="mx-auto min-h-screen flex items-center justify-center"
         >
-          {TVs.map(tv => (
+          {TVs.map((tv, i) => (
             <div 
               key={tv.id} 
               data-pan-id={tv.id} 
-              className="aspect-square w-[clamp(12rem,24vw,20rem)]"
+              className="flex flex-col items-center gap-2"
             >
-              <TVShell className="w-full h-full cursor-pointer">
-                <div className="h-full flex items-center justify-center">
-                  <StaticNoise intensity={1} />
-                  <div className="text-crt-text font-display font-semibold text-center text-sm sm:text-base tracking-wider">
-                    {tv.title}
+              <div className="aspect-square w-[clamp(12rem,24vw,20rem)]">
+                <TVShell className="w-full h-full cursor-pointer">
+                  <div className="h-full flex items-center justify-center">
+                    <StaticNoise intensity={1} />
+                    <div className="text-crt-text font-display font-semibold text-center text-sm sm:text-base tracking-wider">
+                      {tv.title}
+                    </div>
                   </div>
-                </div>
-              </TVShell>
+                </TVShell>
+              </div>
+              <span className="font-mono text-[10px] text-crt-text-muted tracking-widest select-none">
+                CH 0{i + 1}
+              </span>
             </div>
           ))}
         </PanStage>
