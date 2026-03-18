@@ -1,5 +1,6 @@
 import { AnimatePresence, motion } from "framer-motion";
-import { useEffect } from "react";
+import { useEffect, useRef, type RefObject } from "react";
+import { useModalAccessibility } from "../../hooks/useModalAccessibility";
 import type { Project } from "../../types";
 import CRTButton from "../CRTButton";
 import CRTScanlines from "../CRTScanlines";
@@ -13,23 +14,33 @@ interface ProjectDetailViewProps {
   currentChannel: ChannelType;
   onChannelChange: (channel: ChannelType) => void;
   onClose?: () => void;
+  backgroundRef?: RefObject<HTMLElement | null>;
 }
 
 /**
  * ProjectDetailView - Expanded project view as a full-screen CRT modal.
  * Uses theme tokens for backdrop, bezel, screen, and accent colors.
  */
-export default function ProjectDetailView({ 
-  project, 
-  currentChannel, 
-  onChannelChange, 
-  onClose 
+export default function ProjectDetailView({
+  project,
+  currentChannel,
+  onChannelChange,
+  onClose,
+  backgroundRef,
 }: ProjectDetailViewProps) {
+  const dialogRef = useRef<HTMLDivElement>(null);
+
+  useModalAccessibility({
+    isOpen: true,
+    dialogRef,
+    backgroundRef,
+  });
+
   // Lock body scroll when project detail is open
   useEffect(() => {
     const originalStyle = window.getComputedStyle(document.body).overflow;
     document.body.style.overflow = 'hidden';
-    
+
     return () => {
       document.body.style.overflow = originalStyle;
     };
@@ -51,19 +62,21 @@ export default function ProjectDetailView({
   }, [onClose]);
 
   return (
-    <div 
+    <div
+      ref={dialogRef}
       className="fixed inset-0 z-50 bg-crt-base/50 backdrop-blur-sm"
       role="dialog"
       aria-modal="true"
       aria-labelledby={`project-detail-title-${project.id}`}
+      tabIndex={-1}
     >
       {/* Animated TV Card - iOS App Store style */}
       <motion.div
         layoutId={`project-${project.id}`}
         className="absolute inset-4 bg-crt-surface-secondary rounded-lg p-4 border-2 border-crt-accent/50 shadow-lg shadow-crt-accent/20 overflow-hidden"
-        transition={{ 
-          type: "spring", 
-          damping: 20, 
+        transition={{
+          type: "spring",
+          damping: 20,
           stiffness: 300
         }}
       >
@@ -71,12 +84,12 @@ export default function ProjectDetailView({
         <h2 id={`project-detail-title-${project.id}`} className="sr-only">
           {project.title}
         </h2>
-        
+
         {/* TV Screen Area */}
         <div className="relative bg-crt-shell-screen rounded border border-crt-border-secondary overflow-hidden h-full">
-          
+
           {/* Channel Controls */}
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1, duration: 0.2 }}
@@ -98,19 +111,20 @@ export default function ProjectDetailView({
                 Description
               </CRTButton>
             </div>
-            
+
             <CRTButton
               onClick={onClose}
               variant="ghost"
               size="sm"
               className="text-crt-text-tertiary hover:text-crt-text"
+              aria-label="Close project details"
             >
               ✕
             </CRTButton>
           </motion.div>
-          
+
           {/* Channel Content */}
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.2, duration: 0.2 }}
@@ -140,7 +154,7 @@ export default function ProjectDetailView({
               )}
             </AnimatePresence>
           </motion.div>
-          
+
           {/* CRT Effects */}
           <div className="absolute inset-0 pointer-events-none">
             <CRTScanlines opacity={0.1} lineHeight={2} lineSpacing={1} />

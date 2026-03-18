@@ -1,0 +1,107 @@
+import { useEffect, useRef, type RefObject } from "react";
+
+interface UseModalAccessibilityOptions {
+  isOpen: boolean;
+  dialogRef: RefObject<HTMLElement | null>;
+  backgroundRef?: RefObject<HTMLElement | null>;
+}
+
+function getFocusableElements(container: HTMLElement): HTMLElement[] {
+  const selectors = [
+    'a[href]',
+    'button:not([disabled])',
+    'input:not([disabled])',
+    'select:not([disabled])',
+    'textarea:not([disabled])',
+    '[tabindex]:not([tabindex="-1"])',
+  ];
+
+  return Array.from(container.querySelectorAll<HTMLElement>(selectors.join(","))).filter((element) => {
+    return !element.hasAttribute("disabled") && element.getAttribute("aria-hidden") !== "true";
+  });
+}
+
+/**
+ * Adds modal keyboard behavior and temporarily removes background content from interaction.
+ */
+export function useModalAccessibility({
+  isOpen,
+  dialogRef,
+  backgroundRef,
+}: UseModalAccessibilityOptions) {
+  const restoreFocusRef = useRef<HTMLElement | null>(null);
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const dialog = dialogRef.current;
+    if (!dialog) return;
+
+    restoreFocusRef.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+
+    const background = backgroundRef?.current;
+    const previousAriaHidden = background?.getAttribute("aria-hidden");
+    const previousInert = background?.inert ?? false;
+
+    if (background) {
+      background.inert = true;
+      background.setAttribute("aria-hidden", "true");
+    }
+
+    const frame = window.requestAnimationFrame(() => {
+      const [firstFocusable] = getFocusableElements(dialog);
+      (firstFocusable ?? dialog).focus();
+    });
+
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key !== "Tab") return;
+
+      const focusableElements = getFocusableElements(dialog);
+      if (focusableElements.length === 0) {
+        event.preventDefault();
+        dialog.focus();
+        return;
+      }
+
+      const firstFocusable = focusableElements[0];
+      const lastFocusable = focusableElements[focusableElements.length - 1];
+      const activeElement = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+      const isOutsideDialog = !activeElement || !dialog.contains(activeElement);
+
+      if (event.shiftKey) {
+        if (isOutsideDialog || activeElement === firstFocusable) {
+          event.preventDefault();
+          lastFocusable.focus();
+        }
+        return;
+      }
+
+      if (isOutsideDialog || activeElement === lastFocusable) {
+        event.preventDefault();
+        firstFocusable.focus();
+      }
+    }
+
+    document.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      window.cancelAnimationFrame(frame);
+      document.removeEventListener("keydown", handleKeyDown);
+
+      if (background) {
+        background.inert = previousInert;
+
+        if (previousAriaHidden === null) {
+          background.removeAttribute("aria-hidden");
+        } else {
+          background.setAttribute("aria-hidden", previousAriaHidden);
+        }
+      }
+
+      const elementToRestore = restoreFocusRef.current;
+      if (elementToRestore && elementToRestore.isConnected) {
+        elementToRestore.focus();
+      }
+    };
+  }, [backgroundRef, dialogRef, isOpen]);
+}

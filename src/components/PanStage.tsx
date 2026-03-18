@@ -1,12 +1,12 @@
 import { motion, useAnimationControls } from "framer-motion";
-import { 
-  Children, 
-  forwardRef, 
+import {
+  Children,
+  forwardRef,
   useCallback,
-  useEffect, 
-  useImperativeHandle, 
-  useMemo, 
-  useRef, 
+  useEffect,
+  useImperativeHandle,
+  useMemo,
+  useRef,
   useState,
   type ReactNode,
   type ReactElement,
@@ -46,31 +46,31 @@ interface ChildWithPanId {
  * Exposes imperative API for external navigation control.
  */
 const PanStage = forwardRef<PanStageRef, PanStageProps>(function PanStage(
-  { children, focusScale = 6.5, className = "", onStateChange = () => {} }, 
+  { children, focusScale = 6.5, className = "", onStateChange = () => {} },
   ref
 ) {
   // ========================================
   // Refs & State Management
   // ========================================
-  
+
   const containerRef = useRef<HTMLDivElement>(null);
   const itemRefs = useRef<Map<string, HTMLDivElement>>(new Map());
   const resizeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const controls = useAnimationControls();
-  
+
   const [selectedTVId, setSelectedTVId] = useState<string | null>(null);
   const [cameraTransform, setCameraTransform] = useState<CameraTransform>({ x: 0, y: 0, scale: 1 });
   const [isAnimationInProgress, setIsAnimationInProgress] = useState(false);
-  
+
   const currentTransformRef = useRef<CameraTransform>({ x: 0, y: 0, scale: 1 });
   const selectedTVIdRef = useRef<string | null>(null);
 
   // ========================================
   // Animation Utilities
   // ========================================
-  
+
   const nearlyEqual = (a: number, b: number, eps = 0.5) => Math.abs(a - b) <= eps;
-  
+
   const isTransformUnchanged = useCallback((nextTransform: CameraTransform) => {
     const current = currentTransformRef.current;
     return nearlyEqual(current.x, nextTransform.x) &&
@@ -79,22 +79,22 @@ const PanStage = forwardRef<PanStageRef, PanStageProps>(function PanStage(
   }, []);
 
   const animateCameraToPosition = useCallback(async (nextTransform: CameraTransform) => {
-    if (isTransformUnchanged(nextTransform)) { 
-      setIsAnimationInProgress(false); 
-      return; 
+    if (isTransformUnchanged(nextTransform)) {
+      setIsAnimationInProgress(false);
+      return;
     }
-    
+
     setIsAnimationInProgress(true);
     setCameraTransform(nextTransform);
     currentTransformRef.current = nextTransform;
-    
+
     const currentZoomLevel = currentTransformRef.current.scale || 1;
     const targetZoomLevel = nextTransform.scale || 1;
     const isZoomingIn = targetZoomLevel > currentZoomLevel + 1e-6;
-    
+
     const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
     const isFirefox = /Firefox/i.test(navigator.userAgent);
-    
+
     if (isMobile && isFirefox) {
       const containerElement = containerRef.current;
       if (containerElement) {
@@ -105,30 +105,30 @@ const PanStage = forwardRef<PanStageRef, PanStageProps>(function PanStage(
             setIsAnimationInProgress(false);
           }
         };
-        
+
         containerElement.addEventListener('transitionend', handleTransitionEnd);
         containerElement.style.transition = 'transform 0.15s ease-out';
         containerElement.style.transform = `translate(${nextTransform.x}px, ${nextTransform.y}px) scale(${nextTransform.scale})`;
       }
-      
+
       setCameraTransform(nextTransform);
       return;
     }
 
     const animationConfig = isZoomingIn
-      ? { 
-          type: 'tween' as const, 
-          ease: 'easeInOut' as const, 
+      ? {
+          type: 'tween' as const,
+          ease: 'easeInOut' as const,
           duration: 0.2,
           velocity: 0,
           restDelta: 0.001
         }
-      : { 
-          type: 'spring' as const, 
-          duration: 0.5, 
+      : {
+          type: 'spring' as const,
+          duration: 0.5,
           bounce: 0.2
         };
-    
+
     try {
       await controls.start(nextTransform, animationConfig);
     } finally {
@@ -139,17 +139,17 @@ const PanStage = forwardRef<PanStageRef, PanStageProps>(function PanStage(
   // ========================================
   // TV Reference Management
   // ========================================
-  
+
   const setItemRef = (id: string | undefined) => (el: HTMLDivElement | null) => {
     if (!id) return;
-    if (el) itemRefs.current.set(id, el); 
+    if (el) itemRefs.current.set(id, el);
     else itemRefs.current.delete(id);
   };
 
   // ========================================
   // Camera Control Functions
   // ========================================
-  
+
   const centerCameraOnTV = useCallback((tvId: string, targetZoomLevel = focusScale) => {
     const tvElement = itemRefs.current.get(tvId);
     const containerElement = containerRef.current;
@@ -157,7 +157,7 @@ const PanStage = forwardRef<PanStageRef, PanStageProps>(function PanStage(
 
     const viewportCenterX = window.innerWidth / 2;
     const viewportCenterY = window.innerHeight / 2;
-    
+
     const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
     const isFirefox = /Firefox/i.test(navigator.userAgent);
 
@@ -248,23 +248,23 @@ const PanStage = forwardRef<PanStageRef, PanStageProps>(function PanStage(
   // ========================================
   // Effect Hooks & Event Handling
   // ========================================
-  
+
   useEffect(() => {
     function handleWindowResize() {
       if (isAnimationInProgress || selectedTVIdRef.current) {
         return;
       }
-      
+
       if (resizeTimerRef.current) clearTimeout(resizeTimerRef.current);
       resizeTimerRef.current = setTimeout(() => {
         if (selectedTVIdRef.current) {
           return;
         }
-        
+
         recenterContainerInViewport(currentTransformRef.current.scale || 1);
       }, 150);
     }
-    
+
     window.addEventListener('resize', handleWindowResize);
     return () => {
       window.removeEventListener('resize', handleWindowResize);
@@ -281,23 +281,23 @@ const PanStage = forwardRef<PanStageRef, PanStageProps>(function PanStage(
   useEffect(() => {
     selectedTVIdRef.current = selectedTVId;
   }, [selectedTVId]);
-  
+
   useEffect(() => {
     currentTransformRef.current = cameraTransform;
   }, [cameraTransform]);
 
   useEffect(() => {
-    onStateChange?.({ 
-      selectedId: selectedTVId, 
-      scale: cameraTransform.scale || 1, 
-      isAnimating: isAnimationInProgress 
+    onStateChange?.({
+      selectedId: selectedTVId,
+      scale: cameraTransform.scale || 1,
+      isAnimating: isAnimationInProgress
     });
   }, [selectedTVId, cameraTransform.scale, isAnimationInProgress, onStateChange]);
 
   // ========================================
   // Imperative API
   // ========================================
-  
+
   const selectTVById = useCallback((tvId: string) => {
     if (isAnimationInProgress || !tvId) return;
     setSelectedTVId(tvId);
@@ -318,7 +318,7 @@ const PanStage = forwardRef<PanStageRef, PanStageProps>(function PanStage(
   // ========================================
   // Render
   // ========================================
-  
+
   const childrenArray = useMemo(() => Children.toArray(children) as ReactElement<ChildWithPanId['props']>[], [children]);
 
   return (
@@ -342,7 +342,7 @@ const PanStage = forwardRef<PanStageRef, PanStageProps>(function PanStage(
       >
         {childrenArray.map((child) => {
           const tvId = child?.props?.['data-pan-id'];
-          
+
           const handleSelect = () => {
             if (isAnimationInProgress) return;
             if (tvId) {
@@ -351,7 +351,7 @@ const PanStage = forwardRef<PanStageRef, PanStageProps>(function PanStage(
               centerCameraOnTV(tvId);
             }
           };
-          
+
           return (
             <div
               key={tvId ?? Math.random().toString(36)}
@@ -359,15 +359,15 @@ const PanStage = forwardRef<PanStageRef, PanStageProps>(function PanStage(
               role="button"
               tabIndex={0}
               aria-label={`Open ${tvId ?? "item"} TV`}
-              onClick={(e: MouseEvent<HTMLDivElement>) => { 
-                e.stopPropagation(); 
+              onClick={(e: MouseEvent<HTMLDivElement>) => {
+                e.stopPropagation();
                 handleSelect();
-                child?.props?.onClick?.(e); 
+                child?.props?.onClick?.(e);
               }}
               onKeyDown={(e: KeyboardEvent<HTMLDivElement>) => {
                 if (e.key === "Enter" || e.key === " ") {
                   e.preventDefault();
-                  handleSelect();
+                  e.currentTarget.click();
                 }
               }}
               className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-crt-accent/50 rounded-lg"
@@ -377,9 +377,9 @@ const PanStage = forwardRef<PanStageRef, PanStageProps>(function PanStage(
           );
         })}
       </motion.div>
-      
+
       {selectedTVId && !isAnimationInProgress && (
-        <div 
+        <div
           className="fixed inset-0"
           aria-hidden="true"
           onClick={resetCameraToOverview}
