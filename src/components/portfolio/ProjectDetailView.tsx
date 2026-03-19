@@ -34,6 +34,7 @@ export default function ProjectDetailView({
     isOpen: true,
     dialogRef,
     backgroundRef,
+    onClose,
   });
 
   // Lock body scroll when project detail is open
@@ -45,21 +46,6 @@ export default function ProjectDetailView({
       document.body.style.overflow = originalStyle;
     };
   }, []);
-
-  useEffect(() => {
-    function handleKeyDown(event: KeyboardEvent) {
-      if (event.key === 'Escape') {
-        event.stopPropagation();
-        event.preventDefault();
-        onClose?.();
-      }
-    }
-
-    window.addEventListener('keydown', handleKeyDown, true);
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown, true);
-    };
-  }, [onClose]);
 
   return (
     <div

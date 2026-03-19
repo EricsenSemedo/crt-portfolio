@@ -33,25 +33,8 @@ export default function TVZoomOverlay({ selectedItem, onClose, children, backgro
     isOpen: Boolean(selectedItem),
     dialogRef,
     backgroundRef,
+    onClose,
   });
-
-  // ========================================
-  // Event Handlers
-  // ========================================
-
-  /**
-   * Handle keyboard events (Escape key to close)
-   */
-  useEffect(() => {
-    function handleKeyDown(e: KeyboardEvent) {
-      if (e.key === "Escape") onClose?.();
-    }
-
-    if (selectedItem) {
-      window.addEventListener("keydown", handleKeyDown);
-      return () => window.removeEventListener("keydown", handleKeyDown);
-    }
-  }, [selectedItem, onClose]);
 
   /**
    * Handle content visibility and sweep animation timing

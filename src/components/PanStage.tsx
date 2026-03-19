@@ -305,6 +305,11 @@ const PanStage = forwardRef<PanStageRef, PanStageProps>(function PanStage(
     centerCameraOnTV(tvId);
   }, [isAnimationInProgress, centerCameraOnTV]);
 
+  const handleSelect = useCallback((tvId?: string) => {
+    if (!tvId) return;
+    selectTVById(tvId);
+  }, [selectTVById]);
+
   const centerOn = useCallback((tvId: string, zoomLevel = focusScale) => {
     centerCameraOnTV(tvId, zoomLevel);
   }, [focusScale, centerCameraOnTV]);
@@ -340,28 +345,20 @@ const PanStage = forwardRef<PanStageRef, PanStageProps>(function PanStage(
           isolation: 'isolate'
         }}
       >
-        {childrenArray.map((child) => {
+        {childrenArray.map((child, index) => {
           const tvId = child?.props?.['data-pan-id'];
-
-          const handleSelect = () => {
-            if (isAnimationInProgress) return;
-            if (tvId) {
-              setSelectedTVId(tvId);
-              selectedTVIdRef.current = tvId;
-              centerCameraOnTV(tvId);
-            }
-          };
+          const itemId = tvId ?? `pan-item-${index}`;
 
           return (
             <div
-              key={tvId ?? Math.random().toString(36)}
-              ref={setItemRef(tvId)}
+              key={itemId}
+              ref={setItemRef(itemId)}
               role="button"
               tabIndex={0}
               aria-label={`Open ${tvId ?? "item"} TV`}
               onClick={(e: MouseEvent<HTMLDivElement>) => {
                 e.stopPropagation();
-                handleSelect();
+                handleSelect(tvId);
                 child?.props?.onClick?.(e);
               }}
               onKeyDown={(e: KeyboardEvent<HTMLDivElement>) => {

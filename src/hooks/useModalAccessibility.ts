@@ -4,6 +4,7 @@ interface UseModalAccessibilityOptions {
   isOpen: boolean;
   dialogRef: RefObject<HTMLElement | null>;
   backgroundRef?: RefObject<HTMLElement | null>;
+  onClose?: () => void;
 }
 
 function getFocusableElements(container: HTMLElement): HTMLElement[] {
@@ -28,6 +29,7 @@ export function useModalAccessibility({
   isOpen,
   dialogRef,
   backgroundRef,
+  onClose,
 }: UseModalAccessibilityOptions) {
   const restoreFocusRef = useRef<HTMLElement | null>(null);
 
@@ -54,6 +56,13 @@ export function useModalAccessibility({
     });
 
     function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        event.stopPropagation();
+        onClose?.();
+        return;
+      }
+
       if (event.key !== "Tab") return;
 
       const focusableElements = getFocusableElements(dialog);
@@ -82,11 +91,11 @@ export function useModalAccessibility({
       }
     }
 
-    document.addEventListener("keydown", handleKeyDown);
+    document.addEventListener("keydown", handleKeyDown, true);
 
     return () => {
       window.cancelAnimationFrame(frame);
-      document.removeEventListener("keydown", handleKeyDown);
+      document.removeEventListener("keydown", handleKeyDown, true);
 
       if (background) {
         background.inert = previousInert;
@@ -103,5 +112,5 @@ export function useModalAccessibility({
         elementToRestore.focus();
       }
     };
-  }, [backgroundRef, dialogRef, isOpen]);
+  }, [backgroundRef, dialogRef, isOpen, onClose]);
 }
