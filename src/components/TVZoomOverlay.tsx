@@ -1,5 +1,6 @@
 import { AnimatePresence, motion } from "framer-motion";
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode, type RefObject } from "react";
+import { useModalAccessibility } from "../hooks/useModalAccessibility";
 import CRTScanlines from "./CRTScanlines";
 import CRTVignette from "./CRTVignette";
 import Navbar from "./Navbar";
@@ -13,58 +14,49 @@ interface TVZoomOverlayProps {
   selectedItem: SelectedItem | null;
   onClose?: () => void;
   children?: ReactNode;
+  backgroundRef?: RefObject<HTMLElement | null>;
 }
 
 /**
  * TVZoomOverlay - True full-screen overlay that displays TV content with CRT effects.
  * Uses theme tokens for background, glow, and noise colors.
  */
-export default function TVZoomOverlay({ selectedItem, onClose, children }: TVZoomOverlayProps) {
+export default function TVZoomOverlay({ selectedItem, onClose, children, backgroundRef }: TVZoomOverlayProps) {
   // ========================================
   // State Management
   // ========================================
   const [showContent, setShowContent] = useState(false);
   const [sweepVisible, setSweepVisible] = useState(false);
+  const dialogRef = useRef<HTMLDivElement>(null);
 
-  // ========================================
-  // Event Handlers
-  // ========================================
-  
-  /**
-   * Handle keyboard events (Escape key to close)
-   */
-  useEffect(() => {
-    function handleKeyDown(e: KeyboardEvent) {
-      if (e.key === "Escape") onClose?.();
-    }
-    
-    if (selectedItem) {
-      window.addEventListener("keydown", handleKeyDown);
-      return () => window.removeEventListener("keydown", handleKeyDown);
-    }
-  }, [selectedItem, onClose]);
+  useModalAccessibility({
+    isOpen: Boolean(selectedItem),
+    dialogRef,
+    backgroundRef,
+    onClose,
+  });
 
   /**
    * Handle content visibility and sweep animation timing
    */
   useEffect(() => {
     if (!selectedItem) return;
-    
+
     // Reset states when new item selected
     setShowContent(false);
     setSweepVisible(false);
-    
+
     // Show content immediately (no static noise delay)
     const contentTimer = setTimeout(() => {
       setShowContent(true);
       setSweepVisible(true);
     }, 50);
-    
+
     // Hide sweep after animation completes
     const sweepTimer = setTimeout(() => {
       setSweepVisible(false);
     }, 50 + 400);
-    
+
     return () => {
       clearTimeout(contentTimer);
       clearTimeout(sweepTimer);
@@ -74,30 +66,36 @@ export default function TVZoomOverlay({ selectedItem, onClose, children }: TVZoo
   return (
     <AnimatePresence>
       {selectedItem && (
-        <motion.div 
+        <motion.div
+          ref={dialogRef}
           className="fixed inset-0 z-40 flex items-center justify-center"
           style={{ backgroundColor: "rgb(var(--crt-bg-overlay) / 0.6)" }}
-          initial={{ opacity: 0 }} 
-          animate={{ opacity: 1 }} 
-          transition={{ duration: 0 }} 
-          exit={{ opacity: 0 }} 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0 }}
+          exit={{ opacity: 0 }}
           onClick={onClose}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby={showContent ? "tv-overlay-title" : undefined}
+          aria-label={showContent ? undefined : "TV overlay"}
+          tabIndex={-1}
         >
           {/* Full-screen content container with CRT effects */}
-          <motion.div 
-            className="w-full h-full bg-crt-base relative overflow-hidden" 
+          <motion.div
+            className="w-full h-full bg-crt-base relative overflow-hidden"
             onClick={(e) => e.stopPropagation()}
           >
             {/* CRT Effects */}
             <CRTVignette intensity={0.3} innerRadius={40} />
             <CRTScanlines opacity={0.2} lineHeight={4} lineSpacing={2} />
-            
+
             {/* Content */}
-            <motion.div 
-              className="relative w-full h-full" 
-              initial={{ opacity: 0 }} 
-              animate={{ opacity: 1 }} 
-              exit={{ opacity: 0 }} 
+            <motion.div
+              className="relative w-full h-full"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
               transition={{ duration: 0.2 }}
             >
                 {/* Content phase - no static noise, direct transition */}
@@ -105,20 +103,20 @@ export default function TVZoomOverlay({ selectedItem, onClose, children }: TVZoo
                   <div className="absolute inset-0">
                     {/* Navigation bar with title and close button */}
                     <Navbar title={selectedItem.title} onClose={onClose} />
-                    
+
                     {/* Page content - initially blurry */}
-                    <div 
+                    <div
                       className="absolute inset-0"
-                      style={{ 
+                      style={{
                         filter: sweepVisible ? "blur(2px) brightness(0.8)" : "none"
                       }}
                     >
                       {children}
                     </div>
-                    
+
                     {/* Clear content revealed by sweep */}
                     {sweepVisible && (
-                      <div 
+                      <div
                         className="absolute inset-0 pointer-events-none"
                         style={{
                           clipPath: "inset(0 0 100% 0)",
@@ -128,7 +126,7 @@ export default function TVZoomOverlay({ selectedItem, onClose, children }: TVZoo
                         <div className="absolute inset-0">{children}</div>
                       </div>
                     )}
-                    
+
                     {/* CRT sweep line - scales with theme glow intensity */}
                     {sweepVisible && (
                       <div
@@ -142,7 +140,7 @@ export default function TVZoomOverlay({ selectedItem, onClose, children }: TVZoo
                         }}
                       />
                     )}
-                    
+
                     {/* Static noise overlay in unswept area - scales with theme noise intensity */}
                     {sweepVisible && (
                       <div
@@ -170,19 +168,19 @@ export default function TVZoomOverlay({ selectedItem, onClose, children }: TVZoo
                         }}
                       />
                     )}
-                    
+
                     {/* Animation keyframes */}
                     <style>{`
                       @keyframes sweepLine {
                         0% { transform: translateY(-150%); }
                         100% { transform: translateY(calc(100vh + 150%)); }
                       }
-                      
+
                       @keyframes revealClear {
                         0% { clip-path: inset(0 0 100% 0); }
                         100% { clip-path: inset(0 0 0% 0); }
                       }
-                      
+
                       @keyframes hideNoise {
                         0% { clip-path: inset(0% 0 0 0); }
                         100% { clip-path: inset(100% 0 0 0); }

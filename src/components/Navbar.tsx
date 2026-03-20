@@ -30,7 +30,7 @@ export default function Navbar({ title, onClose }: NavbarProps) {
       className="absolute top-0 left-0 right-0 z-10 flex items-center justify-between p-4 pointer-events-none"
       style={{ background: "linear-gradient(to bottom, rgb(var(--crt-bg-overlay) / 0.6), transparent)" }}
     >
-      <div className="text-crt-text font-display font-semibold text-lg tracking-wider pointer-events-auto">
+      <div id="tv-overlay-title" className="text-crt-text font-display font-semibold text-lg tracking-wider pointer-events-auto">
         {title}
       </div>
       <button
@@ -45,7 +45,7 @@ export default function Navbar({ title, onClose }: NavbarProps) {
         onMouseLeave={handleMouseLeave}
         onMouseDown={handleMouseDown}
       >
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
           <path d="M18 6L6 18M6 6l12 12" />
         </svg>
       </button>
