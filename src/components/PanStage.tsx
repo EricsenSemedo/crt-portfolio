@@ -84,13 +84,13 @@ const PanStage = forwardRef<PanStageRef, PanStageProps>(function PanStage(
       return;
     }
 
-    setIsAnimationInProgress(true);
-    setCameraTransform(nextTransform);
-    currentTransformRef.current = nextTransform;
-
     const currentZoomLevel = currentTransformRef.current.scale || 1;
     const targetZoomLevel = nextTransform.scale || 1;
     const isZoomingIn = targetZoomLevel > currentZoomLevel + 1e-6;
+
+    setIsAnimationInProgress(true);
+    setCameraTransform(nextTransform);
+    currentTransformRef.current = nextTransform;
 
     const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
     const isFirefox = /Firefox/i.test(navigator.userAgent);
