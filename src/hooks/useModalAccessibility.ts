@@ -7,6 +7,8 @@ interface UseModalAccessibilityOptions {
   onClose?: () => void;
 }
 
+const activeModalStack: HTMLElement[] = [];
+
 function getFocusableElements(container: HTMLElement): HTMLElement[] {
   const selectors = [
     'a[href]',
@@ -23,6 +25,10 @@ function getFocusableElements(container: HTMLElement): HTMLElement[] {
       element.closest("[inert]") === null &&
       element.getAttribute("aria-hidden") !== "true";
   });
+}
+
+function isTopmostModal(dialog: HTMLElement): boolean {
+  return activeModalStack[activeModalStack.length - 1] === dialog;
 }
 
 /**
@@ -42,6 +48,11 @@ export function useModalAccessibility({
     const dialog = dialogRef.current;
     if (!dialog) return;
 
+    const existingDialogIndex = activeModalStack.lastIndexOf(dialog);
+    if (existingDialogIndex !== -1) {
+      activeModalStack.splice(existingDialogIndex, 1);
+    }
+    activeModalStack.push(dialog);
     restoreFocusRef.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
 
     const background = backgroundRef?.current;
@@ -54,11 +65,14 @@ export function useModalAccessibility({
     }
 
     const frame = window.requestAnimationFrame(() => {
+      if (!isTopmostModal(dialog)) return;
       const [firstFocusable] = getFocusableElements(dialog);
       (firstFocusable ?? dialog).focus();
     });
 
     function handleKeyDown(event: KeyboardEvent) {
+      if (!isTopmostModal(dialog)) return;
+
       if (event.key === "Escape") {
         event.preventDefault();
         event.stopPropagation();
@@ -99,6 +113,10 @@ export function useModalAccessibility({
     return () => {
       window.cancelAnimationFrame(frame);
       document.removeEventListener("keydown", handleKeyDown, true);
+      const dialogIndex = activeModalStack.lastIndexOf(dialog);
+      if (dialogIndex !== -1) {
+        activeModalStack.splice(dialogIndex, 1);
+      }
 
       if (background) {
         background.inert = previousInert;
