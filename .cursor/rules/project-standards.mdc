@@ -17,14 +17,14 @@ A personal portfolio website styled as a retro CRT television interface. Built w
 
 | Command            | Description                        |
 | ------------------ | ---------------------------------- |
-| `yarn dev`         | Start Vite dev server with HMR     |
-| `yarn build`       | Production build (TypeScript + Vite) to `dist/` |
-| `yarn lint`        | Run ESLint across the project      |
-| `yarn preview`     | Preview production build locally   |
+| `bun run dev`      | Start Vite dev server with HMR     |
+| `bun run build`    | Production build (TypeScript + Vite) to `dist/` |
+| `bun run lint`     | Run ESLint across the project      |
+| `bun run preview`  | Preview production build locally   |
 
-**No test framework is configured.** There are no test files, no test runner (Vitest, Jest, Playwright, etc.), and no `test` script. If tests are added in the future, use Vitest (it integrates naturally with Vite).
+**Testing:** Vitest is configured with jsdom. Run `bun run vitest run` to execute tests.
 
-**Type-checking:** TypeScript errors surface during `yarn build` (via `vite build`). There is no standalone `tsc --noEmit` script; run `npx tsc --noEmit` manually to type-check without building.
+**Type-checking:** TypeScript errors surface during `bun run build` (via `vite build`). There is no standalone `tsc --noEmit` script; run `bunx tsc --noEmit` manually to type-check without building.
 
 ## Code Standards
 

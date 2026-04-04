@@ -41,6 +41,10 @@ export function useModalAccessibility({
   onClose,
 }: UseModalAccessibilityOptions) {
   const restoreFocusRef = useRef<HTMLElement | null>(null);
+  // Keep a stable ref to onClose so the effect doesn't re-run when callers
+  // pass inline arrow functions (which create a new reference every render).
+  const onCloseRef = useRef(onClose);
+  useEffect(() => { onCloseRef.current = onClose; }, [onClose]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -48,15 +52,19 @@ export function useModalAccessibility({
     const dialog = dialogRef.current;
     if (!dialog) return;
 
-    const existingDialogIndex = activeModalStack.lastIndexOf(dialog);
+    // Capture a non-null reference for use inside closures below,
+    // since TypeScript doesn't carry the narrowing into nested functions.
+    const dialogEl: HTMLElement = dialog;
+
+    const existingDialogIndex = activeModalStack.lastIndexOf(dialogEl);
     if (existingDialogIndex !== -1) {
       activeModalStack.splice(existingDialogIndex, 1);
     }
-    activeModalStack.push(dialog);
+    activeModalStack.push(dialogEl);
     restoreFocusRef.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
 
     const background = backgroundRef?.current;
-    const previousAriaHidden = background?.getAttribute("aria-hidden");
+    const previousAriaHidden = background?.getAttribute("aria-hidden") ?? null;
     const previousInert = background?.inert ?? false;
 
     if (background) {
@@ -65,34 +73,34 @@ export function useModalAccessibility({
     }
 
     const frame = window.requestAnimationFrame(() => {
-      if (!isTopmostModal(dialog)) return;
-      const [firstFocusable] = getFocusableElements(dialog);
-      (firstFocusable ?? dialog).focus();
+      if (!isTopmostModal(dialogEl)) return;
+      const [firstFocusable] = getFocusableElements(dialogEl);
+      (firstFocusable ?? dialogEl).focus();
     });
 
     function handleKeyDown(event: KeyboardEvent) {
-      if (!isTopmostModal(dialog)) return;
+      if (!isTopmostModal(dialogEl)) return;
 
       if (event.key === "Escape") {
         event.preventDefault();
         event.stopPropagation();
-        onClose?.();
+        onCloseRef.current?.();
         return;
       }
 
       if (event.key !== "Tab") return;
 
-      const focusableElements = getFocusableElements(dialog);
+      const focusableElements = getFocusableElements(dialogEl);
       if (focusableElements.length === 0) {
         event.preventDefault();
-        dialog.focus();
+        dialogEl.focus();
         return;
       }
 
       const firstFocusable = focusableElements[0];
       const lastFocusable = focusableElements[focusableElements.length - 1];
       const activeElement = document.activeElement instanceof HTMLElement ? document.activeElement : null;
-      const isOutsideDialog = !activeElement || !dialog.contains(activeElement);
+      const isOutsideDialog = !activeElement || !dialogEl.contains(activeElement);
 
       if (event.shiftKey) {
         if (isOutsideDialog || activeElement === firstFocusable) {
@@ -113,7 +121,7 @@ export function useModalAccessibility({
     return () => {
       window.cancelAnimationFrame(frame);
       document.removeEventListener("keydown", handleKeyDown, true);
-      const dialogIndex = activeModalStack.lastIndexOf(dialog);
+      const dialogIndex = activeModalStack.lastIndexOf(dialogEl);
       if (dialogIndex !== -1) {
         activeModalStack.splice(dialogIndex, 1);
       }
@@ -133,5 +141,5 @@ export function useModalAccessibility({
         elementToRestore.focus();
       }
     };
-  }, [backgroundRef, dialogRef, isOpen, onClose]);
+  }, [backgroundRef, dialogRef, isOpen]);
 }

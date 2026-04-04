@@ -364,7 +364,7 @@ const PanStage = forwardRef<PanStageRef, PanStageProps>(function PanStage(
               onKeyDown={(e: KeyboardEvent<HTMLDivElement>) => {
                 if (e.key === "Enter" || e.key === " ") {
                   e.preventDefault();
-                  e.currentTarget.click();
+                  handleSelect(tvId);
                 }
               }}
               className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-crt-accent/50 rounded-lg"
