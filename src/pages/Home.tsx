@@ -9,18 +9,18 @@ interface HomeProps {
 export default function Home({ onNavigate }: HomeProps) {
   return (
     <div className="w-full h-full overflow-y-auto bg-crt-base text-crt-text">
-      <div className="min-h-full px-6 py-8 space-y-8">
+      <div className="min-h-full px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-6 sm:space-y-8">
         {/* Hero Section */}
         <section className="text-center space-y-4 pt-8">
           <div className="space-y-2">
-            <h1 className="text-4xl md:text-6xl font-display font-bold bg-linear-to-r from-crt-gradient-from to-crt-gradient-to bg-clip-text text-transparent tracking-wide">
+            <h1 className="text-3xl sm:text-4xl md:text-6xl font-display font-bold bg-linear-to-r from-crt-gradient-from to-crt-gradient-to bg-clip-text text-transparent tracking-wide">
               Ericsen Semedo
             </h1>
-            <h2 className="text-xl md:text-2xl text-crt-text-secondary font-light tracking-wide">
+            <h2 className="text-base sm:text-xl md:text-2xl text-crt-text-secondary font-light tracking-wide">
               Computer Science Graduate | Software Developer
             </h2>
           </div>
-          <p className="text-crt-text-tertiary max-w-2xl mx-auto leading-relaxed">
+          <p className="text-sm sm:text-base text-crt-text-tertiary max-w-2xl mx-auto leading-relaxed">
             Building innovative experiences in software and gaming. 
             Recent CS graduate from University of Rhode Island passionate about creating 
             cutting-edge solutions and immersive digital experiences.
@@ -29,8 +29,8 @@ export default function Home({ onNavigate }: HomeProps) {
 
         {/* Skills Section */}
         <section className="space-y-6">
-          <h3 className="text-2xl font-display font-semibold text-center text-crt-accent tracking-wide">Skills & Technologies</h3>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+          <h3 className="text-xl sm:text-2xl font-display font-semibold text-center text-crt-accent tracking-wide">Skills & Technologies</h3>
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
             {[
               'Python', 'Lua', 'C/C++', 
               'Java', 'AWS', 'OpenTofu',
@@ -45,9 +45,9 @@ export default function Home({ onNavigate }: HomeProps) {
 
         {/* Experience Section */}
         <section className="space-y-4">
-          <h3 className="text-2xl font-display font-semibold text-center text-crt-accent tracking-wide">Experience</h3>
+          <h3 className="text-xl sm:text-2xl font-display font-semibold text-center text-crt-accent tracking-wide">Experience</h3>
           <div className="space-y-4">
-            <div className="bg-crt-surface-primary/30 rounded-lg p-6 border border-crt-border/30">
+            <div className="bg-crt-surface-primary/30 rounded-lg p-4 sm:p-6 border border-crt-border/30">
               <h4 className="text-lg font-semibold text-crt-accent-hover mb-2">Infrastructure Engineer - PixelMux</h4>
               <p className="text-crt-text-tertiary text-sm mb-3">Jan 2025 - Present | Remote</p>
               <p className="text-crt-text-secondary leading-relaxed">
@@ -55,7 +55,7 @@ export default function Home({ onNavigate }: HomeProps) {
                 Developing RBAC strategies and implementing integration testing frameworks for core infrastructure modules.
               </p>
             </div>
-            <div className="bg-crt-surface-primary/30 rounded-lg p-6 border border-crt-border/30">
+            <div className="bg-crt-surface-primary/30 rounded-lg p-4 sm:p-6 border border-crt-border/30">
               <h4 className="text-lg font-semibold text-crt-accent-hover mb-2">Freelance Programmer - Fiverr</h4>
               <p className="text-crt-text-tertiary text-sm mb-3">Dec 2023 - Jan 2024 | Remote</p>
               <p className="text-crt-text-secondary leading-relaxed">
@@ -92,7 +92,7 @@ export default function Home({ onNavigate }: HomeProps) {
           <p className="text-crt-text-tertiary">
             Ready to bring your ideas to life? Let's connect and discuss your next project.
           </p>
-          <div className="flex justify-center space-x-4">
+          <div className="flex flex-col sm:flex-row justify-center gap-3 sm:gap-4">
             <CRTButton 
               onClick={() => onNavigate?.('portfolio')}
               variant="primary"

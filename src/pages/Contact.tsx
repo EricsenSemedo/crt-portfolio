@@ -8,13 +8,13 @@ interface ContactProps {
 export default function Contact({ onNavigate }: ContactProps) {
   return (
     <div className="w-full h-full overflow-y-auto bg-crt-base text-crt-text">
-      <div className="min-h-full px-6 py-8 space-y-8">
+      <div className="min-h-full px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-6 sm:space-y-8">
         {/* Header */}
         <section className="text-center space-y-4 pt-8">
-          <h1 className="text-4xl md:text-5xl font-display font-bold bg-linear-to-r from-crt-gradient-from to-crt-gradient-to bg-clip-text text-transparent tracking-wide">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-display font-bold bg-linear-to-r from-crt-gradient-from to-crt-gradient-to bg-clip-text text-transparent tracking-wide">
             Let's Connect
           </h1>
-          <p className="text-crt-text-tertiary max-w-xl mx-auto leading-relaxed">
+          <p className="text-sm sm:text-base text-crt-text-tertiary max-w-xl mx-auto leading-relaxed">
             Ready to collaborate, discuss opportunities, or just chat about technology? 
             I'd love to hear from you!
           </p>
@@ -105,14 +105,14 @@ export default function Contact({ onNavigate }: ContactProps) {
             Whether you have a project in mind, want to discuss opportunities, 
             or just want to connect with a fellow developer, I'm always excited to meet new people.
           </p>
-          <div className="flex justify-center space-x-4 pt-4">
+          <div className="flex flex-col sm:flex-row justify-center gap-3 sm:gap-4 pt-4">
             <CRTButton 
               onClick={() => onNavigate?.('home')}
               variant="secondary"
             >
               Back to Home
             </CRTButton>
-            <div className="px-3 py-2 bg-linear-to-r from-crt-accent-muted to-crt-secondary rounded-lg font-medium text-xs sm:text-base text-white flex items-center">
+            <div className="px-3 py-2 bg-linear-to-r from-crt-accent-muted to-crt-secondary rounded-lg font-medium text-xs sm:text-base text-white flex items-center justify-center">
               Let's build something amazing!
             </div>
           </div>
