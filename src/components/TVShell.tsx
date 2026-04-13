@@ -20,16 +20,16 @@ const VARIANT_CONFIG = {
     padding: "p-4 sm:p-5",
   },
   "rounded-60s": {
-    bodyRadius: "18px",
-    screenRadius: "14px",
-    bezelWidth: "8px",
-    padding: "p-3 sm:p-4",
+    bodyRadius: "40px",
+    screenRadius: "28px",
+    bezelWidth: "10px",
+    padding: "p-4 sm:p-5",
   },
   "monitor-90s": {
-    bodyRadius: "18px",
-    screenRadius: "14px",
-    bezelWidth: "8px",
-    padding: "p-3 sm:p-4",
+    bodyRadius: "8px",
+    screenRadius: "4px",
+    bezelWidth: "6px",
+    padding: "p-2 sm:p-3",
   },
 } as const;
 
@@ -49,6 +49,8 @@ export default function TVShell({
 }: TVShellProps) {
   const config = variant ? VARIANT_CONFIG[variant] : VARIANT_CONFIG["rounded-60s"];
   const isBoxy = variant === "boxy-80s";
+  const isRounded = variant === "rounded-60s";
+  const isMonitor = variant === "monitor-90s";
 
   return (
     <div className={`relative ${className}`} style={shellStyle}>
@@ -63,7 +65,12 @@ export default function TVShell({
       {/* Outer CRT body */}
       <div
         className={`relative h-full shadow-2xl ${frameClassName} bg-crt-shell border border-crt-border-subtle overflow-hidden`}
-        style={{ borderRadius: config.bodyRadius }}
+        style={{
+          borderRadius: config.bodyRadius,
+          boxShadow: isRounded
+            ? "0 8px 30px rgb(var(--crt-vignette-color) / 0.5), inset 0 2px 4px rgb(var(--crt-glow-color) / 0.1)"
+            : undefined,
+        }}
       >
         <div className={`${config.padding} h-full`}>
           <div className="flex items-stretch gap-3 h-full">
@@ -143,8 +150,38 @@ export default function TVShell({
 
         {/* Decorative details overlay */}
         <div className="pointer-events-none absolute inset-0">
-          {/* Right-edge vents (non-boxy variants) */}
-          {!isBoxy && (
+          {/* Speaker grille — rounded-60s only */}
+          {isRounded && (
+            <div className="absolute inset-x-8 bottom-2 flex items-center justify-center gap-[3px]">
+              {Array.from({length: 12}).map((_, i) => (
+                <div
+                  key={i}
+                  className="w-[2px] h-4 rounded-full bg-crt-shell-detail"
+                  style={{ opacity: 0.5 }}
+                />
+              ))}
+            </div>
+          )}
+
+          {/* Brand strip + power LED — monitor-90s only */}
+          {isMonitor && (
+            <div className="absolute inset-x-3 bottom-1 flex items-center justify-between">
+              <div
+                className="h-[2px] flex-1 rounded-full bg-crt-shell-detail"
+                style={{ opacity: 0.4 }}
+              />
+              <div
+                className="w-2 h-2 rounded-full ml-2 shrink-0"
+                style={{
+                  backgroundColor: "rgb(var(--crt-accent-primary) / 0.7)",
+                  boxShadow: "0 0 4px rgb(var(--crt-accent-primary) / 0.4)",
+                }}
+              />
+            </div>
+          )}
+
+          {/* Right-edge vents (default, non-variant) */}
+          {!isBoxy && !isRounded && !isMonitor && (
             <div className="absolute right-1 top-4 bottom-4 flex flex-col justify-between">
               {Array.from({length: 7}).map((_, i) => (
                 <div key={i} className="w-[3px] h-3 bg-crt-shell-detail rounded-sm" style={{ opacity: 0.8 }} />
@@ -152,19 +189,21 @@ export default function TVShell({
             </div>
           )}
 
-          {/* Bottom-edge indicators */}
-          <div className="absolute inset-x-6 bottom-1 flex items-center justify-center gap-2">
-            {Array.from({length: isBoxy ? 3 : 5}).map((_, i) => (
-              <div
-                key={i}
-                className="w-2 h-2 rounded-full bg-crt-shell-indicator"
-                style={{
-                  opacity: 0.9,
-                  boxShadow: "0 0 0 1px rgb(var(--crt-shell-detail))",
-                }}
-              />
-            ))}
-          </div>
+          {/* Bottom-edge indicators (boxy + default only) */}
+          {!isRounded && !isMonitor && (
+            <div className="absolute inset-x-6 bottom-1 flex items-center justify-center gap-2">
+              {Array.from({length: isBoxy ? 3 : 5}).map((_, i) => (
+                <div
+                  key={i}
+                  className="w-2 h-2 rounded-full bg-crt-shell-indicator"
+                  style={{
+                    opacity: 0.9,
+                    boxShadow: "0 0 0 1px rgb(var(--crt-shell-detail))",
+                  }}
+                />
+              ))}
+            </div>
+          )}
 
           {/* Bezel bevel highlights */}
           <div
