@@ -12,15 +12,10 @@ If a tradeoff is required, choose correctness and robustness over short-term con
 
 Long-term maintainability is a core priority. Before adding functionality, check if there is shared logic that can be extracted to a separate module. Duplicate logic across files is a code smell. Don't take shortcuts by adding local logic — change existing code instead.
 
-## Package Manager
-
-**Bun only.** Use `bun` for installing dependencies and running scripts, `bunx` for one-off executables. Never use `npm`, `npx`, `yarn`, or `pnpm`.
-
 ## Commands
 
 | Command | Description |
 | --- | --- |
-| `bun install` | Install dependencies |
 | `bun run dev` | Vite dev server with HMR |
 | `bun run build` | Production build (also type-checks) |
 | `bun run lint` | ESLint |
@@ -41,7 +36,7 @@ Type-check without building: `bunx tsc --noEmit`
 
 ## PRs
 
-Keep PRs small (100–300 lines, max 500). Run `cr review --plain --base main` before submitting.
+Keep PRs small (50–150 lines). Run `cr review --plain --base main` before submitting.
 
 ## Cursor Cloud specific instructions
 
