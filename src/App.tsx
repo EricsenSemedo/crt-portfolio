@@ -32,9 +32,9 @@ export default function App() {
   // ========================================
 
   const TVs: TVConfig[] = useMemo(() => ([
-    { id: 'home', title: 'HOME', width: 340 },
-    { id: 'portfolio', title: 'PORTFOLIO', width: 340 },
-    { id: 'contact', title: 'CONTACT', width: 340 },
+    { id: 'home', title: 'HOME', width: 340, variant: 'boxy-80s' },
+    { id: 'portfolio', title: 'PORTFOLIO', width: 340, variant: 'rounded-60s' },
+    { id: 'contact', title: 'CONTACT', width: 340, variant: 'monitor-90s' },
   ]), []);
 
   const panRef = useRef<PanStageRef>(null);
@@ -95,7 +95,7 @@ export default function App() {
                 data-pan-id={tv.id}
                 className="aspect-square w-[clamp(12rem,24vw,20rem)]"
               >
-                <TVShell className="w-full h-full cursor-pointer">
+                <TVShell className="w-full h-full cursor-pointer" variant={tv.variant}>
                   <div className="h-full flex items-center justify-center">
                     <StaticNoise intensity={1} />
                     <div className="text-crt-text font-display font-semibold text-center text-sm sm:text-base tracking-wider">
