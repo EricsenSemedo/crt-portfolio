@@ -25,8 +25,7 @@ export default function TVZoomOverlay({ selectedItem, onClose, children, backgro
   // ========================================
   // State Management
   // ========================================
-  const [showContent, setShowContent] = useState(false);
-  const [sweepVisible, setSweepVisible] = useState(false);
+  const [phase, setPhase] = useState<"warmup" | "sweep" | "flicker" | "ready" | "off">("off");
   const dialogRef = useRef<HTMLDivElement>(null);
 
   useModalAccessibility({
@@ -36,31 +35,20 @@ export default function TVZoomOverlay({ selectedItem, onClose, children, backgro
     onClose,
   });
 
-  /**
-   * Handle content visibility and sweep animation timing
-   */
   useEffect(() => {
-    if (!selectedItem) return;
+    if (!selectedItem) {
+      setPhase("off");
+      return;
+    }
 
-    // Reset states when new item selected
-    setShowContent(false);
-    setSweepVisible(false);
+    setPhase("warmup");
+    const timers = [
+      setTimeout(() => setPhase("sweep"), 300),
+      setTimeout(() => setPhase("flicker"), 700),
+      setTimeout(() => setPhase("ready"), 850),
+    ];
 
-    // Show content immediately (no static noise delay)
-    const contentTimer = setTimeout(() => {
-      setShowContent(true);
-      setSweepVisible(true);
-    }, 50);
-
-    // Hide sweep after animation completes
-    const sweepTimer = setTimeout(() => {
-      setSweepVisible(false);
-    }, 50 + 400);
-
-    return () => {
-      clearTimeout(contentTimer);
-      clearTimeout(sweepTimer);
-    };
+    return () => timers.forEach(clearTimeout);
   }, [selectedItem]);
 
   return (
@@ -98,42 +86,57 @@ export default function TVZoomOverlay({ selectedItem, onClose, children, backgro
               exit={{ opacity: 0 }}
               transition={{ duration: 0.2 }}
             >
-                {/* Content phase - no static noise, direct transition */}
-                {showContent && (
+                {/* Phase 1: Phosphor warm-up — bright line expands from center */}
+                {phase === "warmup" && (
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div
+                      className="w-full"
+                      style={{
+                        height: "2px",
+                        background: "rgb(var(--crt-glow-accent))",
+                        boxShadow: "0 0 20px rgb(var(--crt-glow-accent) / 0.6), 0 0 60px rgb(var(--crt-glow-accent) / 0.3)",
+                        animation: "phosphorWarmup 0.3s ease-out forwards",
+                      }}
+                    />
+                  </div>
+                )}
+
+                {/* Phase 2+: Content with sweep/flicker */}
+                {phase !== "warmup" && phase !== "off" && (
                   <div className="absolute inset-0">
-                    {/* Navigation bar with title and close button */}
                     <Navbar title={selectedItem.title} onClose={onClose} />
 
-                    {/* Page content - initially blurry */}
+                    {/* Page content — blurry during sweep, sharp after */}
                     <div
                       className="absolute inset-0"
                       style={{
-                        filter: sweepVisible ? "blur(2px) brightness(0.8)" : "none"
+                        filter: phase === "sweep" ? "blur(2px) brightness(0.8)" : "none",
+                        animation: phase === "flicker" ? "crtFlicker 0.15s ease-in-out" : undefined,
                       }}
                     >
                       {children}
                     </div>
 
                     {/* Clear content revealed by sweep */}
-                    {sweepVisible && (
+                    {phase === "sweep" && (
                       <div
                         className="absolute inset-0 pointer-events-none"
                         style={{
                           clipPath: "inset(0 0 100% 0)",
-                          animation: "revealClear 0.4s linear forwards"
+                          animation: "revealClear 0.4s linear forwards",
                         }}
                       >
                         <div className="absolute inset-0">{children}</div>
                       </div>
                     )}
 
-                    {/* CRT sweep line - scales with theme glow intensity */}
-                    {sweepVisible && (
+                    {/* Accent-colored sweep line */}
+                    {phase === "sweep" && (
                       <div
                         className="pointer-events-none absolute inset-x-0 h-8 -top-8"
                         style={{
-                          background: "linear-gradient(to bottom, rgb(var(--crt-glow-color) / 0.15), rgb(var(--crt-glow-color) / 0.05), transparent)",
-                          boxShadow: "0 0 20px rgb(var(--crt-glow-color) / 0.3)",
+                          background: "linear-gradient(to bottom, rgb(var(--crt-glow-accent) / 0.2), rgb(var(--crt-glow-accent) / 0.08), transparent)",
+                          boxShadow: "0 0 24px rgb(var(--crt-glow-accent) / 0.4)",
                           opacity: "var(--crt-glow-opacity)",
                           mixBlendMode: "screen",
                           animation: "sweepLine 0.4s linear forwards",
@@ -141,53 +144,47 @@ export default function TVZoomOverlay({ selectedItem, onClose, children, backgro
                       />
                     )}
 
-                    {/* Static noise overlay in unswept area - scales with theme noise intensity */}
-                    {sweepVisible && (
+                    {/* Noise overlay in unswept area */}
+                    {phase === "sweep" && (
                       <div
                         className="pointer-events-none absolute inset-0"
                         style={{
                           opacity: "calc(0.4 * var(--crt-noise-opacity))",
-                          background: `
-                            repeating-linear-gradient(
-                              0deg,
-                              rgb(var(--crt-noise-light) / 0.02) 0px,
-                              rgb(var(--crt-noise-dark) / 0.02) 1px,
-                              transparent 2px,
-                              transparent 3px
-                            ),
-                            repeating-linear-gradient(
-                              90deg,
-                              rgb(var(--crt-noise-light) / 0.01) 0px,
-                              rgb(var(--crt-noise-dark) / 0.01) 1px,
-                              transparent 2px,
-                              transparent 4px
-                            )
-                          `,
+                          background: `repeating-linear-gradient(0deg, rgb(var(--crt-noise-light) / 0.02) 0px, rgb(var(--crt-noise-dark) / 0.02) 1px, transparent 2px, transparent 3px), repeating-linear-gradient(90deg, rgb(var(--crt-noise-light) / 0.01) 0px, rgb(var(--crt-noise-dark) / 0.01) 1px, transparent 2px, transparent 4px)`,
                           clipPath: "inset(0 0 0% 0)",
-                          animation: "hideNoise 0.4s linear forwards"
+                          animation: "hideNoise 0.4s linear forwards",
                         }}
                       />
                     )}
-
-                    {/* Animation keyframes */}
-                    <style>{`
-                      @keyframes sweepLine {
-                        0% { transform: translateY(-150%); }
-                        100% { transform: translateY(calc(100vh + 150%)); }
-                      }
-
-                      @keyframes revealClear {
-                        0% { clip-path: inset(0 0 100% 0); }
-                        100% { clip-path: inset(0 0 0% 0); }
-                      }
-
-                      @keyframes hideNoise {
-                        0% { clip-path: inset(0% 0 0 0); }
-                        100% { clip-path: inset(100% 0 0 0); }
-                      }
-                    `}</style>
                   </div>
                 )}
+
+                <style>{`
+                  @keyframes phosphorWarmup {
+                    0% { transform: scaleY(1); opacity: 0.3; }
+                    50% { transform: scaleY(3); opacity: 1; }
+                    100% { transform: scaleY(100); opacity: 0.8; }
+                  }
+                  @keyframes sweepLine {
+                    0% { transform: translateY(-150%); }
+                    100% { transform: translateY(calc(100vh + 150%)); }
+                  }
+                  @keyframes revealClear {
+                    0% { clip-path: inset(0 0 100% 0); }
+                    100% { clip-path: inset(0 0 0% 0); }
+                  }
+                  @keyframes hideNoise {
+                    0% { clip-path: inset(0% 0 0 0); }
+                    100% { clip-path: inset(100% 0 0 0); }
+                  }
+                  @keyframes crtFlicker {
+                    0% { opacity: 1; }
+                    25% { opacity: 0.7; }
+                    50% { opacity: 1; }
+                    75% { opacity: 0.85; }
+                    100% { opacity: 1; }
+                  }
+                `}</style>
               </motion.div>
             </motion.div>
         </motion.div>
