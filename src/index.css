@@ -81,59 +81,59 @@
 :root {
   color-scheme: dark;
 
-  /* Backgrounds */
-  --crt-bg-base: 0 0 0;             /* #000000 - deep black */
-  --crt-bg-elevated: 24 24 27;      /* zinc-900 */
-  --crt-bg-surface: 17 17 17;       /* near-black surface */
-  --crt-bg-overlay: 0 0 0;          /* overlay base */
+  /* Backgrounds — warm brown-black instead of pure black */
+  --crt-bg-base: 26 18 8;           /* #1a1208 - deep warm brown-black */
+  --crt-bg-elevated: 36 28 18;      /* warm dark brown */
+  --crt-bg-surface: 30 22 12;       /* near-black with brown undertone */
+  --crt-bg-overlay: 20 14 6;        /* overlay base */
 
-  /* Surfaces (cards, panels) */
-  --crt-surface-primary: 23 23 23;   /* gray-900 equivalent */
-  --crt-surface-secondary: 38 38 38; /* gray-800 equivalent */
-  --crt-surface-tertiary: 50 50 50;  /* gray-700 equivalent */
+  /* Surfaces (cards, panels) — warm-shifted grays */
+  --crt-surface-primary: 34 26 16;   /* warm dark surface */
+  --crt-surface-secondary: 48 38 26; /* warm mid surface */
+  --crt-surface-tertiary: 62 50 36;  /* warm light surface */
 
-  /* Text */
-  --crt-text-primary: 255 255 255;   /* white */
-  --crt-text-secondary: 209 213 219; /* gray-300 */
-  --crt-text-tertiary: 156 163 175;  /* gray-400 */
-  --crt-text-muted: 107 114 128;     /* gray-500 */
+  /* Text — warm off-white instead of pure white */
+  --crt-text-primary: 245 240 232;   /* #f5f0e8 - warm off-white */
+  --crt-text-secondary: 214 204 188; /* warm gray-300 */
+  --crt-text-tertiary: 168 156 138;  /* warm gray-400 */
+  --crt-text-muted: 122 112 98;      /* warm gray-500 */
 
-  /* Borders */
-  --crt-border-primary: 63 63 70;    /* zinc-700 */
-  --crt-border-secondary: 82 82 91;  /* zinc-600 */
-  --crt-border-subtle: 39 39 42;     /* zinc-800 */
+  /* Borders — brown-shifted */
+  --crt-border-primary: 72 60 44;    /* warm border */
+  --crt-border-secondary: 92 78 58;  /* warm border light */
+  --crt-border-subtle: 46 36 24;     /* warm border dark */
 
-  /* Accent: Primary (phosphor green-cyan glow) */
-  --crt-accent-primary: 34 211 238;    /* cyan-400 */
-  --crt-accent-primary-hover: 103 232 249; /* cyan-300 */
-  --crt-accent-primary-muted: 8 145 178;  /* cyan-600 */
-  --crt-accent-primary-deep: 14 116 144;  /* cyan-700 */
+  /* Accent: Primary (amber-orange phosphor glow) */
+  --crt-accent-primary: 245 158 11;     /* #f59e0b - amber-500 */
+  --crt-accent-primary-hover: 252 191 73; /* amber-300 */
+  --crt-accent-primary-muted: 217 119 6;  /* #d97706 - amber-600 */
+  --crt-accent-primary-deep: 180 83 9;    /* amber-700 */
 
-  /* Accent: Secondary (phosphor purple) */
-  --crt-accent-secondary: 192 132 252;   /* purple-400 */
-  --crt-accent-secondary-hover: 216 180 254; /* purple-300 */
+  /* Accent: Secondary (teal-green modern pop) */
+  --crt-accent-secondary: 45 212 191;   /* #2dd4bf - teal-400 */
+  --crt-accent-secondary-hover: 94 234 212; /* teal-300 */
 
   /* Semantic accents */
   --crt-accent-info: 96 165 250;     /* blue-400 */
   --crt-accent-info-hover: 147 197 253; /* blue-300 */
-  --crt-accent-danger: 239 68 68;    /* red-500 */
-  --crt-accent-warning: 250 204 21;  /* yellow-400 */
+  --crt-accent-danger: 248 113 113;  /* red-400 */
+  --crt-accent-warning: 252 211 77;  /* amber-300 */
   --crt-accent-success: 74 222 128;  /* green-400 */
 
-  /* TV Shell (the physical hardware) */
-  --crt-shell-body: 63 63 70;       /* zinc-700 */
-  --crt-shell-bezel: 24 24 27;      /* zinc-900 */
-  --crt-shell-screen: 9 9 11;       /* zinc-950 */
-  --crt-shell-detail: 113 113 122;  /* zinc-500 */
-  --crt-shell-indicator: 161 161 170; /* zinc-400 */
+  /* TV Shell — warm walnut brown default */
+  --crt-shell-body: 107 76 42;      /* #6b4c2a - walnut brown */
+  --crt-shell-bezel: 61 43 20;      /* #3d2b14 - dark walnut */
+  --crt-shell-screen: 16 12 6;      /* near-black warm */
+  --crt-shell-detail: 138 114 82;   /* warm bronze */
+  --crt-shell-indicator: 180 156 120; /* warm brass */
 
-  /* CRT Effects (glow, scanlines, vignette) */
-  --crt-glow-color: 255 255 255;     /* white glow */
-  --crt-glow-accent: 34 211 238;     /* cyan glow for accented elements */
-  --crt-scanline-color: 255 255 255;  /* white scanlines */
-  --crt-vignette-color: 0 0 0;       /* black vignette */
-  --crt-noise-light: 255 255 255;    /* noise bright */
-  --crt-noise-dark: 0 0 0;           /* noise dark */
+  /* CRT Effects — warm amber glow */
+  --crt-glow-color: 255 241 214;     /* warm white glow */
+  --crt-glow-accent: 245 158 11;     /* amber glow */
+  --crt-scanline-color: 255 241 214;  /* warm scanlines */
+  --crt-vignette-color: 10 6 2;      /* deep warm vignette */
+  --crt-noise-light: 255 241 214;    /* warm noise bright */
+  --crt-noise-dark: 10 6 2;          /* warm noise dark */
 
   /* CRT Effect Intensities (multipliers for dark room) */
   --crt-scanline-opacity: 1;
@@ -142,9 +142,9 @@
   --crt-glow-opacity: 1;
   --crt-bloom-opacity: 1;
 
-  /* Gradient endpoints */
-  --crt-gradient-from: 34 211 238;   /* cyan-400 */
-  --crt-gradient-to: 192 132 252;    /* purple-400 */
+  /* Gradient endpoints — amber to teal */
+  --crt-gradient-from: 245 158 11;   /* amber-500 */
+  --crt-gradient-to: 45 212 191;     /* teal-400 */
 }
 
 /* ========================================
