@@ -33,10 +33,13 @@ export interface PanState {
 }
 
 // TV configuration
+export type TVVariant = "boxy-80s" | "rounded-60s" | "monitor-90s";
+
 export interface TVConfig {
   id: string;
   title: string;
   width: number;
+  variant?: TVVariant;
 }
 
 // Navigation function type

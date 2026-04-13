@@ -32,9 +32,9 @@ export default function App() {
   // ========================================
 
   const TVs: TVConfig[] = useMemo(() => ([
-    { id: 'home', title: 'HOME', width: 340 },
-    { id: 'portfolio', title: 'PORTFOLIO', width: 340 },
-    { id: 'contact', title: 'CONTACT', width: 340 },
+    { id: 'home', title: 'HOME', width: 340, variant: 'boxy-80s' },
+    { id: 'portfolio', title: 'PORTFOLIO', width: 340, variant: 'rounded-60s' },
+    { id: 'contact', title: 'CONTACT', width: 340, variant: 'monitor-90s' },
   ]), []);
 
   const panRef = useRef<PanStageRef>(null);
@@ -87,18 +87,18 @@ export default function App() {
           <PanStage
             ref={panRef}
             onStateChange={setPanState}
-            className="mx-auto min-h-screen flex items-center justify-center"
+            className="mx-auto max-w-[1600px] min-h-screen flex items-center justify-center px-4 sm:px-8"
           >
             {TVs.map(tv => (
               <div
                 key={tv.id}
                 data-pan-id={tv.id}
-                className="aspect-square w-[clamp(12rem,24vw,20rem)]"
+                className="aspect-square w-[clamp(14rem,70vw,18rem)] sm:w-[clamp(12rem,30vw,16rem)] md:w-[clamp(14rem,24vw,20rem)] lg:w-[clamp(16rem,20vw,22rem)]"
               >
-                <TVShell className="w-full h-full cursor-pointer">
+                <TVShell className="w-full h-full cursor-pointer" variant={tv.variant}>
                   <div className="h-full flex items-center justify-center">
                     <StaticNoise intensity={1} />
-                    <div className="text-crt-text font-display font-semibold text-center text-sm sm:text-base tracking-wider">
+                    <div className="text-crt-text font-display font-semibold text-center text-xs sm:text-sm md:text-base tracking-wider">
                       {tv.title}
                     </div>
                   </div>
