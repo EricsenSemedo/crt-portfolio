@@ -1,6 +1,6 @@
 # CRT Portfolio
 
-Retro CRT television portfolio site. React 19, TypeScript, Vite 7, Tailwind CSS v4, Framer Motion v12. Deployed to GitHub Pages at `/crt-portfolio/`.
+Retro CRT television portfolio site. Frontend-only SPA deployed to GitHub Pages at `/crt-portfolio/`.
 
 ## Core Priorities
 
@@ -26,13 +26,10 @@ Type-check without building: `bunx tsc --noEmit`
 
 ## Non-obvious conventions
 
+TypeScript/React-specific rules live in `.cursor/rules/tsx-standards.mdc` (auto-attaches when editing `*.ts` / `*.tsx`). Project-wide:
+
 - **No Prettier.** Semicolons are inconsistent across files — match the file you're editing.
-- **Relative imports only.** `@/*` alias exists in tsconfig but is unused — stay consistent with relative paths.
-- **Function declarations** for components, not arrow functions: `export default function Name(...)`.
-- **No enums.** Use string literal unions.
-- **No clsx.** Use string concatenation for conditional classes.
 - **No external state library.** `useState`/`useRef` only.
-- **Inline `type` keyword** in imports: `import { useState, type ReactNode } from "react"`.
 
 ## PRs
 

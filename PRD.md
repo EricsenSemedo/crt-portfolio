@@ -46,43 +46,20 @@ interaction design skills while presenting project work.
 
 ## Architecture
 
-```
-index.html
-  └─ main.tsx
-      └─ ThemeProvider (context: theme, toggleTheme, setTheme)
-          └─ App
-              ├─ ThemeToggle (fixed position, bottom-right)
-              ├─ ParallaxBackground (mouse-tracking spring offset)
-              │   └─ PanStage (camera: translate/scale via Framer Motion controls)
-              │       └─ TVShell x3 (Home, Portfolio, Contact)
-              │           └─ StaticNoise (idle state)
-              └─ TVZoomOverlay (when selectedId && !isAnimating)
-                  ├─ Navbar (title + close button)
-                  ├─ CRTScanlines + CRTVignette
-                  └─ Page content (Home | Portfolio | Contact)
-                      └─ Portfolio ─→ ProjectDetailView (nested modal)
-```
+Component tree, key patterns, and module responsibilities are discoverable from `src/` —
+start at `src/main.tsx` → `src/App.tsx` → follow imports. Conventions worth flagging that
+are NOT obvious from reading code:
 
-### Key Patterns
-
-- **Camera system (PanStage):** Imperative API via `forwardRef` + `useImperativeHandle`.
-  Exposes `reset()`, `centerOn()`, `selectTV()`. Manages camera transform (x, y, scale)
-  with ref-backed state to avoid stale closures. Different animation configs for zoom-in
-  (tween) vs. zoom-out (spring). Firefox Mobile fallback uses CSS transitions instead of
-  Framer Motion.
-
-- **Modal stack (useModalAccessibility):** Custom hook managing focus trap, Escape key,
-  `inert`/`aria-hidden` on background, and an `activeModalStack` array for nested modals
-  (TVZoomOverlay > ProjectDetailView).
-
-- **Theme system:** CSS custom properties with `rgb(var(--token))` pattern for
-  alpha-composable colors. Tailwind v4 `@theme` directive maps tokens to utility classes.
-  `ThemeProvider` with localStorage persistence. `applyTheme` uses View Transitions API
-  with CSS transition-class fallback.
-
-- **CRT effects:** Composable overlay components (CRTScanlines, CRTVignette, StaticNoise)
-  with intensity props. Effect opacities multiply with CSS variable multipliers
-  (`--crt-scanline-opacity`, etc.) that differ between dark (1.0) and light (0.4–0.6) themes.
+- **Theme intensity multipliers:** CRT effect opacities multiply by CSS vars
+  (`--crt-scanline-opacity`, `--crt-vignette-opacity`, `--crt-noise-opacity`) that differ
+  between dark (1.0) and light (0.4–0.6) modes. Tweaking a single component's opacity
+  without going through these tokens will desync theme parity.
+- **Firefox Mobile fallback in PanStage:** UA-sniffed CSS transitions are used instead of
+  Framer Motion controls because the `transform` interpolation jitters on FF mobile. Don't
+  remove the branch without testing on real device.
+- **Modal stack ordering:** `activeModalStack` in `useModalAccessibility` enforces
+  TVZoomOverlay > ProjectDetailView. Adding a new modal requires registering it in the
+  stack so `inert`/focus-restore work correctly.
 
 ## Task Tracker
 
