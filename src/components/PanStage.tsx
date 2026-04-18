@@ -332,7 +332,7 @@ const PanStage = forwardRef<PanStageRef, PanStageProps>(function PanStage(
         ref={containerRef}
         animate={controls}
         transition={{ type: 'spring', duration: 0.5, bounce: 0.2 }}
-        className="origin-top-left flex flex-col md:flex-row items-center justify-center gap-6 md:gap-8"
+        className="origin-top-left flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 md:gap-8 lg:gap-10"
         style={{
           willChange: 'transform',
           transform: 'translate3d(0, 0, 0)',
