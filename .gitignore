@@ -27,3 +27,8 @@ dist-ssr
 .cursor/*
 !.cursor/rules/
 .cursorrules
+
+# Personal context skills (per-user, copied from owner's Obsidian vault)
+# Source of truth: ~/Documents/ObsidianVault/my_2nd_brain/skills/
+.agents/skills/me/
+.claude/skills/me
