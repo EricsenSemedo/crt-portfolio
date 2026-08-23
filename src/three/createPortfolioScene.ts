@@ -119,7 +119,6 @@ export interface PortfolioSceneController {
   pick: (clientX: number, clientY: number) => PortfolioChannelId | null;
   activateAt: (clientX: number, clientY: number) => PortfolioChannelId | "basketball" | null;
   setParallax: (x: number, y: number) => void;
-  setScreenFit: (id: PortfolioChannelId, fit: ScreenFit) => void;
   setHovered: (id: PortfolioChannelId | null) => void;
   focus: (id: PortfolioChannelId, reducedMotion?: boolean, quick?: boolean) => Promise<void>;
   transitionScreen: (id: PortfolioChannelId, reducedMotion?: boolean) => Promise<ScreenTransitionResult>;
@@ -306,7 +305,7 @@ export function createPortfolioScene(): PortfolioSceneController {
 
   function resize(width: number, height: number) {
     const responsiveScreenFits = getResponsiveScreenFits(width, height);
-    channels.forEach((channel) => setScreenFit(channel.id, responsiveScreenFits[channel.id]));
+    channels.forEach((channel) => applyScreenFit(channel.id, responsiveScreenFits[channel.id]));
     sceneLayout = getSceneLayout(width, height);
     camera.aspect = width / Math.max(height, 1);
     camera.fov = sceneLayout.fov;
@@ -461,7 +460,7 @@ export function createPortfolioScene(): PortfolioSceneController {
     parallaxTarget.set(MathUtils.clamp(x, -1, 1), MathUtils.clamp(y, -1, 1));
   }
 
-  function setScreenFit(id: PortfolioChannelId, fit: ScreenFit) {
+  function applyScreenFit(id: PortfolioChannelId, fit: ScreenFit) {
     const channel = channels.find((item) => item.id === id);
     if (!channel) return;
     channel.screenFit = fit;
@@ -654,7 +653,6 @@ export function createPortfolioScene(): PortfolioSceneController {
     pick,
     activateAt,
     setParallax,
-    setScreenFit,
     setHovered,
     focus,
     transitionScreen,

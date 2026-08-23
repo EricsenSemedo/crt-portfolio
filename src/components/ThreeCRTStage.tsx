@@ -3,9 +3,7 @@ import {
   createPortfolioScene,
   type PortfolioChannelId,
   type PortfolioSceneController,
-  type ScreenFit,
 } from "../three/createPortfolioScene";
-import { cloneScreenFitProfile, getScreenFitProfile } from "../three/screenFitProfiles";
 import "./ThreeCRTStage.css";
 
 interface ThreeCRTStageProps {
@@ -23,31 +21,6 @@ const channels: Array<{ id: PortfolioChannelId; number: string; label: string }>
   { id: "contact", number: "03", label: "Contact" },
 ];
 
-function loadScreenFits(profile: ReturnType<typeof getScreenFitProfile>) {
-  if (!import.meta.env.DEV) return cloneScreenFitProfile(profile);
-  const saved = localStorage.getItem("crt-screen-fits:" + profile);
-  if (!saved) return cloneScreenFitProfile(profile);
-  try {
-    const parsed: unknown = JSON.parse(saved);
-    if (isScreenFitRecord(parsed)) return parsed;
-    return cloneScreenFitProfile(profile);
-  } catch {
-    return cloneScreenFitProfile(profile);
-  }
-}
-
-function isScreenFitRecord(value: unknown): value is Record<PortfolioChannelId, ScreenFit> {
-  if (!value || typeof value !== "object") return false;
-  return channels.every(({ id }) => {
-    const fit = (value as Partial<Record<PortfolioChannelId, ScreenFit>>)[id];
-    return isFinitePair(fit?.scale) && isFinitePair(fit?.offset);
-  });
-}
-
-function isFinitePair(value: unknown): value is [number, number] {
-  return Array.isArray(value) && value.length === 2 && value.every((entry) => typeof entry === "number" && Number.isFinite(entry));
-}
-
 export default function ThreeCRTStage({
   onSelect,
   requestedChannel = null,
@@ -64,27 +37,6 @@ export default function ThreeCRTStage({
   const suppressClickRef = useRef(false);
   const [ready, setReady] = useState(false);
   const [hovered, setHovered] = useState<PortfolioChannelId | null>(null);
-  const [calibrating, setCalibrating] = useState<PortfolioChannelId>("home");
-  const [viewportProfile, setViewportProfile] = useState(() => getScreenFitProfile(window.innerWidth, window.innerHeight));
-  const [viewportSize, setViewportSize] = useState(() => [window.innerWidth, window.innerHeight] as const);
-  const [screenFits, setScreenFits] = useState(() => loadScreenFits(getScreenFitProfile(window.innerWidth, window.innerHeight)));
-  const screenFitsRef = useRef(screenFits);
-  const viewportProfileRef = useRef(viewportProfile);
-
-  function updateScreenFit(part: "width" | "height" | "x" | "y", value: number) {
-    setScreenFits((current) => {
-      const fit = current[calibrating];
-      const nextFit: ScreenFit = {
-        scale: [part === "width" ? value : fit.scale[0], part === "height" ? value : fit.scale[1]],
-        offset: [part === "x" ? value : fit.offset[0], part === "y" ? value : fit.offset[1]],
-      };
-      const next = { ...current, [calibrating]: nextFit };
-      screenFitsRef.current = next;
-      sceneRef.current?.setScreenFit(calibrating, nextFit);
-      localStorage.setItem("crt-screen-fits:" + viewportProfile, JSON.stringify(next));
-      return next;
-    });
-  }
 
   useEffect(() => {
     const mount = mountRef.current;
@@ -95,24 +47,9 @@ export default function ThreeCRTStage({
 
     const resizeObserver = new ResizeObserver(() => {
       controller.resize(mount.clientWidth, mount.clientHeight);
-      const nextProfile = getScreenFitProfile(mount.clientWidth, mount.clientHeight);
-      setViewportSize([mount.clientWidth, mount.clientHeight]);
-      if (import.meta.env.DEV) {
-        if (viewportProfileRef.current !== nextProfile) {
-          viewportProfileRef.current = nextProfile;
-          setViewportProfile(nextProfile);
-          const nextFits = loadScreenFits(nextProfile);
-          screenFitsRef.current = nextFits;
-          setScreenFits(nextFits);
-        }
-        channels.forEach((channel) => controller.setScreenFit(channel.id, screenFitsRef.current[channel.id]));
-      }
     });
     resizeObserver.observe(mount);
     controller.resize(mount.clientWidth, mount.clientHeight);
-    if (import.meta.env.DEV) {
-      channels.forEach((channel) => controller.setScreenFit(channel.id, screenFitsRef.current[channel.id]));
-    }
 
     let frame = 0;
     function draw(time: number) {
@@ -264,36 +201,6 @@ export default function ThreeCRTStage({
       </nav>
 
       <div className={"three-stage__loader " + (ready ? "is-ready" : "")}>WARMING UP</div>
-
-      {import.meta.env.DEV && (
-        <aside className="screen-calibrator" aria-label="CRT screen calibration controls">
-          <header>
-            <span>SCREEN FIT</span>
-            <output>{viewportProfile} · {viewportSize[0]}×{viewportSize[1]}</output>
-          </header>
-          <div className="screen-calibrator__tabs">
-            {channels.map((channel) => (
-              <button key={channel.id} type="button" className={calibrating === channel.id ? "is-active" : ""} onClick={() => setCalibrating(channel.id)}>
-                {channel.number} {channel.label}
-              </button>
-            ))}
-          </div>
-          {([
-            ["width", "W", 0.7, 2.2, screenFits[calibrating].scale[0]],
-            ["height", "H", 0.7, 2.5, screenFits[calibrating].scale[1]],
-            ["x", "X", -0.7, 0.7, screenFits[calibrating].offset[0]],
-            ["y", "Y", -0.7, 0.7, screenFits[calibrating].offset[1]],
-          ] as const).map(([part, label, min, max, value]) => (
-            <label key={part}>
-              <span>{label}</span>
-              <input type="range" min={min} max={max} step="0.01" value={value} onChange={(event) => updateScreenFit(part, Number(event.target.value))} />
-              <output>{value.toFixed(2)}</output>
-            </label>
-          ))}
-          <p>Values save automatically for this viewport class.</p>
-        </aside>
-      )}
-
     </main>
   );
 }

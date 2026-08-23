@@ -1,6 +1,6 @@
 import type { PortfolioChannelId, ScreenFit } from "./createPortfolioScene";
 
-export type ScreenFitProfile = "PHONE PORTRAIT" | "FOLD / TABLET" | "DESKTOP";
+type ScreenFitProfile = "PHONE PORTRAIT" | "FOLD / TABLET" | "DESKTOP";
 
 export const SCREEN_FIT_PROFILES: Record<ScreenFitProfile, Record<PortfolioChannelId, ScreenFit>> = {
   "PHONE PORTRAIT": {
@@ -19,16 +19,6 @@ export const SCREEN_FIT_PROFILES: Record<ScreenFitProfile, Record<PortfolioChann
     contact: { scale: [1.44, 2.11], offset: [-0.12, 0.05] },
   },
 };
-
-export function getScreenFitProfile(width: number, height: number): ScreenFitProfile {
-  if (width < height && width <= 600) return "PHONE PORTRAIT";
-  if (width <= 1100) return "FOLD / TABLET";
-  return "DESKTOP";
-}
-
-export function cloneScreenFitProfile(profile: ScreenFitProfile) {
-  return structuredClone(SCREEN_FIT_PROFILES[profile]);
-}
 
 const SCREEN_FIT_ANCHORS = [
   { aspect: 430 / 932, fits: SCREEN_FIT_PROFILES["PHONE PORTRAIT"] },
