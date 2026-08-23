@@ -4,13 +4,13 @@ import { getScreenTransitionDuration, getScreenTransitionKind } from "../screenT
 describe("physical CRT screen transitions", () => {
   it("assigns one comparison treatment to each television", () => {
     expect(getScreenTransitionKind("home")).toBe("pinch");
-    expect(getScreenTransitionKind("portfolio")).toBe("channel-static");
-    expect(getScreenTransitionKind("contact")).toBe("vertical-lock");
+    expect(getScreenTransitionKind("portfolio")).toBe("signal-acquisition");
+    expect(getScreenTransitionKind("contact")).toBe("vertical-sync-roll");
   });
 
   it("keeps every interruption shorter than half a second", () => {
     expect(getScreenTransitionDuration("pinch")).toBeLessThan(500);
-    expect(getScreenTransitionDuration("channel-static")).toBeLessThan(500);
-    expect(getScreenTransitionDuration("vertical-lock")).toBeLessThan(500);
+    expect(getScreenTransitionDuration("signal-acquisition")).toBeLessThan(500);
+    expect(getScreenTransitionDuration("vertical-sync-roll")).toBeLessThan(500);
   });
 });

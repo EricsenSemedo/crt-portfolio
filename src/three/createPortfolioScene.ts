@@ -389,13 +389,13 @@ export function createPortfolioScene(): PortfolioSceneController {
             source: completed.source,
             kind: completed.kind,
             startedAt: time,
-            active: completed.kind === "channel-static",
+            active: completed.kind === "signal-acquisition",
           };
         }
         resolve("completed");
       }
     } else if (
-      heldScreenEffect?.kind === "channel-static"
+      heldScreenEffect?.kind === "signal-acquisition"
       && heldScreenEffect.active
       && time - heldScreenEffect.display.lastFrame > 70
     ) {
@@ -523,7 +523,7 @@ export function createPortfolioScene(): PortfolioSceneController {
   }
 
   function setScreenEffectActive(active: boolean) {
-    if (!heldScreenEffect || heldScreenEffect.kind !== "channel-static") return;
+    if (!heldScreenEffect || heldScreenEffect.kind !== "signal-acquisition") return;
     heldScreenEffect.active = active;
     heldScreenEffect.startedAt = performance.now();
   }
@@ -1032,7 +1032,7 @@ function drawScreenTransition(
     return;
   }
 
-  if (kind === "channel-static") {
+  if (kind === "signal-acquisition") {
     context.drawImage(source, 0, 0, width, height);
     const noiseOpacity = hold ? 1 : reverse ? 1 - progress : progress;
     context.globalAlpha = noiseOpacity;
@@ -1058,16 +1058,26 @@ function drawScreenTransition(
     return;
   }
 
-  context.fillStyle = "#050b22";
-  context.fillRect(0, 0, width, height);
-  const offset = -easeInOutCubic(phase) * (height + 10);
-  context.drawImage(source, 0, offset, width, height);
-  const lineY = Math.max(0, height + offset - 4);
-  context.fillStyle = "#f8fafa";
+  const rollingPortion = 0.82;
+  const rollProgress = Math.min(phase / rollingPortion, 1);
+  const rollTurns = easeOutCubic(rollProgress) * 3;
+  const wrappedOffset = -(rollTurns % 1) * height;
+  const blankingProgress = Math.max((phase - rollingPortion) / (1 - rollingPortion), 0);
+
+  context.globalAlpha = 1 - blankingProgress;
+  context.drawImage(source, 0, wrappedOffset, width, height);
+  context.drawImage(source, 0, wrappedOffset + height, width, height);
+
+  const syncY = (wrappedOffset + height) % height;
+  const blankingHeight = Math.max(12, height * 0.055);
+  context.fillStyle = "rgba(2, 4, 11, .92)";
+  context.fillRect(0, syncY - blankingHeight, width, blankingHeight);
+  context.fillStyle = "rgba(248, 250, 250, .88)";
   context.shadowColor = "#2457ff";
-  context.shadowBlur = 20;
-  context.fillRect(0, lineY, width, 5);
+  context.shadowBlur = 16;
+  context.fillRect(0, syncY - 1, width, 2);
   context.shadowBlur = 0;
+  context.globalAlpha = 1;
 }
 
 function scrambleScreenLabel(label: string, elapsed: number) {
@@ -1081,4 +1091,8 @@ function scrambleScreenLabel(label: string, elapsed: number) {
 
 function easeInOutCubic(value: number) {
   return value < 0.5 ? 4 * value * value * value : 1 - Math.pow(-2 * value + 2, 3) / 2;
+}
+
+function easeOutCubic(value: number) {
+  return 1 - Math.pow(1 - value, 3);
 }
