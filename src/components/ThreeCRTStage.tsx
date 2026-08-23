@@ -68,7 +68,8 @@ export default function ThreeCRTStage({
   const [viewportProfile, setViewportProfile] = useState(() => getScreenFitProfile(window.innerWidth, window.innerHeight));
   const [viewportSize, setViewportSize] = useState(() => [window.innerWidth, window.innerHeight] as const);
   const [screenFits, setScreenFits] = useState(() => loadScreenFits(getScreenFitProfile(window.innerWidth, window.innerHeight)));
-  const initialScreenFitsRef = useRef(screenFits);
+  const screenFitsRef = useRef(screenFits);
+  const viewportProfileRef = useRef(viewportProfile);
 
   function updateScreenFit(part: "width" | "height" | "x" | "y", value: number) {
     setScreenFits((current) => {
@@ -78,6 +79,7 @@ export default function ThreeCRTStage({
         offset: [part === "x" ? value : fit.offset[0], part === "y" ? value : fit.offset[1]],
       };
       const next = { ...current, [calibrating]: nextFit };
+      screenFitsRef.current = next;
       sceneRef.current?.setScreenFit(calibrating, nextFit);
       localStorage.setItem("crt-screen-fits:" + viewportProfile, JSON.stringify(next));
       return next;
@@ -95,17 +97,22 @@ export default function ThreeCRTStage({
       controller.resize(mount.clientWidth, mount.clientHeight);
       const nextProfile = getScreenFitProfile(mount.clientWidth, mount.clientHeight);
       setViewportSize([mount.clientWidth, mount.clientHeight]);
-      setViewportProfile((currentProfile) => {
-        if (currentProfile === nextProfile) return currentProfile;
-        const nextFits = loadScreenFits(nextProfile);
-        setScreenFits(nextFits);
-        channels.forEach((channel) => controller.setScreenFit(channel.id, nextFits[channel.id]));
-        return nextProfile;
-      });
+      if (import.meta.env.DEV) {
+        if (viewportProfileRef.current !== nextProfile) {
+          viewportProfileRef.current = nextProfile;
+          setViewportProfile(nextProfile);
+          const nextFits = loadScreenFits(nextProfile);
+          screenFitsRef.current = nextFits;
+          setScreenFits(nextFits);
+        }
+        channels.forEach((channel) => controller.setScreenFit(channel.id, screenFitsRef.current[channel.id]));
+      }
     });
     resizeObserver.observe(mount);
     controller.resize(mount.clientWidth, mount.clientHeight);
-    channels.forEach((channel) => controller.setScreenFit(channel.id, initialScreenFitsRef.current[channel.id]));
+    if (import.meta.env.DEV) {
+      channels.forEach((channel) => controller.setScreenFit(channel.id, screenFitsRef.current[channel.id]));
+    }
 
     let frame = 0;
     function draw(time: number) {

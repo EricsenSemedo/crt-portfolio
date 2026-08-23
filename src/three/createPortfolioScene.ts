@@ -38,7 +38,7 @@ import {
   getRandomScreenTransitionKind,
   type ScreenTransitionKind,
 } from "./screenTransition";
-import { getScreenFitProfile, SCREEN_FIT_PROFILES, type ScreenFitProfile } from "./screenFitProfiles";
+import { getResponsiveScreenFits } from "./screenFitProfiles";
 import {
   getBasketballHorizontalBounds,
   getCameraCoverDistance,
@@ -142,7 +142,6 @@ export function createPortfolioScene(): PortfolioSceneController {
   camera.lookAt(OVERVIEW_TARGET);
   const overviewPosition = OVERVIEW_POSITION.clone();
   let sceneLayout = getSceneLayout(1280, 800);
-  let screenFitProfile: ScreenFitProfile = "DESKTOP";
 
   const renderer = new WebGLRenderer({
     antialias: true,
@@ -306,11 +305,8 @@ export function createPortfolioScene(): PortfolioSceneController {
   let heldScreenEffect: HeldScreenEffect | null = null;
 
   function resize(width: number, height: number) {
-    const nextScreenFitProfile = getScreenFitProfile(width, height);
-    if (nextScreenFitProfile !== screenFitProfile) {
-      screenFitProfile = nextScreenFitProfile;
-      channels.forEach((channel) => setScreenFit(channel.id, SCREEN_FIT_PROFILES[screenFitProfile][channel.id]));
-    }
+    const responsiveScreenFits = getResponsiveScreenFits(width, height);
+    channels.forEach((channel) => setScreenFit(channel.id, responsiveScreenFits[channel.id]));
     sceneLayout = getSceneLayout(width, height);
     camera.aspect = width / Math.max(height, 1);
     camera.fov = sceneLayout.fov;
