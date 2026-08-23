@@ -1,15 +1,24 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
-export default function useScrambleText(label: string, disabled = false) {
+interface ScrambleOptions {
+  autoPlay?: "touch" | "always";
+  delay?: number;
+}
+
+export default function useScrambleText(label: string, disabled = false, options: ScrambleOptions = {}) {
   const [visibleLabel, setVisibleLabel] = useState(label);
   const animationRef = useRef(0);
+  const timerRef = useRef<number | undefined>(undefined);
 
   useEffect(() => {
     setVisibleLabel(label);
-    return () => cancelAnimationFrame(animationRef.current);
+    return () => {
+      window.clearTimeout(timerRef.current);
+      cancelAnimationFrame(animationRef.current);
+    };
   }, [label]);
 
-  function scramble() {
+  const scramble = useCallback(() => {
     if (disabled || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     cancelAnimationFrame(animationRef.current);
     const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
@@ -27,7 +36,16 @@ export default function useScrambleText(label: string, disabled = false) {
     }
 
     animationRef.current = requestAnimationFrame(frame);
-  }
+  }, [disabled, label]);
+
+  useEffect(() => {
+    if (!options.autoPlay) return;
+    const touchPrimary = window.matchMedia("(hover: none), (pointer: coarse)").matches;
+    // NOTE: Preserve the entrance cue on touch devices without replaying decoration for mouse users.
+    if (options.autoPlay === "touch" && !touchPrimary) return;
+    timerRef.current = window.setTimeout(scramble, options.delay ?? 0);
+    return () => window.clearTimeout(timerRef.current);
+  }, [options.autoPlay, options.delay, scramble]);
 
   return { visibleLabel, scramble };
 }

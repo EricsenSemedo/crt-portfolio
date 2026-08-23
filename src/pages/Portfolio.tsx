@@ -1,6 +1,7 @@
 import { AnimatePresence } from "framer-motion";
 import { useRef, useState } from "react";
 import CRTButton from "../components/CRTButton";
+import ScrambleHeading from "../components/ScrambleHeading";
 import { ProjectDetailView, ProjectTV } from "../components/portfolio";
 import projects from "../data/projects";
 import type { NavigateFunction, Project } from "../types";
@@ -35,9 +36,9 @@ export default function Portfolio({ onNavigate }: PortfolioProps) {
       <div ref={backgroundRef} className="bg-page-tint min-h-full">
         {/* Header */}
         <section className="text-center space-y-4 pt-20 px-6">
-          <h1 className="pb-2 text-4xl font-display font-bold leading-tight tracking-wide text-white md:text-5xl">
+          <ScrambleHeading className="pb-2 text-4xl font-display font-bold leading-tight tracking-wide text-white md:text-5xl">
             Project Gallery
-          </h1>
+          </ScrambleHeading>
           <p className="text-crt-text-tertiary max-w-2xl mx-auto">
             Browse through my project channels. Click any TV to tune in and explore the details.
           </p>

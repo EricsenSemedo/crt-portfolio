@@ -1,5 +1,6 @@
 import CRTActionLink from "../components/CRTActionLink";
 import CRTButton from "../components/CRTButton";
+import ScrambleHeading from "../components/ScrambleHeading";
 import type { NavigateFunction } from "../types";
 
 interface ContactProps {
@@ -11,7 +12,7 @@ export default function Contact({ onNavigate }: ContactProps) {
     <div className="crt-page bg-page-tint h-full w-full overflow-y-auto text-crt-text">
       <div className="bg-page-tint min-h-full px-6 py-8">
         <section className="pt-12 text-center">
-          <h1 className="font-display text-4xl font-bold tracking-wide text-white md:text-5xl">Connect With Me</h1>
+          <ScrambleHeading className="font-display text-4xl font-bold tracking-wide text-white md:text-5xl">Connect With Me</ScrambleHeading>
         </section>
 
         <section className="mx-auto mt-12 max-w-md">

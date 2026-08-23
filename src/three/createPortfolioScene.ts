@@ -282,7 +282,11 @@ export function createPortfolioScene(): PortfolioSceneController {
     overviewPosition.set(...sceneLayout.camera);
     interactionPrompt.baseY = sceneLayout.promptY;
     interactionPrompt.sprite.position.x = 0;
-    interactionPrompt.setLabel(window.matchMedia("(pointer: coarse)").matches ? "TAP A TV TO VIEW" : "CLICK A TV TO VIEW");
+    interactionPrompt.setLabel(
+      window.matchMedia("(hover: none), (pointer: coarse)").matches
+        ? "TAP A TV TO VIEW"
+        : "CLICK A TV TO VIEW",
+    );
     applyResponsiveLayout(sceneLayout);
     if (basketballBody) {
       basketballBody.horizontalBounds = getBasketballHorizontalBounds(
@@ -414,6 +418,7 @@ export function createPortfolioScene(): PortfolioSceneController {
 
   function reset(reducedMotion = false, quick = false) {
     isOverview = true;
+    interactionPrompt.sprite.visible = true;
     return animateTo(
       overviewPosition,
       new Vector3(...sceneLayout.target),

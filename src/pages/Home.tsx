@@ -1,4 +1,5 @@
 import CRTButton from "../components/CRTButton";
+import ScrambleHeading from "../components/ScrambleHeading";
 import projects from "../data/projects";
 import type { NavigateFunction } from "../types";
 
@@ -13,9 +14,9 @@ export default function Home({ onNavigate }: HomeProps) {
         {/* Hero Section */}
         <section className="text-center space-y-4 pt-16 md:pt-20">
           <div className="space-y-2">
-            <h1 className="text-4xl font-display font-bold tracking-wide text-white md:text-6xl">
+            <ScrambleHeading className="text-4xl font-display font-bold tracking-wide text-white md:text-6xl">
               Ericsen Semedo
-            </h1>
+            </ScrambleHeading>
             <h2 className="text-xl md:text-2xl text-crt-text-secondary font-light tracking-wide">
               Computer Science Graduate | Software Developer
             </h2>

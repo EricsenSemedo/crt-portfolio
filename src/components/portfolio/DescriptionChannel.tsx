@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import type { Project } from "../../types";
+import ScrambleHeading from "../ScrambleHeading";
 
 interface DescriptionChannelProps {
   project: Project;
@@ -20,7 +21,7 @@ export default function DescriptionChannel({ project }: DescriptionChannelProps)
     >
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-8">
-          <h2 className="text-3xl font-display font-bold text-crt-accent mb-2 tracking-wide">{project.title}</h2>
+          <ScrambleHeading as="h2" delay={180} className="text-3xl font-display font-bold text-crt-accent mb-2 tracking-wide">{project.title}</ScrambleHeading>
           <p className="text-crt-text-tertiary font-mono text-lg">{project.category}</p>
         </div>
         
