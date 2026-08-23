@@ -82,58 +82,58 @@
   color-scheme: dark;
 
   /* Backgrounds */
-  --crt-bg-base: 0 0 0;             /* #000000 - deep black */
-  --crt-bg-elevated: 24 24 27;      /* zinc-900 */
-  --crt-bg-surface: 17 17 17;       /* near-black surface */
-  --crt-bg-overlay: 0 0 0;          /* overlay base */
+  --crt-bg-base: 26 26 26;
+  --crt-bg-elevated: 31 31 31;
+  --crt-bg-surface: 37 37 37;
+  --crt-bg-overlay: 17 17 17;
 
   /* Surfaces (cards, panels) */
-  --crt-surface-primary: 23 23 23;   /* gray-900 equivalent */
-  --crt-surface-secondary: 38 38 38; /* gray-800 equivalent */
-  --crt-surface-tertiary: 50 50 50;  /* gray-700 equivalent */
+  --crt-surface-primary: 35 35 35;
+  --crt-surface-secondary: 45 45 45;
+  --crt-surface-tertiary: 58 58 58;
 
   /* Text */
-  --crt-text-primary: 255 255 255;   /* white */
-  --crt-text-secondary: 209 213 219; /* gray-300 */
-  --crt-text-tertiary: 156 163 175;  /* gray-400 */
-  --crt-text-muted: 107 114 128;     /* gray-500 */
+  --crt-text-primary: 248 250 250;
+  --crt-text-secondary: 211 220 223;
+  --crt-text-tertiary: 157 177 183;
+  --crt-text-muted: 103 133 141;
 
   /* Borders */
-  --crt-border-primary: 63 63 70;    /* zinc-700 */
-  --crt-border-secondary: 82 82 91;  /* zinc-600 */
-  --crt-border-subtle: 39 39 42;     /* zinc-800 */
+  --crt-border-primary: 89 89 89;
+  --crt-border-secondary: 126 126 126;
+  --crt-border-subtle: 55 55 55;
 
-  /* Accent: Primary (phosphor green-cyan glow) */
-  --crt-accent-primary: 34 211 238;    /* cyan-400 */
-  --crt-accent-primary-hover: 103 232 249; /* cyan-300 */
-  --crt-accent-primary-muted: 8 145 178;  /* cyan-600 */
-  --crt-accent-primary-deep: 14 116 144;  /* cyan-700 */
+  /* Accent: Primary (electric terminal blue) */
+  --crt-accent-primary: 36 87 255;
+  --crt-accent-primary-hover: 74 116 255;
+  --crt-accent-primary-muted: 26 61 176;
+  --crt-accent-primary-deep: 17 43 128;
 
-  /* Accent: Secondary (phosphor purple) */
-  --crt-accent-secondary: 192 132 252;   /* purple-400 */
-  --crt-accent-secondary-hover: 216 180 254; /* purple-300 */
+  /* Accent: Secondary (neutral signal gray) */
+  --crt-accent-secondary: 186 186 186;
+  --crt-accent-secondary-hover: 255 255 255;
 
   /* Semantic accents */
-  --crt-accent-info: 96 165 250;     /* blue-400 */
-  --crt-accent-info-hover: 147 197 253; /* blue-300 */
-  --crt-accent-danger: 239 68 68;    /* red-500 */
-  --crt-accent-warning: 250 204 21;  /* yellow-400 */
-  --crt-accent-success: 74 222 128;  /* green-400 */
+  --crt-accent-info: 157 177 183;
+  --crt-accent-info-hover: 211 220 223;
+  --crt-accent-danger: 248 250 250;
+  --crt-accent-warning: 157 177 183;
+  --crt-accent-success: 0 255 102;
 
   /* TV Shell (the physical hardware) */
-  --crt-shell-body: 63 63 70;       /* zinc-700 */
-  --crt-shell-bezel: 24 24 27;      /* zinc-900 */
-  --crt-shell-screen: 9 9 11;       /* zinc-950 */
-  --crt-shell-detail: 113 113 122;  /* zinc-500 */
-  --crt-shell-indicator: 161 161 170; /* zinc-400 */
+  --crt-shell-body: 45 45 45;
+  --crt-shell-bezel: 17 17 17;
+  --crt-shell-screen: 12 20 49;
+  --crt-shell-detail: 36 87 255;
+  --crt-shell-indicator: 211 220 223;
 
   /* CRT Effects (glow, scanlines, vignette) */
-  --crt-glow-color: 255 255 255;     /* white glow */
-  --crt-glow-accent: 34 211 238;     /* cyan glow for accented elements */
-  --crt-scanline-color: 255 255 255;  /* white scanlines */
+  --crt-glow-color: 248 250 250;
+  --crt-glow-accent: 36 87 255;
+  --crt-scanline-color: 211 220 223;
   --crt-vignette-color: 0 0 0;       /* black vignette */
-  --crt-noise-light: 255 255 255;    /* noise bright */
-  --crt-noise-dark: 0 0 0;           /* noise dark */
+  --crt-noise-light: 248 250 250;
+  --crt-noise-dark: 17 17 17;
 
   /* CRT Effect Intensities (multipliers for dark room) */
   --crt-scanline-opacity: 1;
@@ -143,80 +143,14 @@
   --crt-bloom-opacity: 1;
 
   /* Gradient endpoints */
-  --crt-gradient-from: 34 211 238;   /* cyan-400 */
-  --crt-gradient-to: 192 132 252;    /* purple-400 */
+  --crt-gradient-from: 211 220 223;
+  --crt-gradient-to: 36 87 255;
 }
 
-/* ========================================
- * Light Theme
- * ======================================== */
+/* The portfolio has one authored CRT-dark palette. Keep legacy theme state from
+ * changing its contrast or visual direction. */
 .light {
-  color-scheme: light;
-
-  /* Backgrounds */
-  --crt-bg-base: 244 244 245;        /* zinc-100 */
-  --crt-bg-elevated: 255 255 255;    /* white */
-  --crt-bg-surface: 250 250 250;     /* zinc-50 */
-  --crt-bg-overlay: 244 244 245;     /* zinc-100 */
-
-  /* Surfaces (cards, panels) */
-  --crt-surface-primary: 241 241 241;  /* warm light gray */
-  --crt-surface-secondary: 228 228 231; /* zinc-200 */
-  --crt-surface-tertiary: 212 212 216; /* zinc-300 */
-
-  /* Text */
-  --crt-text-primary: 24 24 27;      /* zinc-900 */
-  --crt-text-secondary: 63 63 70;    /* zinc-700 */
-  --crt-text-tertiary: 82 82 91;     /* zinc-600 */
-  --crt-text-muted: 113 113 122;     /* zinc-500 */
-
-  /* Borders */
-  --crt-border-primary: 212 212 216;  /* zinc-300 */
-  --crt-border-secondary: 161 161 170; /* zinc-400 */
-  --crt-border-subtle: 228 228 231;  /* zinc-200 */
-
-  /* Accent: Primary (deeper for contrast on light bg) */
-  --crt-accent-primary: 8 145 178;     /* cyan-600 */
-  --crt-accent-primary-hover: 6 182 212; /* cyan-500 */
-  --crt-accent-primary-muted: 14 116 144; /* cyan-700 */
-  --crt-accent-primary-deep: 21 94 117;  /* cyan-800 */
-
-  /* Accent: Secondary */
-  --crt-accent-secondary: 147 51 234;   /* purple-600 */
-  --crt-accent-secondary-hover: 168 85 247; /* purple-500 */
-
-  /* Semantic accents (deeper for light mode) */
-  --crt-accent-info: 37 99 235;       /* blue-600 */
-  --crt-accent-info-hover: 59 130 246; /* blue-500 */
-  --crt-accent-danger: 220 38 38;     /* red-600 */
-  --crt-accent-warning: 161 98 7;     /* amber-700 - better contrast on light */
-  --crt-accent-success: 21 128 61;    /* green-700 - better contrast on light */
-
-  /* TV Shell (warm beige/gray plastic in daylight) */
-  --crt-shell-body: 200 200 204;     /* warm light plastic */
-  --crt-shell-bezel: 161 161 170;    /* zinc-400 */
-  --crt-shell-screen: 240 240 243;    /* light screen for readability */
-  --crt-shell-detail: 113 113 122;   /* zinc-500 */
-  --crt-shell-indicator: 82 82 91;   /* zinc-600 */
-
-  /* CRT Effects (subdued in bright room) */
-  --crt-glow-color: 0 0 0;           /* inverted: dark glow on light */
-  --crt-glow-accent: 8 145 178;      /* cyan-600 */
-  --crt-scanline-color: 0 0 0;       /* dark scanlines on light screen */
-  --crt-vignette-color: 0 0 0;       /* still dark vignette */
-  --crt-noise-light: 0 0 0;          /* inverted noise */
-  --crt-noise-dark: 255 255 255;     /* inverted noise */
-
-  /* CRT Effect Intensities (subdued for bright room) */
-  --crt-scanline-opacity: 0.5;
-  --crt-vignette-opacity: 0.6;
-  --crt-noise-opacity: 0.4;
-  --crt-glow-opacity: 0.3;
-  --crt-bloom-opacity: 0.4;
-
-  /* Gradient endpoints */
-  --crt-gradient-from: 8 145 178;    /* cyan-600 */
-  --crt-gradient-to: 147 51 234;     /* purple-600 */
+  color-scheme: dark;
 }
 
 /* ========================================
@@ -235,6 +169,168 @@ body {
   font-family: var(--font-body);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+.bg-page-tint {
+  background-color: #1a1a1a;
+}
+
+.crt-screen-frame {
+  border: 1px solid rgb(186 186 186 / .32);
+  border-radius: 0;
+  box-shadow: inset 0 0 70px rgb(0 0 0 / .62), inset 0 0 2px rgb(255 255 255 / .42);
+}
+
+.crt-page section {
+  transform-origin: center bottom;
+}
+
+@supports (animation-timeline: view()) {
+  .crt-page section {
+    animation: crt-section-reveal linear both;
+    animation-range: entry 4% cover 26%;
+    animation-timeline: view();
+  }
+}
+
+.smart-header.is-snapping {
+  transition: transform 220ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes crt-section-reveal {
+  from { opacity: .35; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.global-crt-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  overflow: hidden;
+  background: none;
+  pointer-events: none;
+}
+
+.global-crt-overlay::before,
+.global-crt-overlay::after {
+  position: absolute;
+  inset: 0;
+  content: "";
+  pointer-events: none;
+}
+
+.global-crt-overlay::before {
+  background: linear-gradient(to bottom, transparent 50%, rgb(0 0 0 / .26) 51%);
+  background-size: 100% 4px;
+  opacity: .42;
+  animation: crt-raster-drift 1s steps(60) infinite;
+}
+
+.global-crt-overlay::after {
+  inset: -5rem;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.55'/%3E%3C/svg%3E");
+  background-size: 180px 180px;
+  mix-blend-mode: overlay;
+  opacity: .11;
+  animation: crt-noise-shift .5s steps(2) infinite;
+}
+
+.global-crt-overlay__scan-beam {
+  position: absolute;
+  left: 0;
+  top: -10vh;
+  z-index: 1;
+  width: 100%;
+  height: clamp(2px, .18vw, 4px);
+  background: rgb(0 0 0 / .58);
+  opacity: .62;
+  animation: crt-scan-beam 8s linear infinite;
+  will-change: transform;
+}
+
+.global-crt-overlay__gloom {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  opacity: .08;
+  backdrop-filter: blur(2px);
+}
+
+.global-crt-overlay__vignette {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  display: block;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  object-fit: fill;
+  opacity: .7;
+  transform: scale(1.02);
+  transform-origin: center;
+}
+
+.crt-page {
+  scrollbar-color: rgb(186 186 186 / .22) transparent;
+  scrollbar-width: thin;
+}
+
+.crt-page::-webkit-scrollbar {
+  width: 2px;
+  height: 2px;
+}
+
+.crt-page::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.crt-page::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: rgb(186 186 186 / .22);
+}
+
+.crt-page::-webkit-scrollbar-thumb:hover {
+  background: rgb(186 186 186 / .42);
+}
+
+@keyframes crt-scan-beam {
+  to { transform: translate3d(0, 120vh, 0); }
+}
+
+@keyframes crt-raster-drift {
+  to { background-position: 0 4px; }
+}
+
+@keyframes crt-noise-shift {
+  0% { transform: translate(0, 0); }
+  25% { transform: translate(2%, -1%); }
+  50% { transform: translate(-1%, 2%); }
+  75% { transform: translate(1%, 1%); }
+  100% { transform: translate(-2%, -1%); }
+}
+
+.channel-marquee__track {
+  display: flex;
+  width: max-content;
+  animation: channel-marquee 18s linear infinite;
+  will-change: transform;
+}
+
+.channel-marquee__track span {
+  padding-right: clamp(3rem, 9vw, 9rem);
+  white-space: nowrap;
+}
+
+@keyframes channel-marquee {
+  to { transform: translateX(-50%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .crt-page section { animation: none; }
+  .channel-marquee__track { animation-play-state: paused; }
+  .global-crt-overlay::before,
+  .global-crt-overlay::after,
+  .global-crt-overlay__scan-beam { animation: none; }
 }
 
 /* View Transitions API -- smooth crossfade for theme switches */

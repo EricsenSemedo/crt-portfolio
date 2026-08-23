@@ -5,6 +5,7 @@ interface UseModalAccessibilityOptions {
   dialogRef: RefObject<HTMLElement | null>;
   backgroundRef?: RefObject<HTMLElement | null>;
   onClose?: () => void;
+  initialFocus?: "first" | "dialog";
 }
 
 const activeModalStack: HTMLElement[] = [];
@@ -39,6 +40,7 @@ export function useModalAccessibility({
   dialogRef,
   backgroundRef,
   onClose,
+  initialFocus = "first",
 }: UseModalAccessibilityOptions) {
   const restoreFocusRef = useRef<HTMLElement | null>(null);
   // Keep a stable ref to onClose so the effect doesn't re-run when callers
@@ -75,7 +77,7 @@ export function useModalAccessibility({
     const frame = window.requestAnimationFrame(() => {
       if (!isTopmostModal(dialogEl)) return;
       const [firstFocusable] = getFocusableElements(dialogEl);
-      (firstFocusable ?? dialogEl).focus();
+      (initialFocus === "dialog" ? dialogEl : firstFocusable ?? dialogEl).focus();
     });
 
     function handleKeyDown(event: KeyboardEvent) {
@@ -141,5 +143,5 @@ export function useModalAccessibility({
         elementToRestore.focus();
       }
     };
-  }, [backgroundRef, dialogRef, isOpen]);
+  }, [backgroundRef, dialogRef, initialFocus, isOpen]);
 }

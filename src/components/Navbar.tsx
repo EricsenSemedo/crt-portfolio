@@ -1,4 +1,6 @@
-import type { MouseEvent } from 'react';
+import { useEffect, useRef } from "react";
+import useDirectionalFill from "../hooks/useDirectionalFill";
+import useScrambleText from "../hooks/useScrambleText";
 
 interface NavbarProps {
   title: string;
@@ -10,44 +12,115 @@ interface NavbarProps {
  * Uses theme tokens for gradient background and text colors.
  */
 export default function Navbar({ title, onClose }: NavbarProps) {
-  const handleMouseEnter = (e: MouseEvent<HTMLButtonElement>) => {
-    e.currentTarget.style.filter = 'contrast(1.1) brightness(1.1)';
-  };
+  const headerRef = useRef<HTMLDivElement>(null);
+  const offsetRef = useRef(0);
+  const closeFill = useDirectionalFill<HTMLButtonElement>();
+  const closeLabel = useScrambleText("X");
 
-  const handleMouseLeave = (e: MouseEvent<HTMLButtonElement>) => {
-    e.currentTarget.style.filter = 'none';
-  };
+  useEffect(() => {
+    const scroller = document.querySelector<HTMLElement>(".crt-page");
+    if (!scroller) return;
 
-  const handleMouseDown = (e: MouseEvent<HTMLButtonElement>) => {
-    e.currentTarget.style.filter = 'contrast(1.3) brightness(1.2) saturate(1.2)';
-    setTimeout(() => {
-      e.currentTarget.style.filter = 'contrast(1.1) brightness(1.1)';
-    }, 100);
-  };
+    let lastScrollTop = scroller.scrollTop;
+    let touchActive = false;
+    let frameRequested = false;
+    let snapTimer: number | undefined;
+
+    function setPosition(nextOffset: number, animate = false) {
+      const header = headerRef.current;
+      if (!header) return;
+      const offset = Math.min(header.offsetHeight, Math.max(0, nextOffset));
+      offsetRef.current = offset;
+      header.classList.toggle("is-snapping", animate);
+      header.style.transform = `translateY(${-offset}px)`;
+    }
+
+    function stopSnap() {
+      const header = headerRef.current;
+      if (!header?.classList.contains("is-snapping")) return;
+      const transform = window.getComputedStyle(header).transform;
+      try {
+        offsetRef.current = Math.max(0, -new DOMMatrixReadOnly(transform).m42);
+      } catch {
+        // Retain the last measured offset if transform parsing is unavailable.
+      }
+      header.classList.remove("is-snapping");
+      header.style.transform = `translateY(${-offsetRef.current}px)`;
+    }
+
+    function settle() {
+      const header = headerRef.current;
+      if (!header || touchActive) return;
+      setPosition(offsetRef.current < header.offsetHeight / 2 ? 0 : header.offsetHeight, true);
+    }
+
+    function update() {
+      const currentScrollTop = scroller.scrollTop;
+      const movement = currentScrollTop - lastScrollTop;
+      lastScrollTop = currentScrollTop;
+      if (currentScrollTop <= 0) setPosition(0);
+      else if (movement !== 0) {
+        stopSnap();
+        setPosition(offsetRef.current + movement);
+        if (!touchActive) {
+          window.clearTimeout(snapTimer);
+          snapTimer = window.setTimeout(settle, 130);
+        }
+      }
+      frameRequested = false;
+    }
+
+    function handleScroll() {
+      if (!frameRequested) {
+        requestAnimationFrame(update);
+        frameRequested = true;
+      }
+    }
+
+    function handleTouchStart() {
+      touchActive = true;
+      window.clearTimeout(snapTimer);
+      stopSnap();
+    }
+
+    function handleTouchEnd() {
+      touchActive = false;
+      settle();
+    }
+
+    scroller.addEventListener("scroll", handleScroll, { passive: true });
+    scroller.addEventListener("touchstart", handleTouchStart, { passive: true });
+    scroller.addEventListener("touchend", handleTouchEnd, { passive: true });
+    scroller.addEventListener("touchcancel", handleTouchEnd, { passive: true });
+    return () => {
+      window.clearTimeout(snapTimer);
+      scroller.removeEventListener("scroll", handleScroll);
+      scroller.removeEventListener("touchstart", handleTouchStart);
+      scroller.removeEventListener("touchend", handleTouchEnd);
+      scroller.removeEventListener("touchcancel", handleTouchEnd);
+    };
+  }, []);
 
   return (
-    <div
-      className="absolute top-0 left-0 right-0 z-10 flex items-center justify-between p-4 pointer-events-none"
-      style={{ background: "linear-gradient(to bottom, rgb(var(--crt-bg-overlay) / 0.6), transparent)" }}
-    >
-      <div id="tv-overlay-title" className="text-crt-text font-display font-semibold text-lg tracking-wider pointer-events-auto">
-        {title}
+    <div ref={headerRef} className="smart-header pointer-events-none absolute left-0 right-0 top-0 z-10 flex h-16 items-center border-b border-white/30 bg-[#1a1a1a]/95 will-change-transform">
+      <div id="tv-overlay-title" className="channel-marquee pointer-events-auto h-full flex-1 overflow-hidden font-display text-3xl font-bold uppercase leading-none tracking-[.08em] text-crt-text md:text-4xl">
+        <div className="channel-marquee__track h-full items-center">
+          {Array.from({ length: 10 }, (_, index) => <span key={index}>{title}</span>)}
+        </div>
       </div>
       <button
         onClick={onClose}
-        className="text-crt-text/80 hover:text-crt-text transition-all duration-200 pointer-events-auto focus:outline-none focus:ring-2 focus:ring-crt-text/50 rounded p-1 cursor-pointer group relative overflow-hidden"
+        onPointerEnter={(event) => { closeFill.handlePointerEnter(event); closeLabel.scramble(); }}
+        onPointerLeave={closeFill.handlePointerLeave}
+        onFocus={() => { closeFill.handleFocus(); closeLabel.scramble(); }}
+        onBlur={closeFill.handleBlur}
+        className="group pointer-events-auto relative h-full overflow-hidden border-l border-white/30 px-5 text-crt-text/80 transition-[transform,color] duration-150 ease-out hover:translate-y-px hover:scale-[0.97] focus:outline-none focus:ring-2 focus:ring-inset focus:ring-crt-accent active:translate-y-0.5 active:scale-[0.95] cursor-pointer"
         aria-label="Close"
-        style={{
-          filter: 'none',
-          transition: 'all 0.2s ease'
-        }}
-        onMouseEnter={handleMouseEnter}
-        onMouseLeave={handleMouseLeave}
-        onMouseDown={handleMouseDown}
       >
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-          <path d="M18 6L6 18M6 6l12 12" />
-        </svg>
+        <span className={"absolute inset-0 bg-white transition-transform duration-200 ease-out " + (closeFill.fillOrigin === "top" ? "origin-top " : "origin-bottom ") + (closeFill.fillVisible ? "scale-y-100" : "scale-y-0")} aria-hidden="true" />
+        <span className={"relative z-10 block w-5 text-center font-mono text-xl leading-none transition-colors " + (closeFill.fillVisible ? "text-[#111]" : "text-crt-text/80")} aria-hidden="true">
+          {closeLabel.visibleLabel}
+        </span>
       </button>
     </div>
   );

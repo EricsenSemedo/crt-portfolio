@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1082 812" preserveAspectRatio="none">
+  <defs>
+    <filter id="feather" x="-5%" y="-5%" width="110%" height="110%">
+      <feGaussianBlur stdDeviation="5" />
+    </filter>
+    <mask id="lens" maskUnits="userSpaceOnUse">
+      <rect width="1082" height="812" fill="white" />
+      <path
+        d="M28 28 Q541 9 1054 28 Q1070 406 1054 784 Q541 803 28 784 Q12 406 28 28Z"
+        fill="black"
+        filter="url(#feather)"
+      />
+    </mask>
+  </defs>
+  <rect width="1082" height="812" fill="black" mask="url(#lens)" />
+</svg>

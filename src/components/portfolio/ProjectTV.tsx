@@ -1,4 +1,6 @@
-import { motion } from "framer-motion";
+import type { KeyboardEvent, PointerEvent } from "react";
+import useDirectionalFill from "../../hooks/useDirectionalFill";
+import useScrambleText from "../../hooks/useScrambleText";
 import type { Project } from "../../types";
 import CRTButton from "../CRTButton";
 import CRTScanlines from "../CRTScanlines";
@@ -14,19 +16,47 @@ interface ProjectTVProps {
  * Uses theme tokens for bezel, screen, and accent colors.
  */
 export default function ProjectTV({ project, onClick, isSelected }: ProjectTVProps) {
+  const fill = useDirectionalFill<HTMLDivElement>("all");
+  const title = useScrambleText(project.title);
+
+  function handlePointerEnter(event: PointerEvent<HTMLDivElement>) {
+    fill.handlePointerEnter(event);
+    title.scramble();
+  }
+
+  function handleKeyDown(event: KeyboardEvent<HTMLDivElement>) {
+    if (event.key !== "Enter" && event.key !== " ") return;
+    event.preventDefault();
+    onClick?.();
+  }
+
   // Don't render the card if it's selected (it's now in the detail view)
   if (isSelected) return null;
   
   return (
-    <motion.div 
+    <div
       className="group relative cursor-pointer"
-      whileHover={{ scale: 1.02 }}
-      whileTap={{ scale: 0.98 }}
       onClick={onClick}
-      layoutId={`project-${project.id}`}
+      onPointerEnter={handlePointerEnter}
+      onPointerLeave={fill.handlePointerLeave}
+      onFocus={() => { fill.handleFocus(); title.scramble(); }}
+      onBlur={fill.handleBlur}
+      onKeyDown={handleKeyDown}
+      role="button"
+      tabIndex={0}
+      aria-label={"View " + project.title}
     >
       {/* CRT TV Bezel */}
-      <div className="bg-crt-surface-secondary rounded-lg p-4 border-2 border-crt-border hover:border-crt-accent/50 transition-all duration-300 group-hover:shadow-lg group-hover:shadow-crt-accent/20">
+      <div className="relative overflow-hidden rounded-lg border-2 border-crt-border bg-crt-surface-secondary p-4 transition-colors duration-200">
+        <span className={"absolute inset-0 bg-white transition-transform duration-200 ease-out " + (
+          fill.fillOrigin === "top" ? "origin-top " :
+          fill.fillOrigin === "right" ? "origin-right " :
+          fill.fillOrigin === "left" ? "origin-left " : "origin-bottom "
+        ) + (fill.fillOrigin === "left" || fill.fillOrigin === "right"
+          ? (fill.fillVisible ? "scale-x-100" : "scale-x-0")
+          : (fill.fillVisible ? "scale-y-100" : "scale-y-0")
+        )} aria-hidden="true" />
+        <div className="relative z-10">
         
         {/* TV Screen */}
         <div className="relative bg-crt-shell-screen rounded border border-crt-border-secondary overflow-hidden aspect-[4/3]">
@@ -39,16 +69,12 @@ export default function ProjectTV({ project, onClick, isSelected }: ProjectTVPro
               <div className="flex items-center justify-between">
                 <span className="text-crt-accent text-sm font-mono">{project.category}</span>
                 <div 
-                  className="w-2 h-2 bg-crt-danger rounded-full animate-pulse"
-                  style={{
-                    animationDelay: `${(project.id.charCodeAt(0) % 5) * 0.5}s`,
-                    animationDuration: `${1.5 + (project.id.charCodeAt(1) % 3) * 0.5}s`
-                  }}
+                  className="h-2 w-2 rounded-full bg-crt-success shadow-[0_0_10px_rgb(var(--crt-accent-success))]"
                 ></div>
               </div>
               
-              <h3 className="text-xl font-display font-bold text-crt-text group-hover:text-crt-accent-hover transition-colors tracking-wide">
-                {project.title}
+              <h3 className="text-xl font-display font-bold text-crt-text transition-colors tracking-wide">
+                {title.visibleLabel}
               </h3>
               
               <p className="text-crt-text-secondary text-sm leading-relaxed">
@@ -90,17 +116,19 @@ export default function ProjectTV({ project, onClick, isSelected }: ProjectTVPro
               variant="primary"
               size="sm"
               className="pointer-events-none"
+              tabIndex={-1}
             >
               Tune In
             </CRTButton>
           </div>
           
           {/* Channel Number */}
-          <span className="text-crt-text-muted text-xs font-mono">
+          <span className={"text-xs font-mono transition-colors " + (fill.fillVisible ? "text-[#333]" : "text-crt-text-muted")}>
             CH {project.id.slice(-2).toUpperCase()}
           </span>
         </div>
+        </div>
       </div>
-    </motion.div>
+    </div>
   );
 }

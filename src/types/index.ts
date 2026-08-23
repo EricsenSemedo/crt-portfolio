@@ -19,9 +19,9 @@ export interface Project {
   description: string;
   status: string;
   tech: string[];
-  image: string;
+  image?: string;
   github?: string;
-  demo: ProjectDemo;
+  demo?: ProjectDemo;
   detailedDescription: ProjectDetailedDescription;
 }
 

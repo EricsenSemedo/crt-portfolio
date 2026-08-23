@@ -10,6 +10,8 @@ interface DemoChannelProps {
  * Uses theme tokens for backgrounds, text, and accent colors.
  */
 export default function DemoChannel({ project }: DemoChannelProps) {
+  const demo = project.demo;
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -26,9 +28,15 @@ export default function DemoChannel({ project }: DemoChannelProps) {
         
         {/* Demo Media */}
         <div className="relative bg-crt-surface-primary rounded-lg overflow-hidden aspect-video mb-6">
-          {project.demo.type === 'video' ? (
+          {!demo ? (
+            <div className="absolute inset-0 flex items-center justify-center bg-crt-surface-secondary">
+              <div className="text-center px-6">
+                <p className="font-mono text-crt-text-tertiary">Demo media not available</p>
+              </div>
+            </div>
+          ) : demo.type === 'video' ? (
             <video
-              src={project.demo.src}
+              src={demo.src}
               className="w-full h-full object-cover"
               autoPlay
               loop
@@ -37,27 +45,27 @@ export default function DemoChannel({ project }: DemoChannelProps) {
               controls
               preload="metadata"
             />
-          ) : project.demo.type === 'gif' ? (
+          ) : demo.type === 'gif' ? (
             <img
-              src={project.demo.src}
-              alt={project.demo.alt}
+              src={demo.src}
+              alt={demo.alt}
               className="w-full h-full object-cover"
             />
           ) : (
             <img
-              src={project.demo.src}
-              alt={project.demo.alt}
+              src={demo.src}
+              alt={demo.alt}
               className="w-full h-full object-cover"
             />
           )}
           
           {/* Overlay for placeholder only */}
-          {project.demo.src.includes('placeholder') && (
+          {demo?.src.includes('placeholder') && (
             <div className="absolute inset-0 flex items-center justify-center bg-crt-surface-secondary">
               <div className="text-center">
                 <div className="text-6xl mb-4">📹</div>
                 <p className="text-crt-text-tertiary">Demo video coming soon</p>
-                <p className="text-sm text-crt-text-muted mt-2">{project.demo.alt}</p>
+                <p className="text-sm text-crt-text-muted mt-2">{demo.alt}</p>
               </div>
             </div>
           )}

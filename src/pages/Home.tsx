@@ -8,12 +8,12 @@ interface HomeProps {
 
 export default function Home({ onNavigate }: HomeProps) {
   return (
-    <div className="w-full h-full overflow-y-auto bg-crt-base text-crt-text">
-      <div className="min-h-full px-6 py-8 space-y-8">
+    <div className="crt-page bg-page-tint w-full h-full overflow-y-auto text-crt-text">
+      <div className="bg-page-tint min-h-full px-6 py-8 space-y-8">
         {/* Hero Section */}
-        <section className="text-center space-y-4 pt-8">
+        <section className="text-center space-y-4 pt-16 md:pt-20">
           <div className="space-y-2">
-            <h1 className="text-4xl md:text-6xl font-display font-bold bg-linear-to-r from-crt-gradient-from to-crt-gradient-to bg-clip-text text-transparent tracking-wide">
+            <h1 className="text-4xl font-display font-bold tracking-wide text-white md:text-6xl">
               Ericsen Semedo
             </h1>
             <h2 className="text-xl md:text-2xl text-crt-text-secondary font-light tracking-wide">

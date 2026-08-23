@@ -56,15 +56,13 @@ export default function ProjectDetailView({
       aria-labelledby={`project-detail-title-${project.id}`}
       tabIndex={-1}
     >
-      {/* Animated TV Card - iOS App Store style */}
+      {/* Fast center-expansion transition without spring or bounce motion. */}
       <motion.div
-        layoutId={`project-${project.id}`}
         className="absolute inset-4 bg-crt-surface-secondary rounded-lg p-4 border-2 border-crt-accent/50 shadow-lg shadow-crt-accent/20 overflow-hidden"
-        transition={{
-          type: "spring",
-          damping: 20,
-          stiffness: 300
-        }}
+        initial={{ opacity: 0, scaleX: 0.18 }}
+        animate={{ opacity: 1, scaleX: 1 }}
+        exit={{ opacity: 0, scaleX: 0.18 }}
+        transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
       >
         {/* Accessible title for aria-labelledby */}
         <h2 id={`project-detail-title-${project.id}`} className="sr-only">
@@ -76,8 +74,8 @@ export default function ProjectDetailView({
 
           {/* Channel Controls */}
           <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
             transition={{ delay: 0.1, duration: 0.2 }}
             className="absolute top-4 left-4 right-4 z-10 flex justify-between items-center"
           >
@@ -120,9 +118,9 @@ export default function ProjectDetailView({
               {currentChannel === 'demo' ? (
                 <motion.div
                   key="demo"
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 1.05 }}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
                   transition={{ duration: 0.2 }}
                 >
                   <DemoChannel project={project} />
@@ -130,9 +128,9 @@ export default function ProjectDetailView({
               ) : (
                 <motion.div
                   key="description"
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 1.05 }}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
                   transition={{ duration: 0.2 }}
                 >
                   <DescriptionChannel project={project} />

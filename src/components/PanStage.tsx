@@ -130,7 +130,10 @@ const PanStage = forwardRef<PanStageRef, PanStageProps>(function PanStage(
         };
 
     try {
-      await controls.start(nextTransform, animationConfig);
+      await controls.start(
+        { x: nextTransform.x, y: nextTransform.y, scale: nextTransform.scale },
+        animationConfig,
+      );
     } finally {
       setIsAnimationInProgress(false);
     }

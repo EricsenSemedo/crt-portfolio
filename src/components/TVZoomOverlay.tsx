@@ -1,8 +1,6 @@
-import { AnimatePresence, motion } from "framer-motion";
-import { useEffect, useRef, useState, type ReactNode, type RefObject } from "react";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { useRef, type ReactNode, type RefObject } from "react";
 import { useModalAccessibility } from "../hooks/useModalAccessibility";
-import CRTScanlines from "./CRTScanlines";
-import CRTVignette from "./CRTVignette";
 import Navbar from "./Navbar";
 
 interface SelectedItem {
@@ -13,6 +11,7 @@ interface SelectedItem {
 interface TVZoomOverlayProps {
   selectedItem: SelectedItem | null;
   onClose?: () => void;
+  onExitComplete?: () => void;
   children?: ReactNode;
   backgroundRef?: RefObject<HTMLElement | null>;
 }
@@ -21,50 +20,26 @@ interface TVZoomOverlayProps {
  * TVZoomOverlay - True full-screen overlay that displays TV content with CRT effects.
  * Uses theme tokens for background, glow, and noise colors.
  */
-export default function TVZoomOverlay({ selectedItem, onClose, children, backgroundRef }: TVZoomOverlayProps) {
-  // ========================================
-  // State Management
-  // ========================================
-  const [showContent, setShowContent] = useState(false);
-  const [sweepVisible, setSweepVisible] = useState(false);
+export default function TVZoomOverlay({
+  selectedItem,
+  onClose,
+  onExitComplete,
+  children,
+  backgroundRef,
+}: TVZoomOverlayProps) {
   const dialogRef = useRef<HTMLDivElement>(null);
+  const reduceMotion = useReducedMotion();
 
   useModalAccessibility({
     isOpen: Boolean(selectedItem),
     dialogRef,
     backgroundRef,
     onClose,
+    initialFocus: "dialog",
   });
 
-  /**
-   * Handle content visibility and sweep animation timing
-   */
-  useEffect(() => {
-    if (!selectedItem) return;
-
-    // Reset states when new item selected
-    setShowContent(false);
-    setSweepVisible(false);
-
-    // Show content immediately (no static noise delay)
-    const contentTimer = setTimeout(() => {
-      setShowContent(true);
-      setSweepVisible(true);
-    }, 50);
-
-    // Hide sweep after animation completes
-    const sweepTimer = setTimeout(() => {
-      setSweepVisible(false);
-    }, 50 + 400);
-
-    return () => {
-      clearTimeout(contentTimer);
-      clearTimeout(sweepTimer);
-    };
-  }, [selectedItem]);
-
   return (
-    <AnimatePresence>
+    <AnimatePresence onExitComplete={onExitComplete}>
       {selectedItem && (
         <motion.div
           ref={dialogRef}
@@ -72,122 +47,51 @@ export default function TVZoomOverlay({ selectedItem, onClose, children, backgro
           style={{ backgroundColor: "rgb(var(--crt-bg-overlay) / 0.6)" }}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 0 }}
-          exit={{ opacity: 0 }}
+          transition={{ duration: reduceMotion ? 0.01 : 0.24, ease: "easeOut" }}
+          exit={{ opacity: 0, transition: { duration: reduceMotion ? 0.01 : 0.32, ease: "easeIn" } }}
           onClick={onClose}
           role="dialog"
           aria-modal="true"
-          aria-labelledby={showContent ? "tv-overlay-title" : undefined}
-          aria-label={showContent ? undefined : "TV overlay"}
+          aria-labelledby="tv-overlay-title"
           tabIndex={-1}
         >
           {/* Full-screen content container with CRT effects */}
           <motion.div
-            className="w-full h-full bg-crt-base relative overflow-hidden"
+            className="crt-screen-frame relative h-full w-full overflow-hidden bg-[#1a1a1a]"
             onClick={(e) => e.stopPropagation()}
+            style={{ transformOrigin: "center" }}
+            initial={reduceMotion
+              ? { opacity: 0 }
+              : { scaleX: 0.08, scaleY: 0.008, opacity: 0, filter: "brightness(3) blur(3px)" }}
+            animate={reduceMotion ? { opacity: 1 } : {
+              scaleX: [0.08, 1, 1],
+              scaleY: [0.008, 0.018, 1],
+              opacity: [0, 1, 1],
+              filter: ["brightness(3) blur(3px)", "brightness(2.2) blur(1px)", "brightness(1) blur(0px)"],
+            }}
+            transition={reduceMotion
+              ? { duration: 0.01 }
+              : { duration: 0.42, times: [0, 0.34, 1], ease: [0.22, 1, 0.36, 1] }}
+            exit={reduceMotion ? { opacity: 0 } : {
+              scaleX: [1, 1, 0.08],
+              scaleY: [1, 0.014, 0.005],
+              opacity: [1, 1, 0],
+              filter: ["brightness(1) blur(0px)", "brightness(2.4) blur(1px)", "brightness(3) blur(3px)"],
+              transition: { duration: 0.32, times: [0, 0.72, 1], ease: [0.55, 0, 1, 0.45] },
+            }}
           >
-            {/* CRT Effects */}
-            <CRTVignette intensity={0.3} innerRadius={40} />
-            <CRTScanlines opacity={0.2} lineHeight={4} lineSpacing={2} />
-
             {/* Content */}
             <motion.div
               className="relative w-full h-full"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              transition={{ duration: 0.2 }}
+              transition={{ duration: reduceMotion ? 0.01 : 0.2 }}
             >
-                {/* Content phase - no static noise, direct transition */}
-                {showContent && (
-                  <div className="absolute inset-0">
-                    {/* Navigation bar with title and close button */}
-                    <Navbar title={selectedItem.title} onClose={onClose} />
-
-                    {/* Page content - initially blurry */}
-                    <div
-                      className="absolute inset-0"
-                      style={{
-                        filter: sweepVisible ? "blur(2px) brightness(0.8)" : "none"
-                      }}
-                    >
-                      {children}
-                    </div>
-
-                    {/* Clear content revealed by sweep */}
-                    {sweepVisible && (
-                      <div
-                        className="absolute inset-0 pointer-events-none"
-                        style={{
-                          clipPath: "inset(0 0 100% 0)",
-                          animation: "revealClear 0.4s linear forwards"
-                        }}
-                      >
-                        <div className="absolute inset-0">{children}</div>
-                      </div>
-                    )}
-
-                    {/* CRT sweep line - scales with theme glow intensity */}
-                    {sweepVisible && (
-                      <div
-                        className="pointer-events-none absolute inset-x-0 h-8 -top-8"
-                        style={{
-                          background: "linear-gradient(to bottom, rgb(var(--crt-glow-color) / 0.15), rgb(var(--crt-glow-color) / 0.05), transparent)",
-                          boxShadow: "0 0 20px rgb(var(--crt-glow-color) / 0.3)",
-                          opacity: "var(--crt-glow-opacity)",
-                          mixBlendMode: "screen",
-                          animation: "sweepLine 0.4s linear forwards",
-                        }}
-                      />
-                    )}
-
-                    {/* Static noise overlay in unswept area - scales with theme noise intensity */}
-                    {sweepVisible && (
-                      <div
-                        className="pointer-events-none absolute inset-0"
-                        style={{
-                          opacity: "calc(0.4 * var(--crt-noise-opacity))",
-                          background: `
-                            repeating-linear-gradient(
-                              0deg,
-                              rgb(var(--crt-noise-light) / 0.02) 0px,
-                              rgb(var(--crt-noise-dark) / 0.02) 1px,
-                              transparent 2px,
-                              transparent 3px
-                            ),
-                            repeating-linear-gradient(
-                              90deg,
-                              rgb(var(--crt-noise-light) / 0.01) 0px,
-                              rgb(var(--crt-noise-dark) / 0.01) 1px,
-                              transparent 2px,
-                              transparent 4px
-                            )
-                          `,
-                          clipPath: "inset(0 0 0% 0)",
-                          animation: "hideNoise 0.4s linear forwards"
-                        }}
-                      />
-                    )}
-
-                    {/* Animation keyframes */}
-                    <style>{`
-                      @keyframes sweepLine {
-                        0% { transform: translateY(-150%); }
-                        100% { transform: translateY(calc(100vh + 150%)); }
-                      }
-
-                      @keyframes revealClear {
-                        0% { clip-path: inset(0 0 100% 0); }
-                        100% { clip-path: inset(0 0 0% 0); }
-                      }
-
-                      @keyframes hideNoise {
-                        0% { clip-path: inset(0% 0 0 0); }
-                        100% { clip-path: inset(100% 0 0 0); }
-                      }
-                    `}</style>
-                  </div>
-                )}
+                <div className="absolute inset-0">
+                  <Navbar title={selectedItem.title} onClose={onClose} />
+                  <div className="absolute inset-0">{children}</div>
+                </div>
               </motion.div>
             </motion.div>
         </motion.div>
