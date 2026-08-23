@@ -35,6 +35,20 @@ export function getCameraFitDistance(
   return Math.max(verticalDistance, horizontalDistance) * margin;
 }
 
+export function getCameraCoverDistance(
+  width: number,
+  height: number,
+  aspect: number,
+  verticalFov: number,
+  overscan = 0.96,
+) {
+  const verticalHalfFov = MathUtils.degToRad(verticalFov / 2);
+  const horizontalHalfFov = Math.atan(Math.tan(verticalHalfFov) * Math.max(aspect, 0.01));
+  const verticalDistance = height / 2 / Math.tan(verticalHalfFov);
+  const horizontalDistance = width / 2 / Math.tan(horizontalHalfFov);
+  return Math.min(verticalDistance, horizontalDistance) * overscan;
+}
+
 export function getSceneLayout(width: number, height: number): SceneLayout {
   const aspect = width / Math.max(height, 1);
   const portrait = aspect < 0.72;

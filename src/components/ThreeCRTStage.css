@@ -59,6 +59,22 @@
 .three-stage__loader { position: absolute; inset: 0; z-index: 10; display: grid; place-items: center; background: #111; color: var(--phosphor); font-size: .68rem; letter-spacing: .28em; transition: opacity 500ms ease, visibility 500ms; }
 .three-stage__loader.is-ready { opacity: 0; visibility: hidden; }
 
+.screen-calibrator { position: absolute; right: 1rem; bottom: 1rem; z-index: 30; width: min(22rem, calc(100vw - 2rem)); padding: .8rem; border: 1px solid rgba(36, 87, 255, .55); background: rgba(2, 4, 11, .92); box-shadow: 0 12px 36px rgba(0, 0, 0, .55); color: #d3dcdf; font: 600 .68rem/1.2 "IBM Plex Mono", monospace; letter-spacing: .06em; }
+.screen-calibrator header, .screen-calibrator label { display: grid; grid-template-columns: 1.8rem 1fr 3.2rem; align-items: center; gap: .5rem; }
+.screen-calibrator header { grid-template-columns: auto 1fr; margin-bottom: .65rem; color: #f8fafa; }
+.screen-calibrator header output { color: #8aa4ff; font-size: .58rem; }
+.screen-calibrator output { text-align: right; }
+.screen-calibrator__tabs { display: flex; gap: .35rem; margin-bottom: .6rem; }
+.screen-calibrator button { flex: 1; border: 1px solid rgba(211, 220, 223, .3); background: transparent; color: inherit; padding: .3rem .4rem; cursor: pointer; }
+.screen-calibrator button.is-active { border-color: #2457ff; background: #2457ff; color: #f8fafa; }
+.screen-calibrator label + label { margin-top: .35rem; }
+.screen-calibrator input { width: 100%; accent-color: #2457ff; }
+.screen-calibrator p { margin: .65rem 0 0; color: rgba(211, 220, 223, .62); font-size: .58rem; }
+
+@media (max-width: 700px) {
+  .screen-calibrator { right: .65rem; bottom: .65rem; width: calc(100vw - 1.3rem); }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .three-stage__loader, .three-stage__channels button { transition-duration: .01ms; }
 }

@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   getBasketballHorizontalBounds,
+  getCameraCoverDistance,
   getCameraFitDistance,
   getSceneLayout,
   scaleCoordinateAroundPivot,
@@ -51,5 +52,15 @@ describe("responsive scene layout", () => {
     const coverScreen = getCameraFitDistance(1.4, 1, 0.46, 60);
 
     expect(coverScreen).toBeGreaterThan(unfolded * 2);
+  });
+
+  it("moves close enough for the physical screen to cover every viewport ratio", () => {
+    const portraitCover = getCameraCoverDistance(1.4, 1, 0.46, 60);
+    const landscapeCover = getCameraCoverDistance(1.4, 1, 1.6, 38);
+    const portraitContain = getCameraFitDistance(1.4, 1, 0.46, 60);
+    const landscapeContain = getCameraFitDistance(1.4, 1, 1.6, 38);
+
+    expect(portraitCover).toBeLessThan(portraitContain);
+    expect(landscapeCover).toBeLessThan(landscapeContain);
   });
 });

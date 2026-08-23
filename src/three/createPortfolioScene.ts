@@ -40,7 +40,7 @@ import {
 } from "./screenTransition";
 import {
   getBasketballHorizontalBounds,
-  getCameraFitDistance,
+  getCameraCoverDistance,
   getSceneLayout,
   scaleCoordinateAroundPivot,
   type HorizontalBounds,
@@ -118,6 +118,7 @@ export interface PortfolioSceneController {
   pick: (clientX: number, clientY: number) => PortfolioChannelId | null;
   activateAt: (clientX: number, clientY: number) => PortfolioChannelId | "basketball" | null;
   setParallax: (x: number, y: number) => void;
+  setScreenFit: (id: PortfolioChannelId, fit: ScreenFit) => void;
   setHovered: (id: PortfolioChannelId | null) => void;
   focus: (id: PortfolioChannelId, reducedMotion?: boolean, quick?: boolean) => Promise<void>;
   transitionScreen: (id: PortfolioChannelId, reducedMotion?: boolean) => Promise<ScreenTransitionResult>;
@@ -457,6 +458,15 @@ export function createPortfolioScene(): PortfolioSceneController {
     parallaxTarget.set(MathUtils.clamp(x, -1, 1), MathUtils.clamp(y, -1, 1));
   }
 
+  function setScreenFit(id: PortfolioChannelId, fit: ScreenFit) {
+    const channel = channels.find((item) => item.id === id);
+    if (!channel) return;
+    channel.screenFit = fit;
+    channel.asset.screenPlane.scale.set(fit.scale[0], fit.scale[1], 1);
+    channel.asset.screenPlane.position.x = fit.offset[0];
+    channel.asset.screenPlane.position.y = fit.offset[1];
+  }
+
   function setHovered(next: PortfolioChannelId | null) {
     if (hovered === next) return;
     channels.forEach((channel) => {
@@ -486,15 +496,14 @@ export function createPortfolioScene(): PortfolioSceneController {
     channel.asset.screenPlane.geometry.computeBoundingBox();
     const localSize = channel.asset.screenPlane.geometry.boundingBox?.getSize(new Vector3()) ?? new Vector3(1, 1, 0);
     const worldScale = channel.asset.screenPlane.getWorldScale(new Vector3());
-    const fittedDistance = getCameraFitDistance(
+    const coverDistance = getCameraCoverDistance(
       localSize.x * Math.abs(worldScale.x),
       localSize.y * Math.abs(worldScale.y),
       camera.aspect,
       camera.fov,
     );
-    const preferredDistance = id === "contact" ? 1.28 : 1.18;
     const destination = screenPosition.clone().add(
-      screenDirection.multiplyScalar(Math.max(preferredDistance, fittedDistance)),
+      screenDirection.multiplyScalar(coverDistance),
     );
     return animateTo(destination, screenPosition, reducedMotion ? 1 : quick ? 380 : 760, 0.18);
   }
@@ -642,6 +651,7 @@ export function createPortfolioScene(): PortfolioSceneController {
     pick,
     activateAt,
     setParallax,
+    setScreenFit,
     setHovered,
     focus,
     transitionScreen,
