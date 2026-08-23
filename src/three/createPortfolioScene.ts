@@ -35,6 +35,7 @@ import { createTable } from "./assets/createTable";
 import { createVhsTV } from "./assets/createVhsTV";
 import {
   getBasketballHorizontalBounds,
+  getCameraFitDistance,
   getSceneLayout,
   scaleCoordinateAroundPivot,
   type HorizontalBounds,
@@ -413,7 +414,19 @@ export function createPortfolioScene(): PortfolioSceneController {
     const screenDirection = new Vector3(0, 0, 1).applyQuaternion(
       channel.asset.screenPlane.getWorldQuaternion(new Quaternion()),
     );
-    const destination = screenPosition.clone().add(screenDirection.multiplyScalar(id === "contact" ? 1.28 : 1.18));
+    channel.asset.screenPlane.geometry.computeBoundingBox();
+    const localSize = channel.asset.screenPlane.geometry.boundingBox?.getSize(new Vector3()) ?? new Vector3(1, 1, 0);
+    const worldScale = channel.asset.screenPlane.getWorldScale(new Vector3());
+    const fittedDistance = getCameraFitDistance(
+      localSize.x * Math.abs(worldScale.x),
+      localSize.y * Math.abs(worldScale.y),
+      camera.aspect,
+      camera.fov,
+    );
+    const preferredDistance = id === "contact" ? 1.28 : 1.18;
+    const destination = screenPosition.clone().add(
+      screenDirection.multiplyScalar(Math.max(preferredDistance, fittedDistance)),
+    );
     return animateTo(destination, screenPosition, reducedMotion ? 1 : quick ? 380 : 760, 0.18);
   }
 

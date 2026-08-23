@@ -21,6 +21,20 @@ export function scaleCoordinateAroundPivot(value: number, pivot: number, scale: 
   return pivot + (value - pivot) * scale;
 }
 
+export function getCameraFitDistance(
+  width: number,
+  height: number,
+  aspect: number,
+  verticalFov: number,
+  margin = 1.08,
+) {
+  const verticalHalfFov = MathUtils.degToRad(verticalFov / 2);
+  const horizontalHalfFov = Math.atan(Math.tan(verticalHalfFov) * Math.max(aspect, 0.01));
+  const verticalDistance = height / 2 / Math.tan(verticalHalfFov);
+  const horizontalDistance = width / 2 / Math.tan(horizontalHalfFov);
+  return Math.max(verticalDistance, horizontalDistance) * margin;
+}
+
 export function getSceneLayout(width: number, height: number): SceneLayout {
   const aspect = width / Math.max(height, 1);
   const portrait = aspect < 0.72;

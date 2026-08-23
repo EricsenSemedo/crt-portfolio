@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   getBasketballHorizontalBounds,
+  getCameraFitDistance,
   getSceneLayout,
   scaleCoordinateAroundPivot,
 } from "../responsiveScene";
@@ -43,5 +44,12 @@ describe("responsive scene layout", () => {
 
     expect(scaleCoordinateAroundPivot(screenOrigin, pivot, scale)).toBeCloseTo(0.886);
     expect(scaleCoordinateAroundPivot(modelOrigin, pivot, scale)).toBeCloseTo(0.182);
+  });
+
+  it("backs the camera away when a portrait viewport narrows the horizontal field of view", () => {
+    const unfolded = getCameraFitDistance(1.4, 1, 1.2, 60);
+    const coverScreen = getCameraFitDistance(1.4, 1, 0.46, 60);
+
+    expect(coverScreen).toBeGreaterThan(unfolded * 2);
   });
 });

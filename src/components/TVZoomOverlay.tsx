@@ -2,9 +2,11 @@ import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useRef, type ReactNode, type RefObject } from "react";
 import { useModalAccessibility } from "../hooks/useModalAccessibility";
 import Navbar from "./Navbar";
+import TVSignalTransition from "./TVSignalTransition";
+import type { PortfolioChannelId } from "../three/createPortfolioScene";
 
 interface SelectedItem {
-  id: string;
+  id: PortfolioChannelId;
   title: string;
 }
 
@@ -91,6 +93,7 @@ export default function TVZoomOverlay({
                 <div className="absolute inset-0">
                   <Navbar title={selectedItem.title} onClose={onClose} />
                   <div className="absolute inset-0">{children}</div>
+                  <TVSignalTransition channel={selectedItem.id} title={selectedItem.title} reduceMotion={Boolean(reduceMotion)} />
                 </div>
               </motion.div>
             </motion.div>

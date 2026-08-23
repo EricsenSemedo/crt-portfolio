@@ -352,6 +352,63 @@ body {
   will-change: transform;
 }
 
+.tv-signal-transition {
+  position: absolute;
+  inset: 0;
+  z-index: 30;
+  pointer-events: none;
+  transform-origin: center;
+}
+
+.tv-signal-transition--pinch {
+  background: radial-gradient(circle at center, #183ba8 0%, #0b246f 68%, #050b22 100%);
+  box-shadow: 0 0 2.5rem rgba(248, 250, 250, .3) inset;
+}
+
+.tv-signal-transition__title {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  color: #f8fafa;
+  font: 700 clamp(2rem, 7vw, 5rem)/1 var(--font-display);
+  letter-spacing: .08em;
+  text-shadow: 0 0 .55rem rgba(36, 87, 255, .9);
+  transform: translate(-50%, -50%);
+}
+
+.tv-signal-transition--static {
+  overflow: hidden;
+  background: #0a0a0a;
+}
+
+.tv-signal-transition__blanking {
+  position: absolute;
+  inset: -20% 0 auto;
+  height: 38%;
+  background: linear-gradient(180deg, transparent, rgba(248, 250, 250, .16), transparent);
+  animation: tv-blanking-roll 110ms linear 2;
+}
+
+.tv-signal-transition--lock {
+  overflow: hidden;
+  background: #050b22;
+  box-shadow: 0 -1.5rem 2rem rgba(36, 87, 255, .24) inset;
+}
+
+.tv-signal-transition__sync-line {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: clamp(3px, 1vh, 10px);
+  background: #f8fafa;
+  box-shadow: 0 0 1.1rem rgba(248, 250, 250, .85), 0 -1.5rem 3rem rgba(36, 87, 255, .45);
+}
+
+@keyframes tv-blanking-roll {
+  to { transform: translateY(360%); }
+}
+
 .crt-action-shell:active:not(:disabled) .crt-action-content {
   transform: scale(.94);
   transition-duration: 140ms;
