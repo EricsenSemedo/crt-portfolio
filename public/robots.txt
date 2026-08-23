@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://ericsensemedo.github.io/crt-portfolio/sitemap.xml

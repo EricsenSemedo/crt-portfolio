@@ -34,6 +34,11 @@ import { createGameTV } from "./assets/createGameTV";
 import { createTable } from "./assets/createTable";
 import { createVhsTV } from "./assets/createVhsTV";
 import {
+  getScreenTransitionDuration,
+  getScreenTransitionKind,
+  type ScreenTransitionKind,
+} from "./screenTransition";
+import {
   getBasketballHorizontalBounds,
   getCameraFitDistance,
   getSceneLayout,
@@ -43,6 +48,7 @@ import {
 } from "./responsiveScene";
 
 export type PortfolioChannelId = "home" | "portfolio" | "contact";
+export type ScreenTransitionResult = "completed" | "cancelled";
 export interface ScreenFit {
   scale: [number, number];
   offset: [number, number];
@@ -87,6 +93,15 @@ interface BasketballBody {
   horizontalBounds: HorizontalBounds;
 }
 
+interface ActiveScreenTransition {
+  display: ScreenDisplay;
+  source: HTMLCanvasElement;
+  kind: ScreenTransitionKind;
+  startedAt: number;
+  duration: number;
+  resolve: (result: ScreenTransitionResult) => void;
+}
+
 export interface PortfolioSceneController {
   canvas: HTMLCanvasElement;
   resize: (width: number, height: number) => void;
@@ -96,6 +111,7 @@ export interface PortfolioSceneController {
   setParallax: (x: number, y: number) => void;
   setHovered: (id: PortfolioChannelId | null) => void;
   focus: (id: PortfolioChannelId, reducedMotion?: boolean, quick?: boolean) => Promise<void>;
+  transitionScreen: (id: PortfolioChannelId, reducedMotion?: boolean) => Promise<ScreenTransitionResult>;
   reset: (reducedMotion?: boolean, quick?: boolean) => Promise<void>;
   dispose: () => void;
 }
@@ -273,6 +289,7 @@ export function createPortfolioScene(): PortfolioSceneController {
     arcStrength: number;
     resolve: () => void;
   } | null = null;
+  let screenTransition: ActiveScreenTransition | null = null;
 
   function resize(width: number, height: number) {
     sceneLayout = getSceneLayout(width, height);
@@ -341,7 +358,16 @@ export function createPortfolioScene(): PortfolioSceneController {
       camera.lookAt(lookTarget);
     }
 
-    if (hovered) {
+    if (screenTransition) {
+      const progress = Math.min((time - screenTransition.startedAt) / screenTransition.duration, 1);
+      drawScreenTransition(screenTransition.display.canvas, screenTransition.source, screenTransition.kind, progress);
+      screenTransition.display.texture.needsUpdate = true;
+      if (progress >= 1) {
+        const resolve = screenTransition.resolve;
+        screenTransition = null;
+        resolve("completed");
+      }
+    } else if (hovered) {
       const display = displays.get(hovered);
       const channel = channels.find((item) => item.id === hovered);
       if (display && channel && time - display.lastFrame > 70) {
@@ -430,7 +456,40 @@ export function createPortfolioScene(): PortfolioSceneController {
     return animateTo(destination, screenPosition, reducedMotion ? 1 : quick ? 380 : 760, 0.18);
   }
 
+  function transitionScreen(id: PortfolioChannelId, reducedMotion = false) {
+    const channel = channels.find((item) => item.id === id);
+    const display = displays.get(id);
+    if (!channel || !display || reducedMotion) return Promise.resolve("completed" as const);
+    if (screenTransition) screenTransition.resolve("cancelled");
+    const source = document.createElement("canvas");
+    source.width = display.canvas.width;
+    source.height = display.canvas.height;
+    drawScreen(source, channel.label, channel.subtitle, 0);
+    const kind = getScreenTransitionKind(id);
+    return new Promise<ScreenTransitionResult>((resolve) => {
+      screenTransition = {
+        display,
+        source,
+        kind,
+        startedAt: performance.now(),
+        duration: getScreenTransitionDuration(kind),
+        resolve,
+      };
+    });
+  }
+
   function reset(reducedMotion = false, quick = false) {
+    if (screenTransition) {
+      const resolve = screenTransition.resolve;
+      screenTransition = null;
+      resolve("cancelled");
+    }
+    channels.forEach((channel) => {
+      const display = displays.get(channel.id);
+      if (!display) return;
+      drawScreen(display.canvas, channel.label, channel.subtitle, 0);
+      display.texture.needsUpdate = true;
+    });
     isOverview = true;
     interactionPrompt.sprite.visible = true;
     return animateTo(
@@ -497,6 +556,7 @@ export function createPortfolioScene(): PortfolioSceneController {
   function dispose() {
     isDisposed = true;
     if (animation) animation.resolve();
+    if (screenTransition) screenTransition.resolve("cancelled");
     displays.forEach((display) => {
       display.texture.dispose();
       display.material.dispose();
@@ -517,6 +577,7 @@ export function createPortfolioScene(): PortfolioSceneController {
     setParallax,
     setHovered,
     focus,
+    transitionScreen,
     reset,
     dispose,
   };
@@ -866,6 +927,71 @@ function drawScreen(canvas: HTMLCanvasElement, label: string, subtitle: string, 
   context.shadowBlur = 0;
   context.fillStyle = "rgba(0, 18, 25, .16)";
   for (let y = 0; y < height; y += 6) context.fillRect(0, y, width, 1);
+}
+
+function drawScreenTransition(
+  canvas: HTMLCanvasElement,
+  source: HTMLCanvasElement,
+  kind: ScreenTransitionKind,
+  progress: number,
+) {
+  const context = canvas.getContext("2d");
+  if (!context) return;
+  const { width, height } = canvas;
+  context.clearRect(0, 0, width, height);
+  context.fillStyle = "#02040b";
+  context.fillRect(0, 0, width, height);
+
+  if (kind === "pinch") {
+    const verticalProgress = Math.min(progress / 0.72, 1);
+    const horizontalProgress = Math.max((progress - 0.72) / 0.28, 0);
+    const drawHeight = Math.max(2, height * (1 - verticalProgress * 0.985));
+    const drawWidth = Math.max(3, width * (1 - horizontalProgress * 0.94));
+    const x = (width - drawWidth) / 2;
+    const y = (height - drawHeight) / 2;
+    context.globalAlpha = 1 - horizontalProgress * 0.82;
+    context.drawImage(source, x, y, drawWidth, drawHeight);
+    context.globalAlpha = 1;
+    context.fillStyle = `rgba(248, 250, 250, ${0.25 + verticalProgress * 0.7})`;
+    context.shadowColor = "#2457ff";
+    context.shadowBlur = 18;
+    context.fillRect(x, height / 2 - 1, drawWidth, 2);
+    context.shadowBlur = 0;
+    return;
+  }
+
+  if (kind === "channel-static") {
+    context.imageSmoothingEnabled = false;
+    const cell = 8;
+    const phase = Math.floor(progress * 29);
+    for (let y = 0; y < height; y += cell) {
+      for (let x = 0; x < width; x += cell) {
+        const noise = (x * 17 + y * 31 + phase * 47) % 101;
+        const value = noise < 34 ? 24 : noise < 67 ? 112 : 224;
+        context.fillStyle = `rgb(${value} ${value} ${value})`;
+        context.fillRect(x, y, cell, cell);
+      }
+    }
+    const bandY = ((progress * 2.8) % 1) * height;
+    const band = context.createLinearGradient(0, bandY - 42, 0, bandY + 42);
+    band.addColorStop(0, "rgba(248,250,250,0)");
+    band.addColorStop(0.5, "rgba(248,250,250,.42)");
+    band.addColorStop(1, "rgba(248,250,250,0)");
+    context.fillStyle = band;
+    context.fillRect(0, bandY - 42, width, 84);
+    return;
+  }
+
+  context.fillStyle = "#050b22";
+  context.fillRect(0, 0, width, height);
+  const offset = -easeInOutCubic(progress) * (height + 10);
+  context.drawImage(source, 0, offset, width, height);
+  const lineY = Math.max(0, height + offset - 4);
+  context.fillStyle = "#f8fafa";
+  context.shadowColor = "#2457ff";
+  context.shadowBlur = 20;
+  context.fillRect(0, lineY, width, 5);
+  context.shadowBlur = 0;
 }
 
 function scrambleScreenLabel(label: string, elapsed: number) {

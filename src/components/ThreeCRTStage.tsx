@@ -87,9 +87,15 @@ export default function ThreeCRTStage({
     }
     if (focusedRef.current === requestedChannel || selectingRef.current) return;
     selectingRef.current = true;
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     void sceneRef.current
-      ?.focus(requestedChannel, window.matchMedia("(prefers-reduced-motion: reduce)").matches, quickTransition)
-      .then(() => {
+      ?.focus(requestedChannel, reducedMotion, quickTransition)
+      .then(() => sceneRef.current?.transitionScreen(requestedChannel, reducedMotion))
+      .then((result) => {
+        if (result !== "completed") {
+          selectingRef.current = false;
+          return;
+        }
         focusedRef.current = requestedChannel;
         selectingRef.current = false;
         onRequestedFocusComplete?.(requestedChannel);
@@ -102,7 +108,13 @@ export default function ThreeCRTStage({
     selectingRef.current = true;
     setHovered(null);
     controller.setHovered(null);
-    await controller.focus(id, window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    await controller.focus(id, reducedMotion);
+    const transitionResult = await controller.transitionScreen(id, reducedMotion);
+    if (transitionResult !== "completed") {
+      selectingRef.current = false;
+      return;
+    }
     focusedRef.current = id;
     onSelect(id);
   }
