@@ -99,7 +99,16 @@ interface ActiveScreenTransition {
   kind: ScreenTransitionKind;
   startedAt: number;
   duration: number;
+  reverse: boolean;
   resolve: (result: ScreenTransitionResult) => void;
+}
+
+interface HeldScreenEffect {
+  display: ScreenDisplay;
+  source: HTMLCanvasElement;
+  kind: ScreenTransitionKind;
+  startedAt: number;
+  active: boolean;
 }
 
 export interface PortfolioSceneController {
@@ -112,6 +121,7 @@ export interface PortfolioSceneController {
   setHovered: (id: PortfolioChannelId | null) => void;
   focus: (id: PortfolioChannelId, reducedMotion?: boolean, quick?: boolean) => Promise<void>;
   transitionScreen: (id: PortfolioChannelId, reducedMotion?: boolean) => Promise<ScreenTransitionResult>;
+  setScreenEffectActive: (active: boolean) => void;
   reset: (reducedMotion?: boolean, quick?: boolean) => Promise<void>;
   dispose: () => void;
 }
@@ -290,6 +300,7 @@ export function createPortfolioScene(): PortfolioSceneController {
     resolve: () => void;
   } | null = null;
   let screenTransition: ActiveScreenTransition | null = null;
+  let heldScreenEffect: HeldScreenEffect | null = null;
 
   function resize(width: number, height: number) {
     sceneLayout = getSceneLayout(width, height);
@@ -360,13 +371,45 @@ export function createPortfolioScene(): PortfolioSceneController {
 
     if (screenTransition) {
       const progress = Math.min((time - screenTransition.startedAt) / screenTransition.duration, 1);
-      drawScreenTransition(screenTransition.display.canvas, screenTransition.source, screenTransition.kind, progress);
+      drawScreenTransition(
+        screenTransition.display.canvas,
+        screenTransition.source,
+        screenTransition.kind,
+        progress,
+        screenTransition.reverse,
+      );
       screenTransition.display.texture.needsUpdate = true;
       if (progress >= 1) {
-        const resolve = screenTransition.resolve;
+        const completed = screenTransition;
+        const resolve = completed.resolve;
         screenTransition = null;
+        if (!completed.reverse) {
+          heldScreenEffect = {
+            display: completed.display,
+            source: completed.source,
+            kind: completed.kind,
+            startedAt: time,
+            active: completed.kind === "channel-static",
+          };
+        }
         resolve("completed");
       }
+    } else if (
+      heldScreenEffect?.kind === "channel-static"
+      && heldScreenEffect.active
+      && time - heldScreenEffect.display.lastFrame > 70
+    ) {
+      const progress = ((time - heldScreenEffect.startedAt) % 240) / 240;
+      drawScreenTransition(
+        heldScreenEffect.display.canvas,
+        heldScreenEffect.source,
+        heldScreenEffect.kind,
+        progress,
+        false,
+        true,
+      );
+      heldScreenEffect.display.texture.needsUpdate = true;
+      heldScreenEffect.display.lastFrame = time;
     } else if (hovered) {
       const display = displays.get(hovered);
       const channel = channels.find((item) => item.id === hovered);
@@ -473,16 +516,40 @@ export function createPortfolioScene(): PortfolioSceneController {
         kind,
         startedAt: performance.now(),
         duration: getScreenTransitionDuration(kind),
+        reverse: false,
         resolve,
       };
     });
   }
 
-  function reset(reducedMotion = false, quick = false) {
+  function setScreenEffectActive(active: boolean) {
+    if (!heldScreenEffect || heldScreenEffect.kind !== "channel-static") return;
+    heldScreenEffect.active = active;
+    heldScreenEffect.startedAt = performance.now();
+  }
+
+  async function reset(reducedMotion = false, quick = false) {
     if (screenTransition) {
       const resolve = screenTransition.resolve;
       screenTransition = null;
       resolve("cancelled");
+    }
+    if (heldScreenEffect && !reducedMotion) {
+      const effect = heldScreenEffect;
+      heldScreenEffect = null;
+      await new Promise<ScreenTransitionResult>((resolve) => {
+        screenTransition = {
+          display: effect.display,
+          source: effect.source,
+          kind: effect.kind,
+          startedAt: performance.now(),
+          duration: getScreenTransitionDuration(effect.kind),
+          reverse: true,
+          resolve,
+        };
+      });
+    } else {
+      heldScreenEffect = null;
     }
     channels.forEach((channel) => {
       const display = displays.get(channel.id);
@@ -578,6 +645,7 @@ export function createPortfolioScene(): PortfolioSceneController {
     setHovered,
     focus,
     transitionScreen,
+    setScreenEffectActive,
     reset,
     dispose,
   };
@@ -934,6 +1002,8 @@ function drawScreenTransition(
   source: HTMLCanvasElement,
   kind: ScreenTransitionKind,
   progress: number,
+  reverse = false,
+  hold = false,
 ) {
   const context = canvas.getContext("2d");
   if (!context) return;
@@ -942,9 +1012,11 @@ function drawScreenTransition(
   context.fillStyle = "#02040b";
   context.fillRect(0, 0, width, height);
 
+  const phase = reverse ? 1 - progress : progress;
+
   if (kind === "pinch") {
-    const verticalProgress = Math.min(progress / 0.72, 1);
-    const horizontalProgress = Math.max((progress - 0.72) / 0.28, 0);
+    const verticalProgress = Math.min(phase / 0.72, 1);
+    const horizontalProgress = Math.max((phase - 0.72) / 0.28, 0);
     const drawHeight = Math.max(2, height * (1 - verticalProgress * 0.985));
     const drawWidth = Math.max(3, width * (1 - horizontalProgress * 0.94));
     const x = (width - drawWidth) / 2;
@@ -961,6 +1033,9 @@ function drawScreenTransition(
   }
 
   if (kind === "channel-static") {
+    context.drawImage(source, 0, 0, width, height);
+    const noiseOpacity = hold ? 1 : reverse ? 1 - progress : progress;
+    context.globalAlpha = noiseOpacity;
     context.imageSmoothingEnabled = false;
     const cell = 8;
     const phase = Math.floor(progress * 29);
@@ -979,12 +1054,13 @@ function drawScreenTransition(
     band.addColorStop(1, "rgba(248,250,250,0)");
     context.fillStyle = band;
     context.fillRect(0, bandY - 42, width, 84);
+    context.globalAlpha = 1;
     return;
   }
 
   context.fillStyle = "#050b22";
   context.fillRect(0, 0, width, height);
-  const offset = -easeInOutCubic(progress) * (height + 10);
+  const offset = -easeInOutCubic(phase) * (height + 10);
   context.drawImage(source, 0, offset, width, height);
   const lineY = Math.max(0, height + offset - 4);
   context.fillStyle = "#f8fafa";

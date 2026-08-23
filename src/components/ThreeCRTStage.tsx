@@ -10,6 +10,7 @@ interface ThreeCRTStageProps {
   onSelect: (id: PortfolioChannelId) => void;
   requestedChannel?: PortfolioChannelId | null;
   quickTransition?: boolean;
+  screenEffectActive?: boolean;
   onRequestedFocusComplete?: (id: PortfolioChannelId) => void;
   onOverviewComplete?: () => void;
 }
@@ -24,6 +25,7 @@ export default function ThreeCRTStage({
   onSelect,
   requestedChannel = null,
   quickTransition = false,
+  screenEffectActive = false,
   onRequestedFocusComplete,
   onOverviewComplete,
 }: ThreeCRTStageProps) {
@@ -72,6 +74,10 @@ export default function ThreeCRTStage({
       sceneRef.current = null;
     };
   }, []);
+
+  useEffect(() => {
+    sceneRef.current?.setScreenEffectActive(screenEffectActive);
+  }, [screenEffectActive]);
 
   useEffect(() => {
     if (!requestedChannel) {

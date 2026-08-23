@@ -1,5 +1,5 @@
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { useRef, type ReactNode, type RefObject } from "react";
+import { useEffect, useRef, type ReactNode, type RefObject } from "react";
 import { useModalAccessibility } from "../hooks/useModalAccessibility";
 import Navbar from "./Navbar";
 import type { PortfolioChannelId } from "../three/createPortfolioScene";
@@ -13,6 +13,7 @@ interface TVZoomOverlayProps {
   selectedItem: SelectedItem | null;
   onClose?: () => void;
   onExitComplete?: () => void;
+  onEnterComplete?: () => void;
   children?: ReactNode;
   backgroundRef?: RefObject<HTMLElement | null>;
 }
@@ -25,11 +26,20 @@ export default function TVZoomOverlay({
   selectedItem,
   onClose,
   onExitComplete,
+  onEnterComplete,
   children,
   backgroundRef,
 }: TVZoomOverlayProps) {
   const dialogRef = useRef<HTMLDivElement>(null);
   const reduceMotion = useReducedMotion();
+  const selectedId = selectedItem?.id;
+
+  useEffect(() => {
+    if (!selectedId) return;
+    const delay = reduceMotion ? 20 : 460;
+    const timer = window.setTimeout(() => onEnterComplete?.(), delay);
+    return () => window.clearTimeout(timer);
+  }, [onEnterComplete, reduceMotion, selectedId]);
 
   useModalAccessibility({
     isOpen: Boolean(selectedItem),

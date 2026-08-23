@@ -31,6 +31,7 @@ function PortfolioApp() {
   const [pendingId, setPendingId] = useState<PortfolioChannelId | null>(null);
   const [overlayExited, setOverlayExited] = useState(false);
   const [overviewReady, setOverviewReady] = useState(false);
+  const [screenEffectActive, setScreenEffectActive] = useState(false);
   const backgroundRef = useRef<HTMLDivElement>(null);
   const navigateToTV = (targetId: string) => {
     const target = targetId as PortfolioChannelId;
@@ -38,6 +39,7 @@ function PortfolioApp() {
     setPendingId(target);
     setOverlayExited(false);
     setOverviewReady(false);
+    setScreenEffectActive(true);
     setSelectedId(null);
   };
 
@@ -47,6 +49,7 @@ function PortfolioApp() {
   }, [overlayExited, overviewReady, pendingId]);
 
   function closeTV() {
+    setScreenEffectActive(true);
     setPendingId(null);
     setSelectedId(null);
     setOverlayExited(false);
@@ -58,8 +61,10 @@ function PortfolioApp() {
     setOverlayExited(true);
     setSceneChannel(null);
   }, []);
+  const handleOverlayEnterComplete = useCallback(() => setScreenEffectActive(false), []);
   const handleRequestedFocusComplete = useCallback((id: PortfolioChannelId) => {
     if (id !== pendingId) return;
+    setScreenEffectActive(true);
     setSelectedId(id);
     setPendingId(null);
   }, [pendingId]);
@@ -76,11 +81,13 @@ function PortfolioApp() {
         <Suspense fallback={<div className="min-h-screen bg-[#111111]" />}>
           <ThreeCRTStage
             onSelect={(id) => {
+              setScreenEffectActive(true);
               setSceneChannel(id);
               setSelectedId(id);
             }}
             requestedChannel={sceneChannel}
             quickTransition={Boolean(pendingId)}
+            screenEffectActive={screenEffectActive}
             onOverviewComplete={handleOverviewComplete}
             onRequestedFocusComplete={handleRequestedFocusComplete}
           />
@@ -94,6 +101,7 @@ function PortfolioApp() {
         } : null}
         onClose={closeTV}
         onExitComplete={handleOverlayExitComplete}
+        onEnterComplete={handleOverlayEnterComplete}
         backgroundRef={backgroundRef}
       >
         {selectedId ? byId[selectedId] ?? null : null}
