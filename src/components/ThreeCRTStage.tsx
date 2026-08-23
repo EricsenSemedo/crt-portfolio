@@ -5,6 +5,7 @@ import {
   type PortfolioSceneController,
   type ScreenFit,
 } from "../three/createPortfolioScene";
+import { cloneScreenFitProfile, getScreenFitProfile } from "../three/screenFitProfiles";
 import "./ThreeCRTStage.css";
 
 interface ThreeCRTStageProps {
@@ -22,26 +23,29 @@ const channels: Array<{ id: PortfolioChannelId; number: string; label: string }>
   { id: "contact", number: "03", label: "Contact" },
 ];
 
-const defaultScreenFits: Record<PortfolioChannelId, ScreenFit> = {
-  home: { scale: [1.19, 1.58], offset: [0.12, -0.1] },
-  portfolio: { scale: [1.25, 1.83], offset: [0.08, -0.16] },
-  contact: { scale: [1.44, 2.11], offset: [-0.12, 0.05] },
-};
-
-function getViewportProfile(width: number, height: number) {
-  if (width < height && width <= 600) return "PHONE PORTRAIT";
-  if (width <= 1100) return "FOLD / TABLET";
-  return "DESKTOP";
+function loadScreenFits(profile: ReturnType<typeof getScreenFitProfile>) {
+  if (!import.meta.env.DEV) return cloneScreenFitProfile(profile);
+  const saved = localStorage.getItem("crt-screen-fits:" + profile);
+  if (!saved) return cloneScreenFitProfile(profile);
+  try {
+    const parsed: unknown = JSON.parse(saved);
+    if (isScreenFitRecord(parsed)) return parsed;
+    return cloneScreenFitProfile(profile);
+  } catch {
+    return cloneScreenFitProfile(profile);
+  }
 }
 
-function loadScreenFits(profile: string) {
-  const saved = localStorage.getItem("crt-screen-fits:" + profile);
-  if (!saved) return structuredClone(defaultScreenFits);
-  try {
-    return JSON.parse(saved) as Record<PortfolioChannelId, ScreenFit>;
-  } catch {
-    return structuredClone(defaultScreenFits);
-  }
+function isScreenFitRecord(value: unknown): value is Record<PortfolioChannelId, ScreenFit> {
+  if (!value || typeof value !== "object") return false;
+  return channels.every(({ id }) => {
+    const fit = (value as Partial<Record<PortfolioChannelId, ScreenFit>>)[id];
+    return isFinitePair(fit?.scale) && isFinitePair(fit?.offset);
+  });
+}
+
+function isFinitePair(value: unknown): value is [number, number] {
+  return Array.isArray(value) && value.length === 2 && value.every((entry) => typeof entry === "number" && Number.isFinite(entry));
 }
 
 export default function ThreeCRTStage({
@@ -61,9 +65,9 @@ export default function ThreeCRTStage({
   const [ready, setReady] = useState(false);
   const [hovered, setHovered] = useState<PortfolioChannelId | null>(null);
   const [calibrating, setCalibrating] = useState<PortfolioChannelId>("home");
-  const [viewportProfile, setViewportProfile] = useState(() => getViewportProfile(window.innerWidth, window.innerHeight));
+  const [viewportProfile, setViewportProfile] = useState(() => getScreenFitProfile(window.innerWidth, window.innerHeight));
   const [viewportSize, setViewportSize] = useState(() => [window.innerWidth, window.innerHeight] as const);
-  const [screenFits, setScreenFits] = useState(() => loadScreenFits(getViewportProfile(window.innerWidth, window.innerHeight)));
+  const [screenFits, setScreenFits] = useState(() => loadScreenFits(getScreenFitProfile(window.innerWidth, window.innerHeight)));
   const initialScreenFitsRef = useRef(screenFits);
 
   function updateScreenFit(part: "width" | "height" | "x" | "y", value: number) {
@@ -89,7 +93,7 @@ export default function ThreeCRTStage({
 
     const resizeObserver = new ResizeObserver(() => {
       controller.resize(mount.clientWidth, mount.clientHeight);
-      const nextProfile = getViewportProfile(mount.clientWidth, mount.clientHeight);
+      const nextProfile = getScreenFitProfile(mount.clientWidth, mount.clientHeight);
       setViewportSize([mount.clientWidth, mount.clientHeight]);
       setViewportProfile((currentProfile) => {
         if (currentProfile === nextProfile) return currentProfile;

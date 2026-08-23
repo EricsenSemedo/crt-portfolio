@@ -1,11 +1,10 @@
-import type { PortfolioChannelId } from "./createPortfolioScene";
-
 export type ScreenTransitionKind = "pinch" | "signal-acquisition" | "vertical-sync-roll";
 
-export function getScreenTransitionKind(id: PortfolioChannelId): ScreenTransitionKind {
-  if (id === "home") return "pinch";
-  if (id === "portfolio") return "signal-acquisition";
-  return "vertical-sync-roll";
+const SCREEN_TRANSITIONS: ScreenTransitionKind[] = ["pinch", "signal-acquisition", "vertical-sync-roll"];
+
+export function getRandomScreenTransitionKind(random = Math.random): ScreenTransitionKind {
+  const index = Math.min(Math.floor(random() * SCREEN_TRANSITIONS.length), SCREEN_TRANSITIONS.length - 1);
+  return SCREEN_TRANSITIONS[index];
 }
 
 export function getScreenTransitionDuration(kind: ScreenTransitionKind) {

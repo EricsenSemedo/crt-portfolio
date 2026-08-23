@@ -1,11 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { getScreenTransitionDuration, getScreenTransitionKind } from "../screenTransition";
+import { getRandomScreenTransitionKind, getScreenTransitionDuration } from "../screenTransition";
 
 describe("physical CRT screen transitions", () => {
-  it("assigns one comparison treatment to each television", () => {
-    expect(getScreenTransitionKind("home")).toBe("pinch");
-    expect(getScreenTransitionKind("portfolio")).toBe("signal-acquisition");
-    expect(getScreenTransitionKind("contact")).toBe("vertical-sync-roll");
+  it("gives every television interaction an equal chance of each treatment", () => {
+    expect(getRandomScreenTransitionKind(() => 0)).toBe("pinch");
+    expect(getRandomScreenTransitionKind(() => 0.34)).toBe("signal-acquisition");
+    expect(getRandomScreenTransitionKind(() => 0.99)).toBe("vertical-sync-roll");
   });
 
   it("keeps every interruption shorter than half a second", () => {
