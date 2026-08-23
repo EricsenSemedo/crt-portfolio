@@ -122,11 +122,11 @@ export default function Navbar({ title, onClose }: NavbarProps) {
           closeLabel.scramble();
         }}
         onBlur={closeFill.handleBlur}
-        className="crt-hover-sink crt-hover-sink--close group pointer-events-auto relative h-full overflow-hidden border-l border-white/30 px-5 text-crt-text/80 transition-[transform,color] duration-150 ease-out focus:outline-none focus:ring-2 focus:ring-inset focus:ring-crt-accent active:translate-y-0.5 active:scale-[0.95] cursor-pointer"
+        className="crt-action-shell crt-action-shell--close group pointer-events-auto relative h-full overflow-hidden border-l border-white/30 px-5 text-crt-text/80 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-crt-accent cursor-pointer"
         aria-label="Close"
       >
         <span className={"absolute inset-0 bg-white transition-transform duration-200 ease-out " + (closeFill.fillOrigin === "top" ? "origin-top " : "origin-bottom ") + (closeFill.fillVisible ? "scale-y-100" : "scale-y-0")} aria-hidden="true" />
-        <span className={"relative z-10 block w-5 text-center font-mono text-xl leading-none transition-colors " + (closeFill.fillVisible ? "text-[#111]" : "text-crt-text/80")} aria-hidden="true">
+        <span className={"crt-action-content relative z-10 block w-5 text-center font-mono text-xl leading-none transition-colors " + (closeFill.fillVisible ? "text-[#111]" : "text-crt-text/80")} aria-hidden="true">
           {closeLabel.visibleLabel}
         </span>
       </button>

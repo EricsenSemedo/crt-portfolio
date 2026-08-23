@@ -345,13 +345,27 @@ body {
   }
 }
 
+.crt-action-content {
+  transform: scale(1);
+  transform-origin: center;
+  transition: transform 300ms ease;
+  will-change: transform;
+}
+
+.crt-action-shell:active:not(:disabled) .crt-action-content {
+  transform: scale(.94);
+  transition-duration: 140ms;
+}
+
 @media (hover: hover) and (pointer: fine) {
-  .crt-hover-sink:hover {
-    transform: translateY(1px) scale(.99);
+  .crt-action-shell:hover:not(:disabled) .crt-action-content,
+  .crt-action-shell:focus-visible:not(:disabled) .crt-action-content {
+    transform: scale(.965);
   }
 
-  .crt-hover-sink--close:hover {
-    transform: translateY(1px) scale(.97);
+  .crt-action-shell--close:hover:not(:disabled) .crt-action-content,
+  .crt-action-shell--close:focus-visible:not(:disabled) .crt-action-content {
+    transform: scale(.9);
   }
 
   .group:hover .project-tv__hover-static {
@@ -361,6 +375,7 @@ body {
 
 @media (prefers-reduced-motion: reduce) {
   .crt-page section { animation: none; }
+  .crt-action-content { transition: none; }
   .channel-marquee { animation: none; }
   .channel-marquee__track { animation-play-state: paused; }
   .global-crt-overlay::before,

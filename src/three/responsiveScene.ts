@@ -17,6 +17,10 @@ export interface HorizontalBounds {
   max: number;
 }
 
+export function scaleCoordinateAroundPivot(value: number, pivot: number, scale: number) {
+  return pivot + (value - pivot) * scale;
+}
+
 export function getSceneLayout(width: number, height: number): SceneLayout {
   const aspect = width / Math.max(height, 1);
   const portrait = aspect < 0.72;

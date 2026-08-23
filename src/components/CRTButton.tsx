@@ -43,7 +43,7 @@ export default function CRTButton({
   };
 
   const baseClasses = `
-    font-mono font-medium rounded-none transition-colors duration-150 cursor-pointer
+    crt-action-shell font-mono font-medium rounded-none transition-colors duration-150 cursor-pointer
     relative overflow-hidden group
     focus:outline-none focus:ring-2 focus:ring-crt-accent/50
     disabled:opacity-50 disabled:cursor-not-allowed
@@ -63,7 +63,7 @@ export default function CRTButton({
       }}
       {...props}
     >
-      <span className="relative z-10 inline-flex items-center gap-2">
+      <span className="crt-action-content relative z-10 inline-flex items-center gap-2">
         {variant === "primary" && <span className="h-2 w-2 rounded-full bg-[#00ff66] shadow-[0_0_10px_#00ff66]" aria-hidden="true" />}
         {label ? visibleLabel : children}
       </span>

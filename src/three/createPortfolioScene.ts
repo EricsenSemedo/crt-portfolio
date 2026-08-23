@@ -36,6 +36,7 @@ import { createVhsTV } from "./assets/createVhsTV";
 import {
   getBasketballHorizontalBounds,
   getSceneLayout,
+  scaleCoordinateAroundPivot,
   type HorizontalBounds,
   type SceneLayout,
 } from "./responsiveScene";
@@ -431,12 +432,28 @@ export function createPortfolioScene(): PortfolioSceneController {
     channels.forEach((channel, index) => {
       channel.position[0] = layout.channelX[index];
       channel.asset.group.position.x = layout.channelX[index];
+      channel.asset.group.position.y = scaleCoordinateAroundPivot(
+        channel.position[1],
+        TABLE_COLLIDER.topY,
+        layout.tvScale,
+      );
+      channel.asset.group.position.z = scaleCoordinateAroundPivot(
+        channel.position[2],
+        TABLE_COLLIDER.centerZ,
+        layout.tvScale,
+      );
       channel.asset.group.scale.setScalar(channel.scale * layout.tvScale);
     });
     realisticTelevisions?.children.forEach((television, index) => {
       television.position.x = layout.channelX[index];
       const desktopScale = television.userData.desktopScale as number | undefined ?? television.scale.x;
+      const desktopY = television.userData.desktopY as number | undefined ?? television.position.y;
+      const desktopZ = television.userData.desktopZ as number | undefined ?? television.position.z;
       television.userData.desktopScale = desktopScale;
+      television.userData.desktopY = desktopY;
+      television.userData.desktopZ = desktopZ;
+      television.position.y = scaleCoordinateAroundPivot(desktopY, TABLE_COLLIDER.topY, layout.tvScale);
+      television.position.z = scaleCoordinateAroundPivot(desktopZ, TABLE_COLLIDER.centerZ, layout.tvScale);
       television.scale.setScalar(desktopScale * layout.tvScale);
     });
     if (realisticTelevisions) {

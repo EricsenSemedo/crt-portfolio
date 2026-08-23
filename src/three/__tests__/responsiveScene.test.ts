@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { getBasketballHorizontalBounds, getSceneLayout } from "../responsiveScene";
+import {
+  getBasketballHorizontalBounds,
+  getSceneLayout,
+  scaleCoordinateAroundPivot,
+} from "../responsiveScene";
 
 describe("responsive scene layout", () => {
   it("uses a tighter, wider portrait composition", () => {
@@ -29,5 +33,15 @@ describe("responsive scene layout", () => {
     expect(layout.channelX).toEqual([-1.82, 0, 1.84]);
     expect(layout.tvScale).toBe(1);
     expect(layout.ballStartX).toBe(-2.88);
+  });
+
+  it("scales separate TV layers around the same responsive pivot", () => {
+    const pivot = 0.11;
+    const scale = 0.8;
+    const screenOrigin = 1.08;
+    const modelOrigin = 0.2;
+
+    expect(scaleCoordinateAroundPivot(screenOrigin, pivot, scale)).toBeCloseTo(0.886);
+    expect(scaleCoordinateAroundPivot(modelOrigin, pivot, scale)).toBeCloseTo(0.182);
   });
 });
