@@ -15,15 +15,18 @@ export default function CRTActionLink({ href, label, description, icon, primary 
   const fill = useDirectionalFill<HTMLAnchorElement>();
 
   function handlePointerEnter(event: PointerEvent<HTMLAnchorElement>) {
-    fill.handlePointerEnter(event);
-    scramble();
+    if (fill.handlePointerEnter(event)) scramble();
   }
 
   return (
     <a href={href} target="_blank" rel="noopener noreferrer"
       onPointerEnter={handlePointerEnter} onPointerLeave={fill.handlePointerLeave}
-      onFocus={() => { fill.handleFocus(); scramble(); }} onBlur={fill.handleBlur}
-      className="group relative flex items-center gap-4 overflow-hidden border border-crt-border-secondary bg-transparent p-4 font-mono transition-[transform,color] duration-150 ease-out hover:translate-y-px hover:scale-[0.99] focus:outline-none focus:ring-2 focus:ring-crt-accent/50 active:translate-y-0.5 active:scale-[0.985]">
+      onFocus={(event) => {
+        if (!event.currentTarget.matches(":focus-visible")) return;
+        fill.handleFocus();
+        scramble();
+      }} onBlur={fill.handleBlur}
+      className="crt-hover-sink group relative flex items-center gap-4 overflow-hidden border border-crt-border-secondary bg-transparent p-4 font-mono transition-[transform,color] duration-150 ease-out focus:outline-none focus:ring-2 focus:ring-crt-accent/50 active:translate-y-0.5 active:scale-[0.985]">
       <span className={"absolute inset-0 bg-white transition-transform duration-200 ease-out " + (fill.fillOrigin === "top" ? "origin-top " : "origin-bottom ") + (fill.fillVisible ? "scale-y-100" : "scale-y-0")} aria-hidden="true" />
       <span className={"relative z-10 shrink-0 transition-colors " + (fill.fillVisible ? "text-[#111]" : "text-crt-text")}>{icon}</span>
       <span className="relative z-10 min-w-0 flex-1">

@@ -58,7 +58,9 @@ export default function CRTButton({
       disabled={disabled}
       className={baseClasses}
       onMouseEnter={scramble}
-      onFocus={scramble}
+      onFocus={(event) => {
+        if (event.currentTarget.matches(":focus-visible")) scramble();
+      }}
       {...props}
     >
       <span className="relative z-10 inline-flex items-center gap-2">

@@ -20,8 +20,9 @@ export default function Navbar({ title, onClose }: NavbarProps) {
   useEffect(() => {
     const scroller = document.querySelector<HTMLElement>(".crt-page");
     if (!scroller) return;
+    const scrollContainer = scroller;
 
-    let lastScrollTop = scroller.scrollTop;
+    let lastScrollTop = scrollContainer.scrollTop;
     let touchActive = false;
     let frameRequested = false;
     let snapTimer: number | undefined;
@@ -55,7 +56,7 @@ export default function Navbar({ title, onClose }: NavbarProps) {
     }
 
     function update() {
-      const currentScrollTop = scroller.scrollTop;
+      const currentScrollTop = scrollContainer.scrollTop;
       const movement = currentScrollTop - lastScrollTop;
       lastScrollTop = currentScrollTop;
       if (currentScrollTop <= 0) setPosition(0);
@@ -88,16 +89,16 @@ export default function Navbar({ title, onClose }: NavbarProps) {
       settle();
     }
 
-    scroller.addEventListener("scroll", handleScroll, { passive: true });
-    scroller.addEventListener("touchstart", handleTouchStart, { passive: true });
-    scroller.addEventListener("touchend", handleTouchEnd, { passive: true });
-    scroller.addEventListener("touchcancel", handleTouchEnd, { passive: true });
+    scrollContainer.addEventListener("scroll", handleScroll, { passive: true });
+    scrollContainer.addEventListener("touchstart", handleTouchStart, { passive: true });
+    scrollContainer.addEventListener("touchend", handleTouchEnd, { passive: true });
+    scrollContainer.addEventListener("touchcancel", handleTouchEnd, { passive: true });
     return () => {
       window.clearTimeout(snapTimer);
-      scroller.removeEventListener("scroll", handleScroll);
-      scroller.removeEventListener("touchstart", handleTouchStart);
-      scroller.removeEventListener("touchend", handleTouchEnd);
-      scroller.removeEventListener("touchcancel", handleTouchEnd);
+      scrollContainer.removeEventListener("scroll", handleScroll);
+      scrollContainer.removeEventListener("touchstart", handleTouchStart);
+      scrollContainer.removeEventListener("touchend", handleTouchEnd);
+      scrollContainer.removeEventListener("touchcancel", handleTouchEnd);
     };
   }, []);
 
@@ -110,11 +111,17 @@ export default function Navbar({ title, onClose }: NavbarProps) {
       </div>
       <button
         onClick={onClose}
-        onPointerEnter={(event) => { closeFill.handlePointerEnter(event); closeLabel.scramble(); }}
+        onPointerEnter={(event) => {
+          if (closeFill.handlePointerEnter(event)) closeLabel.scramble();
+        }}
         onPointerLeave={closeFill.handlePointerLeave}
-        onFocus={() => { closeFill.handleFocus(); closeLabel.scramble(); }}
+        onFocus={(event) => {
+          if (!event.currentTarget.matches(":focus-visible")) return;
+          closeFill.handleFocus();
+          closeLabel.scramble();
+        }}
         onBlur={closeFill.handleBlur}
-        className="group pointer-events-auto relative h-full overflow-hidden border-l border-white/30 px-5 text-crt-text/80 transition-[transform,color] duration-150 ease-out hover:translate-y-px hover:scale-[0.97] focus:outline-none focus:ring-2 focus:ring-inset focus:ring-crt-accent active:translate-y-0.5 active:scale-[0.95] cursor-pointer"
+        className="crt-hover-sink crt-hover-sink--close group pointer-events-auto relative h-full overflow-hidden border-l border-white/30 px-5 text-crt-text/80 transition-[transform,color] duration-150 ease-out focus:outline-none focus:ring-2 focus:ring-inset focus:ring-crt-accent active:translate-y-0.5 active:scale-[0.95] cursor-pointer"
         aria-label="Close"
       >
         <span className={"absolute inset-0 bg-white transition-transform duration-200 ease-out " + (closeFill.fillOrigin === "top" ? "origin-top " : "origin-bottom ") + (closeFill.fillVisible ? "scale-y-100" : "scale-y-0")} aria-hidden="true" />

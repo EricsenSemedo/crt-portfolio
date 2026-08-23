@@ -117,6 +117,7 @@ export default function ThreeCRTStage({
       ((event.clientX - bounds.left) / bounds.width) * 2 - 1,
       1 - ((event.clientY - bounds.top) / bounds.height) * 2,
     );
+    if (!window.matchMedia("(hover: hover) and (pointer: fine)").matches) return;
     if (selectingRef.current) return;
     const next = sceneRef.current?.pick(event.clientX, event.clientY) ?? null;
     if (next !== hovered) {

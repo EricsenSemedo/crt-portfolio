@@ -33,6 +33,12 @@ import { createDiscTV } from "./assets/createDiscTV";
 import { createGameTV } from "./assets/createGameTV";
 import { createTable } from "./assets/createTable";
 import { createVhsTV } from "./assets/createVhsTV";
+import {
+  getBasketballHorizontalBounds,
+  getSceneLayout,
+  type HorizontalBounds,
+  type SceneLayout,
+} from "./responsiveScene";
 
 export type PortfolioChannelId = "home" | "portfolio" | "contact";
 export interface ScreenFit {
@@ -76,6 +82,7 @@ interface BasketballBody {
   radius: number;
   floorY: number;
   active: boolean;
+  horizontalBounds: HorizontalBounds;
 }
 
 export interface PortfolioSceneController {
@@ -104,6 +111,7 @@ export function createPortfolioScene(): PortfolioSceneController {
   camera.position.copy(OVERVIEW_POSITION);
   camera.lookAt(OVERVIEW_TARGET);
   const overviewPosition = OVERVIEW_POSITION.clone();
+  let sceneLayout = getSceneLayout(1280, 800);
 
   const renderer = new WebGLRenderer({
     antialias: true,
@@ -188,9 +196,11 @@ export function createPortfolioScene(): PortfolioSceneController {
   scene.add(interactionPrompt.sprite);
 
   const importedResources: Array<{ dispose: () => void }> = [];
-  const basketballColliders = createBasketballColliders();
+  const roomColliders = createBasketballColliders();
+  const basketballColliders = [...roomColliders];
   const basketballHitTargets: Object3D[] = [];
   let basketballBody: BasketballBody | null = null;
+  let realisticTelevisions: Group | null = null;
   let isDisposed = false;
   void loadGarageEnvironment(renderer, scene).then((environment) => {
     if (!environment) return;
@@ -210,11 +220,9 @@ export function createPortfolioScene(): PortfolioSceneController {
     if (!televisions) return;
     if (isDisposed) televisions.dispose();
     else {
+      realisticTelevisions = televisions.group;
       scene.add(televisions.group);
-      televisions.group.children.forEach((television) => {
-        television.updateWorldMatrix(true, true);
-        basketballColliders.push(new Box3().setFromObject(television));
-      });
+      applyResponsiveLayout(sceneLayout);
       importedResources.push(televisions);
     }
   });
@@ -234,7 +242,9 @@ export function createPortfolioScene(): PortfolioSceneController {
         radius: 0.41,
         floorY: -0.68,
         active: false,
+        horizontalBounds: getBasketballHorizontalBounds(sceneLayout, camera.aspect, 0.42, 0.41),
       };
+      basketball.group.position.x = sceneLayout.ballStartX;
     }
   });
 
@@ -263,18 +273,33 @@ export function createPortfolioScene(): PortfolioSceneController {
   } | null = null;
 
   function resize(width: number, height: number) {
+    sceneLayout = getSceneLayout(width, height);
     camera.aspect = width / Math.max(height, 1);
-    camera.fov = width < 700 ? 48 : width / height > 2 ? 34 : 38;
+    camera.fov = sceneLayout.fov;
     camera.updateProjectionMatrix();
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, width < 700 ? 1.35 : 1.75));
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, sceneLayout.pixelRatioCap));
     renderer.setSize(width, height, false);
-    overviewPosition.set(0, width < 700 ? 1.84 : 1.82, width < 700 ? 8.25 : 7.55);
-    interactionPrompt.baseY = width < 700 ? 2.72 : 2.3;
+    overviewPosition.set(...sceneLayout.camera);
+    interactionPrompt.baseY = sceneLayout.promptY;
     interactionPrompt.sprite.position.x = 0;
     interactionPrompt.setLabel(window.matchMedia("(pointer: coarse)").matches ? "TAP A TV TO VIEW" : "CLICK A TV TO VIEW");
+    applyResponsiveLayout(sceneLayout);
+    if (basketballBody) {
+      basketballBody.horizontalBounds = getBasketballHorizontalBounds(
+        sceneLayout,
+        camera.aspect,
+        basketballBody.group.position.z,
+        basketballBody.radius,
+      );
+      basketballBody.group.position.x = MathUtils.clamp(
+        basketballBody.group.position.x,
+        basketballBody.horizontalBounds.min,
+        basketballBody.horizontalBounds.max,
+      );
+    }
     if (!animation && isOverview) {
       camera.position.copy(overviewPosition);
-      lookTarget.copy(OVERVIEW_TARGET);
+      lookTarget.set(...sceneLayout.target);
       camera.lookAt(lookTarget);
     }
   }
@@ -304,7 +329,7 @@ export function createPortfolioScene(): PortfolioSceneController {
       camera.position.copy(overviewPosition);
       camera.position.x += parallaxCurrent.x * 0.2;
       camera.position.y += parallaxCurrent.y * 0.12;
-      lookTarget.copy(OVERVIEW_TARGET);
+      lookTarget.set(...sceneLayout.target);
       lookTarget.x += parallaxCurrent.x * 0.28;
       lookTarget.y += parallaxCurrent.y * 0.18;
       camera.lookAt(lookTarget);
@@ -389,7 +414,33 @@ export function createPortfolioScene(): PortfolioSceneController {
 
   function reset(reducedMotion = false, quick = false) {
     isOverview = true;
-    return animateTo(overviewPosition, OVERVIEW_TARGET, reducedMotion ? 1 : quick ? 280 : 620, 0.1);
+    return animateTo(
+      overviewPosition,
+      new Vector3(...sceneLayout.target),
+      reducedMotion ? 1 : quick ? 280 : 620,
+      0.1,
+    );
+  }
+
+  function applyResponsiveLayout(layout: SceneLayout) {
+    channels.forEach((channel, index) => {
+      channel.position[0] = layout.channelX[index];
+      channel.asset.group.position.x = layout.channelX[index];
+      channel.asset.group.scale.setScalar(channel.scale * layout.tvScale);
+    });
+    realisticTelevisions?.children.forEach((television, index) => {
+      television.position.x = layout.channelX[index];
+      const desktopScale = television.userData.desktopScale as number | undefined ?? television.scale.x;
+      television.userData.desktopScale = desktopScale;
+      television.scale.setScalar(desktopScale * layout.tvScale);
+    });
+    if (realisticTelevisions) {
+      realisticTelevisions.updateWorldMatrix(true, true);
+      basketballColliders.splice(roomColliders.length);
+      realisticTelevisions.children.forEach((television) => {
+        basketballColliders.push(new Box3().setFromObject(television));
+      });
+    }
   }
 
   function animateTo(position: Vector3, target: Vector3, duration: number, arcStrength: number) {
@@ -453,9 +504,9 @@ function updateBasketballPhysics(body: BasketballBody, colliders: Box3[], delta:
     body.velocity.z *= friction;
   }
 
-  const xLimit = 4.8 - body.radius;
-  if (Math.abs(body.group.position.x) > xLimit) {
-    body.group.position.x = Math.sign(body.group.position.x) * xLimit;
+  const { min: xMin, max: xMax } = body.horizontalBounds;
+  if (body.group.position.x < xMin || body.group.position.x > xMax) {
+    body.group.position.x = MathUtils.clamp(body.group.position.x, xMin, xMax);
     body.velocity.x *= -0.66;
   }
   const zMin = -3.6 + body.radius;

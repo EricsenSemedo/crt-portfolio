@@ -20,13 +20,17 @@ export default function useDirectionalFill<T extends HTMLElement>(mode: "vertica
   }
 
   function handlePointerEnter(event: PointerEvent<T>) {
+    if (!window.matchMedia("(hover: hover) and (pointer: fine)").matches) return false;
     setFillOrigin(pointerEdge(event));
     setFillVisible(true);
+    return true;
   }
 
   function handlePointerLeave(event: PointerEvent<T>) {
+    if (!window.matchMedia("(hover: hover) and (pointer: fine)").matches) return false;
     setFillOrigin(pointerEdge(event));
     setFillVisible(false);
+    return true;
   }
 
   function handleFocus() {

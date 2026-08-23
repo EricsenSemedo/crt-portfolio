@@ -325,6 +325,20 @@ body {
   to { transform: translateX(-50%); }
 }
 
+@media (hover: hover) and (pointer: fine) {
+  .crt-hover-sink:hover {
+    transform: translateY(1px) scale(.99);
+  }
+
+  .crt-hover-sink--close:hover {
+    transform: translateY(1px) scale(.97);
+  }
+
+  .group:hover .project-tv__hover-static {
+    opacity: 1;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .crt-page section { animation: none; }
   .channel-marquee__track { animation-play-state: paused; }

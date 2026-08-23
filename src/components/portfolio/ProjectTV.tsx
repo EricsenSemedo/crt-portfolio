@@ -20,8 +20,7 @@ export default function ProjectTV({ project, onClick, isSelected }: ProjectTVPro
   const title = useScrambleText(project.title);
 
   function handlePointerEnter(event: PointerEvent<HTMLDivElement>) {
-    fill.handlePointerEnter(event);
-    title.scramble();
+    if (fill.handlePointerEnter(event)) title.scramble();
   }
 
   function handleKeyDown(event: KeyboardEvent<HTMLDivElement>) {
@@ -39,7 +38,11 @@ export default function ProjectTV({ project, onClick, isSelected }: ProjectTVPro
       onClick={onClick}
       onPointerEnter={handlePointerEnter}
       onPointerLeave={fill.handlePointerLeave}
-      onFocus={() => { fill.handleFocus(); title.scramble(); }}
+      onFocus={(event) => {
+        if (!event.currentTarget.matches(":focus-visible")) return;
+        fill.handleFocus();
+        title.scramble();
+      }}
       onBlur={fill.handleBlur}
       onKeyDown={handleKeyDown}
       role="button"
@@ -104,7 +107,7 @@ export default function ProjectTV({ project, onClick, isSelected }: ProjectTVPro
           </div>
           
           {/* Hover Static Effect */}
-          <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
+          <div className="project-tv__hover-static absolute inset-0 opacity-0 transition-opacity duration-200 pointer-events-none">
             <CRTScanlines opacity={0.25} lineHeight={2} lineSpacing={1} />
           </div>
         </div>
