@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { getScrollRevealState, shouldUseDesktopSmoothScroll } from "../scrollMotion";
+import { getScrollRevealState, hasScrollableOverflow, shouldUseDesktopSmoothScroll } from "../scrollMotion";
 
 describe("shouldUseDesktopSmoothScroll", () => {
   it("enables Lenis only for a desktop pointer without touch input", () => {
@@ -65,5 +65,13 @@ describe("getScrollRevealState", () => {
       opacity: 1,
       blur: 0,
     });
+  });
+});
+
+describe("hasScrollableOverflow", () => {
+  it("disables reveal motion when the TV screen has no vertical scroll range", () => {
+    expect(hasScrollableOverflow(800, 800)).toBe(false);
+    expect(hasScrollableOverflow(799, 800)).toBe(false);
+    expect(hasScrollableOverflow(801, 800)).toBe(true);
   });
 });

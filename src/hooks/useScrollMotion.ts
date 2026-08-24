@@ -1,6 +1,6 @@
 import Lenis from "lenis";
 import { useEffect, type RefObject } from "react";
-import { getScrollRevealState, shouldUseDesktopSmoothScroll } from "../utils/scrollMotion";
+import { getScrollRevealState, hasScrollableOverflow, shouldUseDesktopSmoothScroll } from "../utils/scrollMotion";
 
 const SCROLL_SURFACE_SELECTOR = ".crt-page, [data-crt-scroll-container]";
 
@@ -22,10 +22,11 @@ function getSurfaceRows(surface: HTMLElement) {
 function updateSurfaceRows(surface: HTMLElement, reducedMotion: boolean) {
   const surfaceRect = surface.getBoundingClientRect();
   const viewportHeight = surface.clientHeight;
+  const revealDisabled = reducedMotion || !hasScrollableOverflow(surface.scrollHeight, viewportHeight);
 
   for (const row of getSurfaceRows(surface)) {
     const rowTop = row.getBoundingClientRect().top - surfaceRect.top;
-    const state = getScrollRevealState(rowTop, viewportHeight, reducedMotion);
+    const state = getScrollRevealState(rowTop, viewportHeight, revealDisabled);
     row.style.setProperty("--crt-reveal-opacity", state.opacity.toFixed(3));
     row.style.setProperty("--crt-reveal-blur", `${state.blur.toFixed(2)}px`);
     row.classList.toggle("is-crt-revealing", state.opacity > 0 && state.opacity < 1);

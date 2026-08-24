@@ -128,4 +128,20 @@ describe("useScrollMotion", () => {
     mounted = true;
     expect(lenisMocks.construct).not.toHaveBeenCalled();
   });
+
+  it("keeps rows sharp when a TV page has no scroll range", () => {
+    act(() => root.render(<ScrollProbe />));
+    mounted = true;
+    const page = container.querySelector<HTMLElement>(".crt-page")!;
+    const row = container.querySelector<HTMLElement>(".crt-scroll-reveal")!;
+    Object.defineProperty(page, "clientHeight", { configurable: true, value: 800 });
+    Object.defineProperty(page, "scrollHeight", { configurable: true, value: 800 });
+    page.getBoundingClientRect = () => ({ top: 0, left: 0, right: 800, bottom: 800, width: 800, height: 800, x: 0, y: 0, toJSON() {} });
+    row.getBoundingClientRect = () => ({ top: 0, left: 0, right: 800, bottom: 80, width: 800, height: 80, x: 0, y: 0, toJSON() {} });
+
+    act(() => window.dispatchEvent(new Event("resize")));
+
+    expect(row.style.getPropertyValue("--crt-reveal-opacity")).toBe("1.000");
+    expect(row.style.getPropertyValue("--crt-reveal-blur")).toBe("0.00px");
+  });
 });
