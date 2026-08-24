@@ -229,15 +229,41 @@ export const projects: Project[] = [
     id: "shadi",
     title: "SHADI",
     category: "AI / Healthcare Hackathon",
-    description: "A local multi-agent emergency-medicine reasoning system with four specialists, evidence grounding, debate, and a safety veto.",
+    description: "A local, multi-agent clinical reasoning system that turns FHIR R4 patient cases into ranked differential diagnoses with confidence scores and citations before physician review.",
     status: "2nd Place — NVIDIA DGX Track",
-    tech: ["Python", "FastAPI", "FHIR R4", "Multi-Agent AI"],
+    detailLayout: "hackathon",
+    tech: ["Python", "FastAPI", "FHIR R4", "Next.js", "Ollama", "PostgreSQL", "Redis", "Docker Compose"],
     image: "/crt-portfolio/projects/shadi-dashboard-home.png",
     demo: {
       type: "image",
       src: "/crt-portfolio/projects/shadi-dashboard-home.png",
       alt: "SHADI clinical diagnostic role-selection dashboard",
     },
+    sources: [
+      { label: "GitHub Repository", href: "https://github.com/noahvar15/shadi" },
+    ],
+    storySteps: [
+      {
+        label: "Clinical Window",
+        title: "Between triage and physician review",
+        description: "SHADI is designed to surface evidence-backed differential diagnoses during the critical window between triage and the attending physician's assessment.",
+      },
+      {
+        label: "Parallel Reasoning",
+        title: "Four specialist agents",
+        description: "Cardiology, neurology, pulmonology, and toxicology agents reason concurrently over a shared Meditron model, with optional MedGemma analysis when imaging is attached.",
+      },
+      {
+        label: "Grounding & Safety",
+        title: "Debate before delivery",
+        description: "Evidence grounding feeds a structured agent-to-agent debate; DeepSeek-R1 synthesizes the ranked differential, and Phi-4 applies a final safety veto before the report reaches the physician.",
+      },
+      {
+        label: "Local Deployment",
+        title: "Built for NVIDIA DGX",
+        description: "Ollama, FastAPI, arq, PostgreSQL with pgvector, Redis, and a Next.js physician dashboard run as an air-gapped Docker Compose stack so patient data stays local.",
+      },
+    ],
     detailedDescription: {
       problem: "Emergency clinicians need useful differential reasoning in the short window between triage and physician assessment without sending PHI to cloud services.",
       solution: "Built a local pipeline that normalizes FHIR cases, runs four specialist agents in parallel, grounds claims, debates disagreements, synthesizes a differential, and vetoes unsafe recommendations.",
