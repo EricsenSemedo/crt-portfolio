@@ -1,0 +1,30 @@
+{
+  "last_updated": "2026-08-24",
+  "summary": {
+    "total_concepts": 53,
+    "by_level": {
+      "known": 0,
+      "familiar": 17,
+      "learning": 27,
+      "new": 9
+    },
+    "stale_count": 0,
+    "struggles_this_month": 0
+  },
+  "weekly_progress": [
+    {
+      "week_of": "2026-08-23",
+      "concepts_promoted": 0,
+      "concepts_added": 2,
+      "struggles": 0
+    }
+  ],
+  "category_breakdown": {
+    "React 19 / TypeScript": { "known": 0, "familiar": 5, "learning": 5, "new": 0 },
+    "Framer Motion v12": { "known": 0, "familiar": 3, "learning": 5, "new": 0 },
+    "Tailwind CSS v4": { "known": 0, "familiar": 2, "learning": 1, "new": 4 },
+    "Accessibility / WCAG": { "known": 0, "familiar": 2, "learning": 6, "new": 1 },
+    "Tooling": { "known": 0, "familiar": 3, "learning": 2, "new": 3 },
+    "Architecture / Patterns": { "known": 0, "familiar": 2, "learning": 8, "new": 1 }
+  }
+}

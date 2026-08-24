@@ -21,6 +21,7 @@ export default function DescriptionChannel({ project }: DescriptionChannelProps)
       exit={{ opacity: 0, y: -20 }}
       transition={{ duration: 0.3 }}
       className="h-full overflow-y-auto p-8"
+      data-crt-scroll-container
     >
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-8">

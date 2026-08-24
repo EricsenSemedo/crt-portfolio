@@ -75,7 +75,8 @@ export default function DemoChannel({ project }: DemoChannelProps) {
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
       transition={{ duration: 0.3 }}
-      className="h-full flex flex-col items-center justify-center p-8"
+      className="h-full overflow-y-auto flex flex-col items-center justify-center p-8"
+      data-crt-scroll-container
     >
       <div className="max-w-4xl w-full">
         <div className="text-center mb-8">
