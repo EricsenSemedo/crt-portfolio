@@ -42,14 +42,17 @@ export default function DescriptionChannel({ project }: DescriptionChannelProps)
               <p className="text-crt-text-secondary text-lg leading-relaxed">{project.description}</p>
             </div>
           ) : isHackathon ? (
-            <div className="grid md:grid-cols-2 gap-6">
-              <div className="bg-crt-surface-primary/50 p-6 rounded-lg border border-crt-border">
-                <h3 className="text-xl font-display font-bold text-crt-accent mb-3">What We Built</h3>
-                <p className="text-crt-text-secondary">{project.description}</p>
-              </div>
-              <div className="bg-crt-surface-primary/50 p-6 rounded-lg border border-crt-border">
-                <h3 className="text-xl font-display font-bold text-crt-accent mb-3">My Contribution</h3>
-                <p className="text-crt-text-secondary">{project.detailedDescription.solution}</p>
+            <div>
+              <p className="mb-10 max-w-3xl font-display text-2xl leading-relaxed text-crt-text">{project.description}</p>
+              <div className="ml-2 border-l border-crt-accent pl-7">
+                {project.storySteps?.map((step, index) => (
+                  <div key={step.label} className="relative pb-8 last:pb-0">
+                    <span className="absolute -left-[2rem] top-1 block h-2.5 w-2.5 bg-crt-accent" aria-hidden="true" />
+                    <p className="font-mono text-xs uppercase tracking-[.2em] text-crt-accent">{String(index + 1).padStart(2, "0")} / {step.label}</p>
+                    <h3 className="mt-2 text-xl font-display font-bold text-crt-text">{step.title}</h3>
+                    <p className="mt-2 max-w-3xl leading-relaxed text-crt-text-secondary">{step.description}</p>
+                  </div>
+                ))}
               </div>
             </div>
           ) : (
@@ -72,8 +75,8 @@ export default function DescriptionChannel({ project }: DescriptionChannelProps)
           )}
           
           {/* Key Highlights */}
-          <div className="bg-crt-surface-primary/30 p-6 rounded-lg border border-crt-border">
-            <h3 className="text-xl font-display font-bold text-crt-accent mb-4">{isGame ? "Key Features" : isHackathon ? "Build Evidence" : "Key Highlights"}</h3>
+          {!isHackathon && <div className="bg-crt-surface-primary/30 p-6 rounded-lg border border-crt-border">
+            <h3 className="text-xl font-display font-bold text-crt-accent mb-4">{isGame ? "Key Features" : "Key Highlights"}</h3>
             <ul className="space-y-2">
               {project.detailedDescription.highlights.map((highlight, index) => (
                 <li key={index} className="flex items-start">
@@ -82,7 +85,7 @@ export default function DescriptionChannel({ project }: DescriptionChannelProps)
                 </li>
               ))}
             </ul>
-          </div>
+          </div>}
           
           {/* Tech Stack */}
           <div className="text-center">

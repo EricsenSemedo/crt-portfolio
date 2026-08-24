@@ -162,7 +162,7 @@ export const projects: Project[] = [
     description: "An AI-assisted skin-cancer screening platform providing real-time diagnostic support for dermatologists.",
     status: "2nd Place — NVIDIA Track",
     detailLayout: "hackathon",
-    tech: ["Flutter", "Flask", "YOLO", "Cloud Infrastructure"],
+    tech: ["Flutter", "Flask", "YOLO26s-cls", "Docker", "Google Cloud Run", "Firebase", "OpenCV"],
     image: "/crt-portfolio/projects/derma-dashboard-home.png",
     demo: {
       type: "image",
@@ -175,6 +175,28 @@ export const projects: Project[] = [
         href: "https://www.linkedin.com/posts/ericsen-semedo_hackuri-hackathon-artificialintelligence-activity-7435821519123054593-8TV3",
       },
       { label: "Devpost Project", href: "https://devpost.com/software/derma-860oku" },
+    ],
+    storySteps: [
+      {
+        label: "My Contribution",
+        title: "Frontend & integration",
+        description: "Designed and developed the Flutter interface, then coordinated how it exchanged images, classifications, and confidence results with the Flask backend.",
+      },
+      {
+        label: "The Pivot",
+        title: "From consumer app to clinician tool",
+        description: "When the team discovered the model only worked with dermatoscopic images—not ordinary phone photos—they reframed Derma for dermatologists instead of discarding the system.",
+      },
+      {
+        label: "Model",
+        title: "YOLO26s-cls",
+        description: "Trained on roughly 10,000 dermatoscopic images and reported around 95% classification accuracy.",
+      },
+      {
+        label: "Deployment",
+        title: "Working cloud pipeline",
+        description: "Flutter and Flask connected through Docker, Google Cloud Run, Firebase, and OpenCV.",
+      },
     ],
     detailedDescription: {
       problem: "Dermatologists need fast, consistent decision support when reviewing skin-lesion images without replacing clinical judgment.",

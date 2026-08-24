@@ -10,6 +10,12 @@ export interface ProjectSourceLink {
   href: string;
 }
 
+export interface ProjectStoryStep {
+  label: string;
+  title: string;
+  description: string;
+}
+
 export interface ProjectDetailedDescription {
   problem: string;
   solution: string;
@@ -29,6 +35,7 @@ export interface Project {
   demo?: ProjectDemo;
   detailLayout?: 'case-study' | 'game' | 'hackathon';
   sources?: ProjectSourceLink[];
+  storySteps?: ProjectStoryStep[];
   detailedDescription: ProjectDetailedDescription;
 }
 
