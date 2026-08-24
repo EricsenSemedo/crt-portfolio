@@ -109,7 +109,7 @@ export default function Navbar({ title, onClose }: NavbarProps) {
   }, []);
 
   return (
-    <div ref={headerRef} className="smart-header pointer-events-none absolute left-0 right-0 top-0 z-10 flex h-16 items-center border-b border-white/30 bg-[#1a1a1a]/95">
+    <div ref={headerRef} className="smart-header pointer-events-none absolute left-0 right-0 top-0 flex h-16 items-center border-b border-white/30 bg-[#1a1a1a]/95">
       <div id="tv-overlay-title" className="channel-marquee pointer-events-auto h-full flex-1 overflow-hidden font-display text-3xl font-bold uppercase leading-none tracking-[.08em] text-crt-text md:text-4xl">
         <div className="channel-marquee__track h-full items-center">
           {Array.from({ length: 10 }, (_, index) => <span key={index}>{marqueeLabel.visibleLabel}</span>)}

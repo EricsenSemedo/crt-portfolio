@@ -18,6 +18,8 @@ interface ProjectTVProps {
 export default function ProjectTV({ project, onClick, isSelected }: ProjectTVProps) {
   const fill = useDirectionalFill<HTMLDivElement>("all");
   const title = useScrambleText(project.title);
+  const previewSrc = project.image ?? project.media?.[0]?.src ?? project.demo?.src;
+  const previewAlt = project.media?.[0]?.alt ?? project.demo?.alt ?? project.title + " preview";
 
   function handlePointerEnter(event: PointerEvent<HTMLDivElement>) {
     if (fill.handlePointerEnter(event)) title.scramble();
@@ -64,33 +66,35 @@ export default function ProjectTV({ project, onClick, isSelected }: ProjectTVPro
         {/* TV Screen */}
         <div className="relative bg-crt-shell-screen rounded border border-crt-border-secondary overflow-hidden aspect-[4/3]">
           
-          {/* Screen Content */}
-          <div className="absolute inset-0 p-4 flex flex-col justify-between">
-            
-            {/* Project Preview "Channel" */}
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <span className="text-crt-accent text-sm font-mono">{project.category}</span>
-                <div 
-                  className="h-2 w-2 rounded-full bg-crt-success shadow-[0_0_10px_rgb(var(--crt-accent-success))]"
-                ></div>
-              </div>
-              
-              <h3 className="text-xl font-display font-bold text-crt-text transition-colors tracking-wide">
-                {title.visibleLabel}
-              </h3>
-              
-              <p className="text-crt-text-secondary text-sm leading-relaxed">
-                {project.description}
-              </p>
-            </div>
-            
-            {/* Tech Stack Tags */}
-            <div className="flex flex-wrap gap-1">
+          {/* Project preview media */}
+          {previewSrc ? (
+            <img
+              src={previewSrc}
+              alt={previewAlt}
+              className="absolute inset-0 h-full w-full object-cover"
+              loading="lazy"
+            />
+          ) : (
+            <div className="absolute inset-0 bg-crt-surface-primary" />
+          )}
+
+          <div className="absolute inset-x-0 top-0 flex items-center justify-between bg-black/80 px-4 py-3">
+            <span className="text-crt-accent text-sm font-mono">{project.category}</span>
+            <div className="h-2 w-2 rounded-full bg-crt-success shadow-[0_0_10px_rgb(var(--crt-accent-success))]" />
+          </div>
+
+          <div className="absolute inset-x-0 bottom-0 bg-black/85 p-4">
+            <h3 className="text-xl font-display font-bold text-crt-text transition-colors tracking-wide">
+              {title.visibleLabel}
+            </h3>
+            <p className="mt-2 text-sm leading-relaxed text-crt-text-secondary">
+              {project.description}
+            </p>
+            <div className="mt-3 flex flex-wrap gap-1">
               {project.tech.slice(0, 3).map((tech) => (
-                <span 
-                  key={tech} 
-                  className="px-2 py-1 bg-crt-surface-primary/80 text-xs font-mono rounded border border-crt-border-secondary text-crt-text-secondary"
+                <span
+                  key={tech}
+                  className="border border-crt-border-secondary bg-black/80 px-2 py-1 text-xs font-mono text-crt-text-secondary"
                 >
                   {tech}
                 </span>

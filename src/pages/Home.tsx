@@ -9,7 +9,9 @@ interface HomeProps {
 
 const skills = [
   "Java", "Python", "C++", "C#", "JavaScript", "TypeScript", "Lua", "Go",
-  "MySQL", "SQL", "PostgreSQL", "Git", "Docker", "Kubernetes", "AWS", "OpenTofu", "CI/CD",
+  "MySQL", "SQL", "PostgreSQL", "JDBC", "REST APIs", "Spring", "Spring Boot", "Spring Data JPA",
+  "Maven", "Javalin", "JUnit", "Mockito", "Logback", "Git", "Docker", "Kubernetes", "AWS", "OpenTofu",
+  "CI/CD", "Linux", "Hadoop", "Agile",
 ];
 
 export default function Home({ onNavigate }: HomeProps) {
@@ -48,6 +50,15 @@ export default function Home({ onNavigate }: HomeProps) {
         <section className="space-y-4">
           <h3 className="text-2xl font-display font-semibold text-center text-crt-accent tracking-wide">Experience</h3>
           <div className="space-y-4">
+            <div className="bg-crt-surface-primary/30 rounded-lg p-6 border border-crt-border/30">
+              <h4 className="text-lg font-semibold text-crt-accent-hover mb-1">Java Intern - Revature</h4>
+              <p className="mb-2 font-mono text-sm text-crt-accent">Pre-Employment Program | Back-end Developer</p>
+              <p className="text-crt-text-tertiary text-sm mb-3">Jun 2026 - Aug 2026</p>
+              <p className="text-crt-text-secondary leading-relaxed">
+                Built functional REST APIs with Java, SQL, Spring, and test-driven development.
+                Completed 108 coding activities and demonstrated proficiency through 14 evaluations.
+              </p>
+            </div>
             <div className="bg-crt-surface-primary/30 rounded-lg p-6 border border-crt-border/30">
               <h4 className="text-lg font-semibold text-crt-accent-hover mb-2">Infrastructure Engineer - PixelMux</h4>
               <p className="text-crt-text-tertiary text-sm mb-3">Jan 2025 - Dec 2025 | Remote</p>

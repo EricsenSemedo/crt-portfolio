@@ -202,6 +202,7 @@ body {
 }
 
 .smart-header {
+  z-index: 60;
   will-change: transform, opacity, filter;
 }
 
@@ -376,6 +377,12 @@ body {
   will-change: transform;
 }
 
+.additional-project-row__content {
+  transform: scale(1);
+  transform-origin: center;
+  transition: transform 300ms cubic-bezier(.22, 1, .36, 1);
+}
+
 .crt-action-shell:active:not(:disabled) .crt-action-content {
   transform: scale(.94);
   transition-duration: 140ms;
@@ -395,11 +402,17 @@ body {
   .group:hover .project-tv__hover-static {
     opacity: 1;
   }
+
+  .additional-project-row:hover .additional-project-row__content,
+  .additional-project-row:focus-visible .additional-project-row__content {
+    transform: scale(.985);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .crt-page section { animation: none; }
   .crt-action-content { transition: none; }
+  .additional-project-row__content { transition: none; }
   .channel-marquee { animation: none; }
   .channel-marquee__track { animation-play-state: paused; }
   .global-crt-overlay::before,

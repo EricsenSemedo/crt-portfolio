@@ -9,7 +9,7 @@ export const projects: Project[] = [
     description: "Photo-to-profit workflow for junkyard buyers: identify a part, evaluate comps, and make a defensible buy decision.",
     status: "Flagship Build",
     tech: ["Next.js", "TypeScript", "SQLite", "AI Vision"],
-    image: "/crt-portfolio/projects/pullworth-dashboard-v2.webm",
+    image: "/crt-portfolio/projects/pullworth-preview.webp",
     demo: {
       type: "video",
       src: "/crt-portfolio/projects/pullworth-dashboard-v2.webm",
@@ -34,7 +34,7 @@ export const projects: Project[] = [
     description: "A tense multiplayer timing game: finish your plate, but freeze before the Looker drops the newspaper.",
     status: "Playable",
     tech: ["Luau", "Roblox", "React Lua", "ByteNet"],
-    image: "/crt-portfolio/projects/dont-get-caught-gameplay-v2.webm",
+    image: "/crt-portfolio/projects/dont-get-caught-preview.webp",
     demo: {
       type: "video",
       src: "/crt-portfolio/projects/dont-get-caught-gameplay-v2.webm",
@@ -136,7 +136,7 @@ export const projects: Project[] = [
     description: "A social discovery app for finding, organizing, and sharing movies, TV shows, and music with friends.",
     status: "Featured Project",
     tech: ["TypeScript", "Next.js", "Supabase", "PostgreSQL"],
-    image: "/crt-portfolio/projects/toonsync-demo-v2.webm",
+    image: "/crt-portfolio/projects/toonsync-preview.webp",
     github: "https://github.com/EricsenSemedo/toonsync",
     demo: {
       type: "video",
