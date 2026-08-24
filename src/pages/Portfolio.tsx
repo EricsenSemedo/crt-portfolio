@@ -8,28 +8,50 @@ import type { NavigateFunction, Project } from "../types";
 
 type ChannelType = 'demo' | 'description';
 
-const featuredProjectIds = [
+const softwareProjectIds = [
   "pullworth",
   "toonsync",
   "derma",
   "shadi",
+];
+
+const gameDevelopmentProjectIds = [
   "dont-get-caught",
   "grow-your-plant",
 ];
 
-interface PortfolioProps {
-  onNavigate?: NavigateFunction;
-}
+const featuredProjectIds = [...softwareProjectIds, ...gameDevelopmentProjectIds];
 
-export default function Portfolio({ onNavigate }: PortfolioProps) {
-  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
-  const [currentChannel, setCurrentChannel] = useState<ChannelType>('demo');
-  const backgroundRef = useRef<HTMLDivElement>(null);
-  const featuredProjects = featuredProjectIds.flatMap((id) => {
+function projectsById(ids: string[]) {
+  return ids.flatMap((id) => {
     const project = projects.find((candidate) => candidate.id === id);
     return project ? [project] : [];
   });
+}
+
+interface PortfolioProps {
+  onNavigate?: NavigateFunction;
+  onProjectDetailOpenChange?: (isOpen: boolean) => void;
+}
+
+export default function Portfolio({ onNavigate, onProjectDetailOpenChange }: PortfolioProps) {
+  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+  const [currentChannel, setCurrentChannel] = useState<ChannelType>('demo');
+  const backgroundRef = useRef<HTMLDivElement>(null);
+  const softwareProjects = projectsById(softwareProjectIds);
+  const gameDevelopmentProjects = projectsById(gameDevelopmentProjectIds);
   const additionalProjects = projects.filter((project) => !featuredProjectIds.includes(project.id));
+
+  function openProject(project: Project) {
+    setSelectedProject(project);
+    onProjectDetailOpenChange?.(true);
+  }
+
+  function closeProject() {
+    setSelectedProject(null);
+    setCurrentChannel('demo');
+    onProjectDetailOpenChange?.(false);
+  }
 
   return (
     <div className="crt-page bg-page-tint w-full h-full overflow-y-auto text-crt-text">
@@ -40,20 +62,41 @@ export default function Portfolio({ onNavigate }: PortfolioProps) {
             Project Gallery
           </ScrambleHeading>
           <p className="text-crt-text-tertiary max-w-2xl mx-auto">
-            Browse the featured TVs and additional project rows. Select any project to explore its details.
+            Browse game development, software, and AI work. Select any project to explore its details.
           </p>
         </section>
 
-        <section className="px-6 pt-10">
-          <p className="font-mono text-xs uppercase tracking-[0.24em] text-crt-accent">Featured</p>
+        <section id="software-and-ai" className="border-t border-crt-border-subtle px-6 pt-10">
+          <p className="font-mono text-xs uppercase tracking-[0.24em] text-crt-accent">Software &amp; AI</p>
+          <p className="mt-2 max-w-2xl text-sm text-crt-text-tertiary">
+            Product, client, and hackathon work spanning field tools, social platforms, and applied AI systems.
+          </p>
         </section>
 
         <section className="grid grid-cols-1 md:grid-cols-2 gap-8 px-6 py-8">
-          {featuredProjects.map((project) => (
+          {softwareProjects.map((project) => (
             <ProjectTV
               key={project.id}
               project={project}
-              onClick={() => setSelectedProject(project)}
+              onClick={() => openProject(project)}
+              isSelected={selectedProject?.id === project.id}
+            />
+          ))}
+        </section>
+
+        <section id="game-development" className="border-t border-crt-border-subtle px-6 pt-10">
+          <p className="font-mono text-xs uppercase tracking-[0.24em] text-crt-accent">Game Development</p>
+          <p className="mt-2 max-w-2xl text-sm text-crt-text-tertiary">
+            Roblox games and gameplay systems built around multiplayer loops, progression, and responsive cross-platform controls.
+          </p>
+        </section>
+
+        <section className="grid grid-cols-1 md:grid-cols-2 gap-8 px-6 py-8">
+          {gameDevelopmentProjects.map((project) => (
+            <ProjectTV
+              key={project.id}
+              project={project}
+              onClick={() => openProject(project)}
               isSelected={selectedProject?.id === project.id}
             />
           ))}
@@ -72,7 +115,7 @@ export default function Portfolio({ onNavigate }: PortfolioProps) {
               <AdditionalProjectRow
                 key={project.id}
                 project={project}
-                onClick={() => setSelectedProject(project)}
+                onClick={() => openProject(project)}
               />
             ))}
           </div>
@@ -105,10 +148,7 @@ export default function Portfolio({ onNavigate }: PortfolioProps) {
             project={selectedProject}
             currentChannel={currentChannel}
             onChannelChange={setCurrentChannel}
-            onClose={() => {
-              setSelectedProject(null);
-              setCurrentChannel('demo');
-            }}
+            onClose={closeProject}
             backgroundRef={backgroundRef}
           />
         )}

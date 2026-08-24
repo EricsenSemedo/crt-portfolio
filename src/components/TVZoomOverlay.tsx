@@ -2,6 +2,7 @@ import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useEffect, useRef, type ReactNode, type RefObject } from "react";
 import { PORTFOLIO_CHANNELS, type PortfolioChannelId } from "../data/channels";
 import { useModalAccessibility } from "../hooks/useModalAccessibility";
+import useScrollMotion from "../hooks/useScrollMotion";
 import Navbar from "./Navbar";
 
 interface SelectedItem {
@@ -13,6 +14,7 @@ interface TVZoomOverlayProps {
   onClose?: () => void;
   onExitComplete?: () => void;
   onEnterComplete?: () => void;
+  hideHeader?: boolean;
   children?: ReactNode;
   backgroundRef?: RefObject<HTMLElement | null>;
 }
@@ -26,12 +28,15 @@ export default function TVZoomOverlay({
   onClose,
   onExitComplete,
   onEnterComplete,
+  hideHeader = false,
   children,
   backgroundRef,
 }: TVZoomOverlayProps) {
   const dialogRef = useRef<HTMLDivElement>(null);
   const reduceMotion = useReducedMotion();
   const selectedId = selectedItem?.id;
+
+  useScrollMotion(dialogRef, selectedId);
 
   useEffect(() => {
     if (!selectedId) return;
@@ -62,7 +67,8 @@ export default function TVZoomOverlay({
           onClick={onClose}
           role="dialog"
           aria-modal="true"
-          aria-labelledby="tv-overlay-title"
+          aria-labelledby={hideHeader ? undefined : "tv-overlay-title"}
+          aria-label={hideHeader ? PORTFOLIO_CHANNELS[selectedItem.id].title : undefined}
           tabIndex={-1}
         >
           {/* Full-screen content container with CRT effects */}
@@ -99,7 +105,7 @@ export default function TVZoomOverlay({
               transition={{ duration: reduceMotion ? 0.01 : 0.2 }}
             >
                 <div className="absolute inset-0">
-                  <Navbar title={PORTFOLIO_CHANNELS[selectedItem.id].title} onClose={onClose} />
+                  {!hideHeader && <Navbar title={PORTFOLIO_CHANNELS[selectedItem.id].title} onClose={onClose} />}
                   <div className="absolute inset-0">{children}</div>
                 </div>
               </motion.div>

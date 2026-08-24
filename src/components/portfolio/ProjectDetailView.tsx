@@ -112,12 +112,13 @@ export default function ProjectDetailView({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.2, duration: 0.2 }}
-            className="absolute inset-0 pt-16"
+            className="absolute inset-0 overflow-hidden pt-16"
           >
             <AnimatePresence mode="wait">
               {currentChannel === 'demo' ? (
                 <motion.div
                   key="demo"
+                  className="h-full min-h-0"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
@@ -128,6 +129,7 @@ export default function ProjectDetailView({
               ) : (
                 <motion.div
                   key="description"
+                  className="h-full min-h-0"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}

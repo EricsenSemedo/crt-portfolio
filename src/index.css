@@ -182,16 +182,13 @@ body {
 }
 
 .crt-scroll-reveal {
-  transform-origin: center bottom;
+  opacity: var(--crt-reveal-opacity, 1);
+  filter: blur(var(--crt-reveal-blur, 0px));
+  transform-origin: center top;
 }
 
-@supports (animation-timeline: view()) {
-  .crt-scroll-reveal {
-    animation: crt-section-reveal linear both;
-    animation-range: entry 0% exit 100%;
-    animation-timeline: view();
-    will-change: opacity, filter, transform;
-  }
+.crt-scroll-reveal.is-crt-revealing {
+  will-change: opacity, filter;
 }
 
 .smart-header.is-snapping {
@@ -204,12 +201,6 @@ body {
 .smart-header {
   z-index: 60;
   will-change: transform, opacity, filter;
-}
-
-@keyframes crt-section-reveal {
-  0% { opacity: .25; filter: blur(6px); transform: translateY(8px); }
-  22%, 74% { opacity: 1; filter: blur(0); transform: translateY(0); }
-  100% { opacity: 0; filter: blur(8px); transform: translateY(-8px); }
 }
 
 .global-crt-overlay {
@@ -410,7 +401,11 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .crt-scroll-reveal { animation: none; }
+  .crt-scroll-reveal {
+    opacity: 1;
+    filter: none;
+    will-change: auto;
+  }
   .crt-action-content { transition: none; }
   .additional-project-row__content { transition: none; }
   .channel-marquee { animation: none; }

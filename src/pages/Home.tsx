@@ -8,7 +8,7 @@ interface HomeProps {
 }
 
 const skills = [
-  "Java", "Python", "C++", "C#", "JavaScript", "TypeScript", "Lua", "Go",
+  "Java", "Python", "C++", "C#", "JavaScript", "TypeScript", "Luau", "Go",
   "MySQL", "SQL", "PostgreSQL", "JDBC", "REST APIs", "Spring", "Spring Boot", "Spring Data JPA",
   "Maven", "Javalin", "JUnit", "Mockito", "Logback", "Git", "Docker", "Kubernetes", "AWS", "OpenTofu",
   "CI/CD", "Linux", "Hadoop", "Agile",
@@ -39,7 +39,7 @@ export default function Home({ onNavigate }: HomeProps) {
           <h3 className="text-2xl font-display font-semibold text-center text-crt-accent tracking-wide">Skills & Technologies</h3>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
             {skills.map((skill) => (
-              <div key={skill} className="crt-scroll-reveal bg-crt-surface-primary/50 rounded-lg p-3 text-center border border-crt-border/50 hover:border-crt-accent/30 transition-colors">
+              <div key={skill} className="crt-scroll-reveal bg-crt-surface-primary/50 p-3 text-center border border-crt-border/50 hover:border-crt-accent/30 transition-colors">
                 <span className="text-sm font-mono font-medium text-crt-text-secondary">{skill}</span>
               </div>
             ))}
@@ -50,7 +50,7 @@ export default function Home({ onNavigate }: HomeProps) {
         <section className="space-y-4">
           <h3 className="text-2xl font-display font-semibold text-center text-crt-accent tracking-wide">Experience</h3>
           <div className="space-y-4">
-            <div className="crt-scroll-reveal bg-crt-surface-primary/30 rounded-lg p-6 border border-crt-border/30">
+            <div className="crt-scroll-reveal bg-crt-surface-primary/30 p-6 border border-crt-border/30">
               <h4 className="text-lg font-semibold text-crt-accent-hover mb-1">Java Intern - Revature</h4>
               <p className="mb-2 font-mono text-sm text-crt-accent">Pre-Employment Program | Back-end Developer</p>
               <p className="text-crt-text-tertiary text-sm mb-3">Jun 2026 - Aug 2026</p>
@@ -59,7 +59,7 @@ export default function Home({ onNavigate }: HomeProps) {
                 Completed 108 coding activities and demonstrated proficiency through 14 evaluations.
               </p>
             </div>
-            <div className="crt-scroll-reveal bg-crt-surface-primary/30 rounded-lg p-6 border border-crt-border/30">
+            <div className="crt-scroll-reveal bg-crt-surface-primary/30 p-6 border border-crt-border/30">
               <h4 className="text-lg font-semibold text-crt-accent-hover mb-2">Infrastructure Engineer - PixelMux</h4>
               <p className="text-crt-text-tertiary text-sm mb-3">Jan 2025 - Dec 2025 | Remote</p>
               <p className="text-crt-text-secondary leading-relaxed">
@@ -67,11 +67,11 @@ export default function Home({ onNavigate }: HomeProps) {
                 and developed CI/CD integration-testing pipelines for core infrastructure modules.
               </p>
             </div>
-            <div className="crt-scroll-reveal bg-crt-surface-primary/30 rounded-lg p-6 border border-crt-border/30">
+            <div className="crt-scroll-reveal bg-crt-surface-primary/30 p-6 border border-crt-border/30">
               <h4 className="text-lg font-semibold text-crt-accent-hover mb-2">Freelance Programmer - Fiverr</h4>
               <p className="text-crt-text-tertiary text-sm mb-3">Dec 2023 - Jan 2024 | Remote</p>
               <p className="text-crt-text-secondary leading-relaxed">
-                Delivered Lua scripts for Roblox games, refactored reusable NPC and AI systems,
+                Delivered Luau scripts for Roblox games, refactored reusable NPC and AI systems,
                 added features, resolved bugs, and improved game performance.
               </p>
             </div>
@@ -80,18 +80,18 @@ export default function Home({ onNavigate }: HomeProps) {
 
         {/* Education & Stats */}
         <section className="space-y-4">
-          <div className="crt-scroll-reveal bg-crt-surface-primary/30 rounded-lg p-6 border border-crt-border/30 text-center">
+          <div className="crt-scroll-reveal bg-crt-surface-primary/30 p-6 border border-crt-border/30 text-center">
             <h4 className="text-lg font-display font-semibold text-crt-secondary mb-2 tracking-wide">Education</h4>
             <p className="text-crt-text-secondary">University of Rhode Island</p>
             <p className="text-crt-text-tertiary text-sm">Bachelor of Arts in Computer Science</p>
             <p className="text-crt-text-tertiary text-sm">Graduated: May 2025</p>
           </div>
           <div className="grid grid-cols-2 gap-4">
-            <div className="crt-scroll-reveal text-center p-4 bg-crt-surface-primary/30 rounded-lg border border-crt-border/30">
+            <div className="crt-scroll-reveal text-center p-4 bg-crt-surface-primary/30 border border-crt-border/30">
               <div className="text-2xl font-display font-bold text-crt-accent">1+</div>
               <div className="text-sm text-crt-text-tertiary">Years Professional</div>
             </div>
-            <div className="crt-scroll-reveal text-center p-4 bg-crt-surface-primary/30 rounded-lg border border-crt-border/30">
+            <div className="crt-scroll-reveal text-center p-4 bg-crt-surface-primary/30 border border-crt-border/30">
               <div className="text-2xl font-display font-bold text-crt-secondary">{projects.length}+</div>
               <div className="text-sm text-crt-text-tertiary">Projects Built</div>
             </div>

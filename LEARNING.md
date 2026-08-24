@@ -2,6 +2,11 @@
 
 Owner knowledge profile for calibrating PR explanations and code comments.
 
+## Explanation Preferences
+
+- Use the PX Push case-study sequence: begin with the visual idea, name the mechanism, show the smallest useful implementation core, then explain why each piece exists.
+- Prefer concrete cause-and-effect language over abstract framework terminology.
+
 ## Proficiency Levels
 
 - **known**: Owner is fluent. Skip detailed explanations.
@@ -88,6 +93,8 @@ Owner knowledge profile for calibrating PR explanations and code comments.
 | Theme intensity multipliers | new | `--crt-scanline-opacity` etc. scale CRT effect intensity per theme mode |
 | Imperative ref API for navigation | learning | `useImperativeHandle` exposing `selectTV`, `reset`, `centerOn` on PanStage |
 | Pending navigation pattern | learning | `pendingNavigation` state in App for sequential zoom-out-then-zoom-in transitions |
+| Progressive 3D asset loading and placeholder handoff | learning | Procedural scene renders immediately; GLTF/HDR assets replace it only after asynchronous downloads finish |
+| Scroll-linked blur-and-fade | learning | A fixed marquee can map scroll progress to `filter: blur()` and `opacity` while its horizontal track animates independently |
 | Mobile browser detection fallbacks | learning | UA-sniffing for Firefox Mobile CSS transition fallback in PanStage |
 | Modal accessibility hook | learning | Reusable `useModalAccessibility` handling focus trap, escape, inert, restore focus |
 | Barrel exports | familiar | `components/portfolio/index.ts` re-exports for cleaner imports |

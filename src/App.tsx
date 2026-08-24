@@ -32,6 +32,7 @@ function PortfolioApp() {
   const [overlayExited, setOverlayExited] = useState(false);
   const [overviewReady, setOverviewReady] = useState(false);
   const [screenEffectActive, setScreenEffectActive] = useState(false);
+  const [projectDetailOpen, setProjectDetailOpen] = useState(false);
   const backgroundRef = useRef<HTMLDivElement>(null);
   const navigateToTV = (targetId: string) => {
     const target = targetId as PortfolioChannelId;
@@ -40,6 +41,7 @@ function PortfolioApp() {
     setOverlayExited(false);
     setOverviewReady(false);
     setScreenEffectActive(true);
+    setProjectDetailOpen(false);
     setSelectedId(null);
   };
 
@@ -54,6 +56,7 @@ function PortfolioApp() {
     setSelectedId(null);
     setOverlayExited(false);
     setOverviewReady(false);
+    setProjectDetailOpen(false);
   }
 
   const handleOverviewComplete = useCallback(() => setOverviewReady(true), []);
@@ -71,7 +74,7 @@ function PortfolioApp() {
 
   const byId: Record<string, React.ReactNode> = {
     home: <Home onNavigate={navigateToTV} />,
-    portfolio: <Portfolio onNavigate={navigateToTV} />,
+    portfolio: <Portfolio onNavigate={navigateToTV} onProjectDetailOpenChange={setProjectDetailOpen} />,
     contact: <Contact onNavigate={navigateToTV} />,
   };
 
@@ -82,6 +85,7 @@ function PortfolioApp() {
           <ThreeCRTStage
             onSelect={(id) => {
               setScreenEffectActive(true);
+              setProjectDetailOpen(false);
               setSceneChannel(id);
               setSelectedId(id);
             }}
@@ -99,6 +103,7 @@ function PortfolioApp() {
         onClose={closeTV}
         onExitComplete={handleOverlayExitComplete}
         onEnterComplete={handleOverlayEnterComplete}
+        hideHeader={projectDetailOpen}
         backgroundRef={backgroundRef}
       >
         {selectedId ? byId[selectedId] ?? null : null}
