@@ -40,6 +40,7 @@ export const projects: Project[] = [
       src: "/crt-portfolio/projects/dont-get-caught-gameplay-v2.webm",
       alt: "Don't Get Caught live round gameplay",
     },
+    detailLayout: "game",
     detailedDescription: {
       problem: "Turn one readable social bluff into a complete round-based game that remains fair across desktop, gamepad, and touch.",
       solution: "Built a server-authoritative match system with role assignment, AI Looker behavior, synchronized action windows, persistence, and adaptive input UI.",
@@ -65,6 +66,7 @@ export const projects: Project[] = [
       src: "/crt-portfolio/projects/grow-your-plant.png",
       alt: "Grow Your Plant game artwork",
     },
+    detailLayout: "game",
     detailedDescription: {
       problem: "Create an extensible progression game whose economy and random rewards cannot be trusted to the client.",
       solution: "Separated authoritative services for wallets, growth, seed RNG, temporary upgrades, permanent upgrades, and prestige behind type-safe networking.",
@@ -142,7 +144,7 @@ export const projects: Project[] = [
       alt: "ToonSync social discovery homepage and recommendation feed",
     },
     detailedDescription: {
-      problem: "Media discovery is fragmented across separate movie, television, and music services, while recommendations from friends get lost in messages.",
+      problem: "Media discovery is scattered across separate movie, television, and music services, while recommendations from friends get lost in messages.",
       solution: "Built a unified responsive app with guest libraries, accounts, friend requests, recommendation feeds, custom lists, and external catalog integrations.",
       impact: "Created one social layer for discovering and sharing entertainment across TMDB and Deezer-backed catalogs.",
       highlights: [

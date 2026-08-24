@@ -22,6 +22,7 @@ export interface Project {
   image?: string;
   github?: string;
   demo?: ProjectDemo;
+  detailLayout?: 'case-study' | 'game';
   detailedDescription: ProjectDetailedDescription;
 }
 

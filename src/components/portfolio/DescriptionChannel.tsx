@@ -11,6 +11,8 @@ interface DescriptionChannelProps {
  * Uses theme tokens for card backgrounds, borders, semantic colors, and text.
  */
 export default function DescriptionChannel({ project }: DescriptionChannelProps) {
+  const isGame = project.detailLayout === "game";
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -26,27 +28,33 @@ export default function DescriptionChannel({ project }: DescriptionChannelProps)
         </div>
         
         <div className="space-y-8">
-          {/* Problem/Solution/Impact */}
-          <div className="grid md:grid-cols-3 gap-6">
+          {isGame ? (
             <div className="bg-crt-surface-primary/50 p-6 rounded-lg border border-crt-border">
-              <h3 className="text-xl font-display font-bold text-crt-danger mb-3">Problem</h3>
-              <p className="text-crt-text-secondary">{project.detailedDescription.problem}</p>
+              <h3 className="text-xl font-display font-bold text-crt-accent mb-3">About the Game</h3>
+              <p className="text-crt-text-secondary text-lg leading-relaxed">{project.description}</p>
             </div>
-            
-            <div className="bg-crt-surface-primary/50 p-6 rounded-lg border border-crt-border">
-              <h3 className="text-xl font-display font-bold text-crt-warning mb-3">Solution</h3>
-              <p className="text-crt-text-secondary">{project.detailedDescription.solution}</p>
+          ) : (
+            <div className="grid md:grid-cols-3 gap-6">
+              <div className="bg-crt-surface-primary/50 p-6 rounded-lg border border-crt-border">
+                <h3 className="text-xl font-display font-bold text-crt-danger mb-3">Problem</h3>
+                <p className="text-crt-text-secondary">{project.detailedDescription.problem}</p>
+              </div>
+
+              <div className="bg-crt-surface-primary/50 p-6 rounded-lg border border-crt-border">
+                <h3 className="text-xl font-display font-bold text-crt-warning mb-3">Solution</h3>
+                <p className="text-crt-text-secondary">{project.detailedDescription.solution}</p>
+              </div>
+
+              <div className="bg-crt-surface-primary/50 p-6 rounded-lg border border-crt-border">
+                <h3 className="text-xl font-display font-bold text-crt-success mb-3">Impact</h3>
+                <p className="text-crt-text-secondary">{project.detailedDescription.impact}</p>
+              </div>
             </div>
-            
-            <div className="bg-crt-surface-primary/50 p-6 rounded-lg border border-crt-border">
-              <h3 className="text-xl font-display font-bold text-crt-success mb-3">Impact</h3>
-              <p className="text-crt-text-secondary">{project.detailedDescription.impact}</p>
-            </div>
-          </div>
+          )}
           
           {/* Key Highlights */}
           <div className="bg-crt-surface-primary/30 p-6 rounded-lg border border-crt-border">
-            <h3 className="text-xl font-display font-bold text-crt-accent mb-4">Key Highlights</h3>
+            <h3 className="text-xl font-display font-bold text-crt-accent mb-4">{isGame ? "Key Features" : "Key Highlights"}</h3>
             <ul className="space-y-2">
               {project.detailedDescription.highlights.map((highlight, index) => (
                 <li key={index} className="flex items-start">
