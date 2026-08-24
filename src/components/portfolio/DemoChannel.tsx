@@ -84,7 +84,7 @@ export default function DemoChannel({ project }: DemoChannelProps) {
         </div>
         
         {/* Demo Media */}
-        <div className="relative bg-crt-surface-primary overflow-hidden aspect-video border border-crt-border mb-3">
+        <div className="crt-scroll-reveal relative bg-crt-surface-primary overflow-hidden aspect-video border border-crt-border mb-3">
           {!activeMedia ? (
             <div className="absolute inset-0 flex items-center justify-center bg-crt-surface-secondary">
               <div className="text-center px-6">
@@ -186,7 +186,7 @@ export default function DemoChannel({ project }: DemoChannelProps) {
         )}
         
         {/* Tech Stack */}
-        <div className="flex flex-wrap justify-center gap-2">
+        <div className="crt-scroll-reveal flex flex-wrap justify-center gap-2">
           {project.tech.map((tech) => (
             <span
               key={tech}

@@ -36,7 +36,7 @@ export default function ProjectTV({ project, onClick, isSelected }: ProjectTVPro
   
   return (
     <div
-      className="group relative cursor-pointer"
+      className="crt-scroll-reveal group relative cursor-pointer"
       onClick={onClick}
       onPointerEnter={handlePointerEnter}
       onPointerLeave={fill.handlePointerLeave}

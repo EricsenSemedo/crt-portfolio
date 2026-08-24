@@ -24,7 +24,7 @@ export default function AdditionalProjectRow({ project, onClick }: AdditionalPro
 
   return (
     <div
-      className="additional-project-row group relative cursor-pointer overflow-hidden border-b border-crt-border"
+      className="crt-scroll-reveal additional-project-row group relative cursor-pointer overflow-hidden border-b border-crt-border"
       onClick={onClick}
       onPointerEnter={handlePointerEnter}
       onPointerLeave={fill.handlePointerLeave}
