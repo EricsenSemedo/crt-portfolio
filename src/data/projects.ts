@@ -161,6 +161,7 @@ export const projects: Project[] = [
     category: "AI / Healthcare Hackathon",
     description: "An AI-assisted skin-cancer screening platform providing real-time diagnostic support for dermatologists.",
     status: "2nd Place — NVIDIA Track",
+    detailLayout: "hackathon",
     tech: ["Flutter", "Flask", "YOLO", "Cloud Infrastructure"],
     image: "/crt-portfolio/projects/derma-dashboard-home.png",
     demo: {
@@ -168,6 +169,13 @@ export const projects: Project[] = [
       src: "/crt-portfolio/projects/derma-dashboard-home.png",
       alt: "Derma skin-lesion analysis dashboard",
     },
+    sources: [
+      {
+        label: "LinkedIn Post",
+        href: "https://www.linkedin.com/posts/ericsen-semedo_hackuri-hackathon-artificialintelligence-activity-7435821519123054593-8TV3",
+      },
+      { label: "Devpost Project", href: "https://devpost.com/software/derma-860oku" },
+    ],
     detailedDescription: {
       problem: "Dermatologists need fast, consistent decision support when reviewing skin-lesion images without replacing clinical judgment.",
       solution: "Developed the Flutter frontend for a real-time screening workflow and collaborated on a cloud-deployed YOLO system trained on roughly 10,000 images.",

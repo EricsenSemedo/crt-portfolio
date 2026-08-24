@@ -12,6 +12,7 @@ interface DescriptionChannelProps {
  */
 export default function DescriptionChannel({ project }: DescriptionChannelProps) {
   const isGame = project.detailLayout === "game";
+  const isHackathon = project.detailLayout === "hackathon";
 
   return (
     <motion.div
@@ -28,10 +29,28 @@ export default function DescriptionChannel({ project }: DescriptionChannelProps)
         </div>
         
         <div className="space-y-8">
+          {isHackathon && (
+            <div className="border border-crt-accent p-6">
+              <p className="font-mono text-xs uppercase tracking-[.2em] text-crt-accent mb-2">Competition Result</p>
+              <p className="font-display text-3xl font-bold text-crt-text">{project.status}</p>
+            </div>
+          )}
+
           {isGame ? (
             <div className="bg-crt-surface-primary/50 p-6 rounded-lg border border-crt-border">
               <h3 className="text-xl font-display font-bold text-crt-accent mb-3">About the Game</h3>
               <p className="text-crt-text-secondary text-lg leading-relaxed">{project.description}</p>
+            </div>
+          ) : isHackathon ? (
+            <div className="grid md:grid-cols-2 gap-6">
+              <div className="bg-crt-surface-primary/50 p-6 rounded-lg border border-crt-border">
+                <h3 className="text-xl font-display font-bold text-crt-accent mb-3">What We Built</h3>
+                <p className="text-crt-text-secondary">{project.description}</p>
+              </div>
+              <div className="bg-crt-surface-primary/50 p-6 rounded-lg border border-crt-border">
+                <h3 className="text-xl font-display font-bold text-crt-accent mb-3">My Contribution</h3>
+                <p className="text-crt-text-secondary">{project.detailedDescription.solution}</p>
+              </div>
             </div>
           ) : (
             <div className="grid md:grid-cols-3 gap-6">
@@ -54,7 +73,7 @@ export default function DescriptionChannel({ project }: DescriptionChannelProps)
           
           {/* Key Highlights */}
           <div className="bg-crt-surface-primary/30 p-6 rounded-lg border border-crt-border">
-            <h3 className="text-xl font-display font-bold text-crt-accent mb-4">{isGame ? "Key Features" : "Key Highlights"}</h3>
+            <h3 className="text-xl font-display font-bold text-crt-accent mb-4">{isGame ? "Key Features" : isHackathon ? "Build Evidence" : "Key Highlights"}</h3>
             <ul className="space-y-2">
               {project.detailedDescription.highlights.map((highlight, index) => (
                 <li key={index} className="flex items-start">
@@ -79,6 +98,22 @@ export default function DescriptionChannel({ project }: DescriptionChannelProps)
               ))}
             </div>
           </div>
+
+          {project.sources && project.sources.length > 0 && (
+            <div className="flex flex-wrap justify-center gap-3 border-t border-crt-border pt-6">
+              {project.sources.map((source) => (
+                <a
+                  key={source.href}
+                  href={source.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="crt-action-shell border border-crt-border px-4 py-3 font-mono text-crt-text hover:bg-white hover:text-[#111] transition-colors"
+                >
+                  {source.label} ↗
+                </a>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </motion.div>

@@ -5,6 +5,11 @@ export interface ProjectDemo {
   alt: string;
 }
 
+export interface ProjectSourceLink {
+  label: string;
+  href: string;
+}
+
 export interface ProjectDetailedDescription {
   problem: string;
   solution: string;
@@ -22,7 +27,8 @@ export interface Project {
   image?: string;
   github?: string;
   demo?: ProjectDemo;
-  detailLayout?: 'case-study' | 'game';
+  detailLayout?: 'case-study' | 'game' | 'hackathon';
+  sources?: ProjectSourceLink[];
   detailedDescription: ProjectDetailedDescription;
 }
 
