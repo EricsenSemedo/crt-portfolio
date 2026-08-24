@@ -22,9 +22,9 @@ vi.mock("lenis", () => ({
   },
 }));
 
-function ScrollProbe() {
+function ScrollProbe({ initializationDelay = 0 }: { initializationDelay?: number }) {
   const rootRef = useRef<HTMLDivElement>(null);
-  useScrollMotion(rootRef, "portfolio");
+  useScrollMotion(rootRef, "portfolio", initializationDelay);
 
   return (
     <div ref={rootRef}>
@@ -143,5 +143,17 @@ describe("useScrollMotion", () => {
 
     expect(row.style.getPropertyValue("--crt-reveal-opacity")).toBe("1.000");
     expect(row.style.getPropertyValue("--crt-reveal-blur")).toBe("0.00px");
+  });
+
+  it("waits for the inbound CRT animation before measuring or starting Lenis", () => {
+    act(() => root.render(<ScrollProbe initializationDelay={460} />));
+    mounted = true;
+    expect(lenisMocks.construct).not.toHaveBeenCalled();
+
+    act(() => vi.advanceTimersByTime(459));
+    expect(lenisMocks.construct).not.toHaveBeenCalled();
+
+    act(() => vi.advanceTimersByTime(1));
+    expect(lenisMocks.construct).toHaveBeenCalledTimes(1);
   });
 });

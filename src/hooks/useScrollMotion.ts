@@ -36,6 +36,7 @@ function updateSurfaceRows(surface: HTMLElement, reducedMotion: boolean) {
 export default function useScrollMotion(
   rootRef: RefObject<HTMLElement | null>,
   lifecycleKey: string | undefined,
+  initializationDelay = 0,
 ) {
   useEffect(() => {
     const root = rootRef.current;
@@ -174,12 +175,20 @@ export default function useScrollMotion(
       window.matchMedia("(prefers-reduced-motion: reduce)"),
     ];
 
-    configureInputMode();
-    mutationObserver.observe(root, { childList: true, subtree: true });
-    window.addEventListener("resize", configureInputMode, { passive: true });
-    inputMediaQueries.forEach((query) => query.addEventListener("change", configureInputMode));
+    function start() {
+      configureInputMode();
+      mutationObserver.observe(root, { childList: true, subtree: true });
+      window.addEventListener("resize", configureInputMode, { passive: true });
+      inputMediaQueries.forEach((query) => query.addEventListener("change", configureInputMode));
+    }
+
+    const startTimer = initializationDelay > 0
+      ? window.setTimeout(start, initializationDelay)
+      : undefined;
+    if (startTimer === undefined) start();
 
     return () => {
+      if (startTimer !== undefined) window.clearTimeout(startTimer);
       mutationObserver.disconnect();
       resizeObserver.disconnect();
       window.removeEventListener("resize", configureInputMode);
@@ -190,5 +199,5 @@ export default function useScrollMotion(
       for (const lenis of lenisBySurface.values()) lenis.destroy();
       for (const surface of nativeSurfaces) surface.removeEventListener("scroll", requestRowUpdate);
     };
-  }, [lifecycleKey, rootRef]);
+  }, [initializationDelay, lifecycleKey, rootRef]);
 }

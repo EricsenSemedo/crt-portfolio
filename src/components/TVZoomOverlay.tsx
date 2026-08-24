@@ -35,15 +35,15 @@ export default function TVZoomOverlay({
   const dialogRef = useRef<HTMLDivElement>(null);
   const reduceMotion = useReducedMotion();
   const selectedId = selectedItem?.id;
+  const enterDelay = reduceMotion ? 20 : 460;
 
-  useScrollMotion(dialogRef, selectedId);
+  useScrollMotion(dialogRef, selectedId, enterDelay);
 
   useEffect(() => {
     if (!selectedId) return;
-    const delay = reduceMotion ? 20 : 460;
-    const timer = window.setTimeout(() => onEnterComplete?.(), delay);
+    const timer = window.setTimeout(() => onEnterComplete?.(), enterDelay);
     return () => window.clearTimeout(timer);
-  }, [onEnterComplete, reduceMotion, selectedId]);
+  }, [enterDelay, onEnterComplete, selectedId]);
 
   useModalAccessibility({
     isOpen: Boolean(selectedItem),
