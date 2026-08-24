@@ -160,7 +160,7 @@ export const projects: Project[] = [
     title: "Derma",
     category: "AI / Healthcare Hackathon",
     description: "An AI-assisted skin-cancer screening platform providing real-time diagnostic support for dermatologists.",
-    status: "2nd Place — NVIDIA Track",
+    status: "2nd Place, NVIDIA Track",
     detailLayout: "hackathon",
     tech: ["Flutter", "Flask", "YOLO26s-cls", "Docker", "Google Cloud Run", "Firebase", "OpenCV"],
     image: "/crt-portfolio/projects/derma-dashboard-home.png",
@@ -200,7 +200,7 @@ export const projects: Project[] = [
       {
         label: "The Pivot",
         title: "From consumer app to clinician tool",
-        description: "When the team discovered the model only worked with dermatoscopic images—not ordinary phone photos—they reframed Derma for dermatologists instead of discarding the system.",
+        description: "Once we discovered the model only worked with dermatoscopic images, not ordinary phone photos, we reframed Derma for dermatologists instead of discarding the system.",
       },
       {
         label: "Model",
@@ -229,8 +229,8 @@ export const projects: Project[] = [
     id: "shadi",
     title: "SHADI",
     category: "AI / Healthcare Hackathon",
-    description: "A local, multi-agent clinical reasoning system that turns FHIR R4 patient cases into ranked differential diagnoses with confidence scores and citations before physician review.",
-    status: "2nd Place — NVIDIA DGX Track",
+    description: "A local multi-agent AI system we built to help emergency medicine teams reason through patient cases and produce a ranked list of possible diagnoses, confidence scores, and supporting sources before a physician reviews it.",
+    status: "2nd Place, NVIDIA DGX Track",
     detailLayout: "hackathon",
     tech: ["Python", "FastAPI", "FHIR R4", "Next.js", "Ollama", "PostgreSQL", "Redis", "Docker Compose"],
     image: "/crt-portfolio/projects/shadi-dashboard-home.png",
@@ -251,7 +251,7 @@ export const projects: Project[] = [
       {
         label: "Parallel Reasoning",
         title: "Four specialist agents",
-        description: "Cardiology, neurology, pulmonology, and toxicology agents reason concurrently over a shared Meditron model, with optional MedGemma analysis when imaging is attached.",
+        description: "Cardiology, neurology, pulmonology, and toxicology agents reason in parallel over a shared Meditron model, with optional MedGemma analysis when imaging is attached.",
       },
       {
         label: "Grounding & Safety",
@@ -273,7 +273,7 @@ export const projects: Project[] = [
         "FHIR R4 intake and DiagnosticReport output",
         "Evidence-grounded A2A debate and synthesis",
         "Independent safety veto for contraindicated recommendations",
-        "2nd Place — NVIDIA DGX Track",
+        "2nd Place, NVIDIA DGX Track",
       ],
     },
   },
