@@ -1,4 +1,5 @@
-import type { PortfolioChannelId, ScreenFit } from "./createPortfolioScene";
+import type { PortfolioChannelId } from "../data/channels";
+import type { ScreenFit } from "./createPortfolioScene";
 
 type ScreenFitProfile = "PHONE PORTRAIT" | "FOLD / TABLET" | "DESKTOP";
 

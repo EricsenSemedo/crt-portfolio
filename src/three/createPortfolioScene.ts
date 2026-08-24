@@ -28,6 +28,7 @@ import {
 } from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { HDRLoader } from "three/examples/jsm/loaders/HDRLoader.js";
+import { PORTFOLIO_CHANNELS, type PortfolioChannelId } from "../data/channels";
 import { createBasementRoom } from "./assets/createBasementRoom";
 import { createDiscTV } from "./assets/createDiscTV";
 import { createGameTV } from "./assets/createGameTV";
@@ -48,7 +49,6 @@ import {
   type SceneLayout,
 } from "./responsiveScene";
 
-export type PortfolioChannelId = "home" | "portfolio" | "contact";
 export type ScreenTransitionResult = "completed" | "cancelled";
 export interface ScreenFit {
   scale: [number, number];
@@ -170,8 +170,8 @@ export function createPortfolioScene(): PortfolioSceneController {
   const channels: ChannelConfig[] = [
     {
       id: "home",
-      label: "PROFILE",
-      subtitle: "CH 01",
+      label: PORTFOLIO_CHANNELS.home.title.toUpperCase(),
+      subtitle: `CH ${PORTFOLIO_CHANNELS.home.number}`,
       asset: createVhsTV(),
       position: [-1.82, 1.08, -0.48],
       rotationY: 0.11,
@@ -180,8 +180,8 @@ export function createPortfolioScene(): PortfolioSceneController {
     },
     {
       id: "portfolio",
-      label: "PROJECTS",
-      subtitle: "CH 02",
+      label: PORTFOLIO_CHANNELS.portfolio.title.toUpperCase(),
+      subtitle: `CH ${PORTFOLIO_CHANNELS.portfolio.number}`,
       asset: createDiscTV(),
       position: [0, 1.04, -0.76],
       rotationY: 0,
@@ -190,8 +190,8 @@ export function createPortfolioScene(): PortfolioSceneController {
     },
     {
       id: "contact",
-      label: "CONTACT",
-      subtitle: "CH 03",
+      label: PORTFOLIO_CHANNELS.contact.title.toUpperCase(),
+      subtitle: `CH ${PORTFOLIO_CHANNELS.contact.number}`,
       asset: createGameTV(),
       position: [1.84, 1.02, -0.5],
       rotationY: -0.11,

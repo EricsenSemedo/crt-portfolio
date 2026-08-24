@@ -1,10 +1,10 @@
 import { lazy, Suspense, useCallback, useEffect, useRef, useState } from "react";
 import crtLensMatte from "./assets/crt-lens-matte.svg";
 import TVZoomOverlay from "./components/TVZoomOverlay";
+import type { PortfolioChannelId } from "./data/channels";
 import Contact from "./pages/Contact";
 import Home from "./pages/Home";
 import Portfolio from "./pages/Portfolio";
-import type { PortfolioChannelId } from "./three/createPortfolioScene";
 
 const AssetViewer = lazy(() => import("./pages/AssetViewer"));
 const ThreeCRTStage = lazy(() => import("./components/ThreeCRTStage"));
@@ -95,10 +95,7 @@ function PortfolioApp() {
       </div>
 
       <TVZoomOverlay
-        selectedItem={selectedId ? {
-          id: selectedId,
-          title: selectedId === "home" ? "PROFILE" : selectedId === "portfolio" ? "PROJECTS" : "CONTACT",
-        } : null}
+        selectedItem={selectedId ? { id: selectedId } : null}
         onClose={closeTV}
         onExitComplete={handleOverlayExitComplete}
         onEnterComplete={handleOverlayEnterComplete}

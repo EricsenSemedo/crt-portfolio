@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
+import { PORTFOLIO_CHANNEL_LIST, type PortfolioChannelId } from "../data/channels";
 import {
   createPortfolioScene,
-  type PortfolioChannelId,
   type PortfolioSceneController,
 } from "../three/createPortfolioScene";
 import "./ThreeCRTStage.css";
@@ -14,12 +14,6 @@ interface ThreeCRTStageProps {
   onRequestedFocusComplete?: (id: PortfolioChannelId) => void;
   onOverviewComplete?: () => void;
 }
-
-const channels: Array<{ id: PortfolioChannelId; number: string; label: string }> = [
-  { id: "home", number: "01", label: "Profile" },
-  { id: "portfolio", number: "02", label: "Projects" },
-  { id: "contact", number: "03", label: "Contact" },
-];
 
 export default function ThreeCRTStage({
   onSelect,
@@ -179,7 +173,7 @@ export default function ThreeCRTStage({
       />
 
       <nav id="channels" className="three-stage__channels" aria-label="Portfolio sections">
-        {channels.map((channel) => (
+        {PORTFOLIO_CHANNEL_LIST.map((channel) => (
           <button
             key={channel.id}
             type="button"
@@ -195,7 +189,7 @@ export default function ThreeCRTStage({
             onBlur={() => sceneRef.current?.setHovered(null)}
             onClick={() => void selectChannel(channel.id)}
           >
-            <span>{channel.number}</span>{channel.label}
+            <span>{channel.number}</span>{channel.title}
           </button>
         ))}
       </nav>
