@@ -40,6 +40,18 @@ export const projects: Project[] = [
       src: "/crt-portfolio/projects/dont_get_caught_demo.mp4",
       alt: "Don't Get Caught live round gameplay",
     },
+    media: [
+      {
+        type: "video",
+        src: "/crt-portfolio/projects/dont_get_caught_demo.mp4",
+        alt: "Don't Get Caught live round gameplay",
+      },
+      {
+        type: "image",
+        src: "/crt-portfolio/projects/dont-get-caught-preview.webp",
+        alt: "Don't Get Caught dining room round with AI eater debugging controls",
+      },
+    ],
     detailLayout: "game",
     detailedDescription: {
       problem: "Turn one readable social bluff into a complete round-based game that remains fair across desktop, gamepad, and touch.",
@@ -60,12 +72,29 @@ export const projects: Project[] = [
     description: "A server-authoritative idle game with plants, crates, permanent upgrades, prestige, and polished React Lua UI.",
     status: "Public-test MVP",
     tech: ["Luau", "Roblox", "React Lua", "ProfileStore"],
-    image: "/crt-portfolio/projects/grow-your-plant.png",
+    image: "/crt-portfolio/projects/grow-your-plant-garden.webp",
     demo: {
-      type: "image",
-      src: "/crt-portfolio/projects/grow-your-plant.png",
-      alt: "Grow Your Plant game artwork",
+      type: "video",
+      src: "/crt-portfolio/projects/grow-your-plant-demo.mp4",
+      alt: "Grow Your Plant progression and garden gameplay demo",
     },
+    media: [
+      {
+        type: "video",
+        src: "/crt-portfolio/projects/grow-your-plant-demo.mp4",
+        alt: "Grow Your Plant progression and garden gameplay demo",
+      },
+      {
+        type: "image",
+        src: "/crt-portfolio/projects/grow-your-plant-garden.webp",
+        alt: "Grow Your Plant garden collection showing the equipped watermelon plant",
+      },
+      {
+        type: "image",
+        src: "/crt-portfolio/projects/grow-your-plant-upgrades.webp",
+        alt: "Grow Your Plant permanent upgrades interface",
+      },
+    ],
     detailLayout: "game",
     detailedDescription: {
       problem: "Create an extensible progression game whose economy and random rewards cannot be trusted to the client.",

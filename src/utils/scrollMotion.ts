@@ -24,6 +24,10 @@ export function shouldUseDesktopSmoothScroll(environment: SmoothScrollEnvironmen
     && !environment.reducedMotion;
 }
 
+export function hasScrollableOverflow(scrollHeight: number, clientHeight: number) {
+  return scrollHeight > clientHeight;
+}
+
 export function getScrollRevealState(
   rowTop: number,
   viewportHeight: number,
