@@ -7,6 +7,11 @@ interface HomeProps {
   onNavigate?: NavigateFunction;
 }
 
+const skills = [
+  "Java", "Python", "C++", "C#", "JavaScript", "TypeScript", "Lua", "Go",
+  "MySQL", "SQL", "PostgreSQL", "Git", "Docker", "Kubernetes", "AWS", "OpenTofu", "CI/CD",
+];
+
 export default function Home({ onNavigate }: HomeProps) {
   return (
     <div className="crt-page bg-page-tint w-full h-full overflow-y-auto text-crt-text">
@@ -22,9 +27,8 @@ export default function Home({ onNavigate }: HomeProps) {
             </h2>
           </div>
           <p className="text-crt-text-tertiary max-w-2xl mx-auto leading-relaxed">
-            Building innovative experiences in software and gaming. 
-            Recent CS graduate from University of Rhode Island passionate about creating 
-            cutting-edge solutions and immersive digital experiences.
+            Computer science graduate and software developer working across cloud infrastructure,
+            full-stack applications, AI systems, and games.
           </p>
         </section>
 
@@ -32,11 +36,7 @@ export default function Home({ onNavigate }: HomeProps) {
         <section className="space-y-6">
           <h3 className="text-2xl font-display font-semibold text-center text-crt-accent tracking-wide">Skills & Technologies</h3>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-            {[
-              'Python', 'Lua', 'C/C++', 
-              'Java', 'AWS', 'OpenTofu',
-              'Docker', 'Git', 'Roblox Studio'
-            ].map((skill) => (
+            {skills.map((skill) => (
               <div key={skill} className="bg-crt-surface-primary/50 rounded-lg p-3 text-center border border-crt-border/50 hover:border-crt-accent/30 transition-colors">
                 <span className="text-sm font-mono font-medium text-crt-text-secondary">{skill}</span>
               </div>
@@ -50,18 +50,18 @@ export default function Home({ onNavigate }: HomeProps) {
           <div className="space-y-4">
             <div className="bg-crt-surface-primary/30 rounded-lg p-6 border border-crt-border/30">
               <h4 className="text-lg font-semibold text-crt-accent-hover mb-2">Infrastructure Engineer - PixelMux</h4>
-              <p className="text-crt-text-tertiary text-sm mb-3">Jan 2025 - Present | Remote</p>
+              <p className="text-crt-text-tertiary text-sm mb-3">Jan 2025 - Dec 2025 | Remote</p>
               <p className="text-crt-text-secondary leading-relaxed">
-                Designing IAM role architecture across multiple AWS accounts with granular permission boundaries. 
-                Developing RBAC strategies and implementing integration testing frameworks for core infrastructure modules.
+                Designed granular IAM role architecture across multiple AWS accounts, implemented RBAC policies for secure collaboration,
+                and developed CI/CD integration-testing pipelines for core infrastructure modules.
               </p>
             </div>
             <div className="bg-crt-surface-primary/30 rounded-lg p-6 border border-crt-border/30">
               <h4 className="text-lg font-semibold text-crt-accent-hover mb-2">Freelance Programmer - Fiverr</h4>
               <p className="text-crt-text-tertiary text-sm mb-3">Dec 2023 - Jan 2024 | Remote</p>
               <p className="text-crt-text-secondary leading-relaxed">
-                Delivered Lua programming for 4 Roblox games with top reviews. Refactored NPC/AI logic 
-                using Simple Path library and optimized game functionality through efficient scripting.
+                Delivered Lua scripts for Roblox games, refactored reusable NPC and AI systems,
+                added features, resolved bugs, and improved game performance.
               </p>
             </div>
           </div>
