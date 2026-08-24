@@ -1,6 +1,8 @@
-import { motion } from "framer-motion";
-import type { Project } from "../../types";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import { type Project } from "../../types";
 import ScrambleHeading from "../ScrambleHeading";
+import StaticNoise from "../StaticNoise";
 
 interface DemoChannelProps {
   project: Project;
@@ -12,6 +14,60 @@ interface DemoChannelProps {
  */
 export default function DemoChannel({ project }: DemoChannelProps) {
   const demo = project.demo;
+  const media = useMemo(() => project.media ?? (demo ? [demo] : []), [demo, project.media]);
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [isTuning, setIsTuning] = useState(false);
+  const pendingIndex = useRef<number | null>(null);
+
+  useEffect(() => {
+    setActiveIndex(0);
+    setIsTuning(false);
+    pendingIndex.current = null;
+  }, [project.id]);
+
+  useEffect(() => {
+    if (media.length === 0) return;
+
+    const preloadIndices = new Set([
+      activeIndex,
+      (activeIndex - 1 + media.length) % media.length,
+      (activeIndex + 1) % media.length,
+    ]);
+    const imagePreloads = [...preloadIndices]
+      .map((index) => media[index])
+      .filter((item) => item.type === "image" || item.type === "gif")
+      .map((item) => {
+        const image = new Image();
+        image.src = item.src;
+        return image;
+      });
+
+    return () => imagePreloads.forEach((image) => image.removeAttribute("src"));
+  }, [activeIndex, media]);
+
+  useEffect(() => {
+    if (!isTuning) return;
+
+    const timeout = window.setTimeout(() => {
+      if (pendingIndex.current !== null) setActiveIndex(pendingIndex.current);
+      pendingIndex.current = null;
+      setIsTuning(false);
+    }, 180);
+
+    return () => window.clearTimeout(timeout);
+  }, [isTuning]);
+
+  function selectMedia(index: number) {
+    if (index === activeIndex || isTuning) return;
+    pendingIndex.current = index;
+    setIsTuning(true);
+  }
+
+  function moveMedia(direction: -1 | 1) {
+    selectMedia((activeIndex + direction + media.length) % media.length);
+  }
+
+  const activeMedia = media[activeIndex];
 
   return (
     <motion.div
@@ -28,17 +84,18 @@ export default function DemoChannel({ project }: DemoChannelProps) {
         </div>
         
         {/* Demo Media */}
-        <div className="relative bg-crt-surface-primary rounded-lg overflow-hidden aspect-video mb-6">
-          {!demo ? (
+        <div className="relative bg-crt-surface-primary overflow-hidden aspect-video border border-crt-border mb-3">
+          {!activeMedia ? (
             <div className="absolute inset-0 flex items-center justify-center bg-crt-surface-secondary">
               <div className="text-center px-6">
                 <p className="font-mono text-crt-text-tertiary">Demo media not available</p>
               </div>
             </div>
-          ) : demo.type === 'video' ? (
+          ) : activeMedia.type === 'video' ? (
             <video
-              src={demo.src}
-              className="w-full h-full object-cover"
+              key={activeMedia.src}
+              src={activeMedia.src}
+              className="w-full h-full object-contain"
               autoPlay
               loop
               muted
@@ -46,17 +103,17 @@ export default function DemoChannel({ project }: DemoChannelProps) {
               controls
               preload="metadata"
             />
-          ) : demo.type === 'gif' ? (
+          ) : activeMedia.type === 'gif' ? (
             <img
-              src={demo.src}
-              alt={demo.alt}
-              className="w-full h-full object-cover"
+              src={activeMedia.src}
+              alt={activeMedia.alt}
+              className="w-full h-full object-contain"
             />
           ) : (
             <img
-              src={demo.src}
-              alt={demo.alt}
-              className="w-full h-full object-cover"
+              src={activeMedia.src}
+              alt={activeMedia.alt}
+              className="w-full h-full object-contain"
             />
           )}
           
@@ -70,7 +127,63 @@ export default function DemoChannel({ project }: DemoChannelProps) {
               </div>
             </div>
           )}
+
+          <AnimatePresence>
+            {isTuning && (
+              <motion.div
+                key="media-static"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.04 }}
+                className="absolute inset-0 z-10 overflow-hidden bg-black"
+                aria-hidden="true"
+              >
+                <StaticNoise intensity={7} />
+                <div className="demo-carousel__static absolute inset-0" />
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {media.length > 1 && (
+            <>
+              <button
+                type="button"
+                onClick={() => moveMedia(-1)}
+                className="absolute left-3 top-1/2 z-20 -translate-y-1/2 border border-white/50 bg-black/70 px-3 py-2 font-mono text-white transition-colors hover:bg-white hover:text-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-crt-accent"
+                aria-label="Previous project media"
+              >
+                ←
+              </button>
+              <button
+                type="button"
+                onClick={() => moveMedia(1)}
+                className="absolute right-3 top-1/2 z-20 -translate-y-1/2 border border-white/50 bg-black/70 px-3 py-2 font-mono text-white transition-colors hover:bg-white hover:text-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-crt-accent"
+                aria-label="Next project media"
+              >
+                →
+              </button>
+              <span className="absolute bottom-3 right-3 z-20 bg-black/75 px-2 py-1 font-mono text-xs text-white">
+                {String(activeIndex + 1).padStart(2, "0")} / {String(media.length).padStart(2, "0")}
+              </span>
+            </>
+          )}
         </div>
+
+        {media.length > 1 && (
+          <div className="mb-6 flex justify-center gap-1.5" aria-label={`${project.title} media slides`}>
+            {media.map((item, index) => (
+              <button
+                key={item.src}
+                type="button"
+                onClick={() => selectMedia(index)}
+                className={"h-1.5 transition-[width,background-color] duration-150 " + (index === activeIndex ? "w-8 bg-crt-accent" : "w-3 bg-crt-border hover:bg-crt-text-tertiary")}
+                aria-label={`Show media ${index + 1} of ${media.length}`}
+                aria-current={index === activeIndex ? "true" : undefined}
+              />
+            ))}
+          </div>
+        )}
         
         {/* Tech Stack */}
         <div className="flex flex-wrap justify-center gap-2">

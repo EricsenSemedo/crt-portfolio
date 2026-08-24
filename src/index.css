@@ -310,6 +310,21 @@ body {
   to { background-position: 0 4px; }
 }
 
+.demo-carousel__static {
+  background-image:
+    repeating-radial-gradient(circle at 28% 37%, rgb(255 255 255 / .9) 0 1px, transparent 1px 3px),
+    repeating-radial-gradient(circle at 73% 62%, rgb(255 255 255 / .65) 0 1px, transparent 1px 4px);
+  background-size: 5px 4px, 7px 6px;
+  mix-blend-mode: screen;
+  animation: demo-static-burst 55ms steps(2) infinite;
+}
+
+@keyframes demo-static-burst {
+  0% { transform: translate3d(-1%, 0, 0) scale(1.04); filter: contrast(2.2); }
+  50% { transform: translate3d(1%, -1%, 0) scale(1.02); filter: contrast(3); }
+  100% { transform: translate3d(0, 1%, 0) scale(1.05); filter: contrast(2.4); }
+}
+
 @keyframes crt-noise-shift {
   0% { transform: translate(0, 0); }
   25% { transform: translate(2%, -1%); }

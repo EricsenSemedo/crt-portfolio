@@ -166,9 +166,24 @@ export const projects: Project[] = [
     image: "/crt-portfolio/projects/derma-dashboard-home.png",
     demo: {
       type: "image",
-      src: "/crt-portfolio/projects/derma-dashboard-home.png",
-      alt: "Derma skin-lesion analysis dashboard",
+      src: "/crt-portfolio/projects/derma-01.webp",
+      alt: "Derma application screen shown in the project gallery",
     },
+    media: [
+      { type: "image", src: "/crt-portfolio/projects/derma-01.webp", alt: "Derma dark-mode home screen explaining the analysis workflow" },
+      { type: "image", src: "/crt-portfolio/projects/derma-02.webp", alt: "Derma dark-mode image upload screen" },
+      { type: "image", src: "/crt-portfolio/projects/derma-03.webp", alt: "Derma dark-mode benign lesion result with confidence score" },
+      { type: "image", src: "/crt-portfolio/projects/derma-04.webp", alt: "Derma dark-mode scan history" },
+      { type: "image", src: "/crt-portfolio/projects/derma-05.webp", alt: "Derma dark-mode clinical information and disclaimer screen" },
+      { type: "image", src: "/crt-portfolio/projects/derma-06.webp", alt: "Derma light-mode home screen explaining the analysis workflow" },
+      { type: "image", src: "/crt-portfolio/projects/derma-07.webp", alt: "Derma light-mode image upload screen" },
+      { type: "image", src: "/crt-portfolio/projects/derma-08.webp", alt: "Derma light-mode benign lesion result with confidence score" },
+      { type: "image", src: "/crt-portfolio/projects/derma-09.webp", alt: "Derma light-mode scan history" },
+      { type: "image", src: "/crt-portfolio/projects/derma-10.webp", alt: "Derma light-mode clinical information and disclaimer screen" },
+      { type: "image", src: "/crt-portfolio/projects/derma-11.webp", alt: "Derma cloud inference pipeline diagram" },
+      { type: "image", src: "/crt-portfolio/projects/derma-12.webp", alt: "Derma model confusion matrix" },
+      { type: "image", src: "/crt-portfolio/projects/derma-13.webp", alt: "Derma model training metrics" },
+    ],
     sources: [
       {
         label: "LinkedIn Post",

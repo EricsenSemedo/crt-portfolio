@@ -33,6 +33,7 @@ export interface Project {
   image?: string;
   github?: string;
   demo?: ProjectDemo;
+  media?: ProjectDemo[];
   detailLayout?: 'case-study' | 'game' | 'hackathon';
   sources?: ProjectSourceLink[];
   storySteps?: ProjectStoryStep[];
