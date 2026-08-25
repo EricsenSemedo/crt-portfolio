@@ -10,7 +10,7 @@ interface ContactProps {
 export default function Contact({ onNavigate }: ContactProps) {
   return (
     <div className="crt-page bg-page-tint h-full w-full overflow-y-auto text-crt-text">
-      <div className="bg-page-tint min-h-full px-6 py-8">
+      <div className="crt-content-container flex min-h-full flex-col py-8">
         <section className="pt-12 text-center">
           <ScrambleHeading className="font-display text-4xl font-bold tracking-wide text-white md:text-5xl">Connect With Me</ScrambleHeading>
         </section>
@@ -30,9 +30,9 @@ export default function Contact({ onNavigate }: ContactProps) {
           </div>
         </section>
 
-        <div className="flex justify-center pb-8 pt-12">
+        <footer className="mt-auto flex justify-center border-t border-crt-border pt-10" aria-label="Contact navigation">
           <CRTButton onClick={() => onNavigate?.("home")} variant="secondary">Back to Home</CRTButton>
-        </div>
+        </footer>
       </div>
     </div>
   );

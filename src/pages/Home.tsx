@@ -1,5 +1,11 @@
+import CRTButton from "../components/CRTButton";
 import ScrambleHeading from "../components/ScrambleHeading";
 import projects from "../data/projects";
+import type { NavigateFunction } from "../types";
+
+interface HomeProps {
+  onNavigate?: NavigateFunction;
+}
 
 const skills = [
   "Java", "Python", "C++", "C#", "JavaScript", "TypeScript", "Luau", "Go",
@@ -41,10 +47,10 @@ const experience = [
   },
 ];
 
-export default function Home() {
+export default function Home({ onNavigate }: HomeProps) {
   return (
     <div className="crt-page bg-page-tint w-full h-full overflow-y-auto text-crt-text">
-      <div className="bg-page-tint min-h-full px-5 py-8 sm:px-6">
+      <div className="crt-content-container min-h-full py-8">
         {/* Hero Section */}
         <section className="space-y-5 border-b border-crt-border pb-12 pt-16 text-center md:pt-20">
           <div className="space-y-2">
@@ -55,7 +61,7 @@ export default function Home() {
               Computer Science Graduate | Software Developer
             </h2>
           </div>
-          <p className="text-crt-text-tertiary max-w-2xl mx-auto leading-relaxed">
+          <p className="crt-reading-width mx-auto leading-relaxed text-crt-text-tertiary">
             Computer science graduate and software developer working across cloud infrastructure,
             full-stack applications, AI systems, and games.
           </p>
@@ -113,7 +119,10 @@ export default function Home() {
           </div>
         </section>
 
-        <div className="h-10" aria-hidden="true" />
+        <footer className="mt-10 flex flex-wrap justify-center gap-4 border-t border-crt-border py-10" aria-label="Profile navigation">
+          <CRTButton onClick={() => onNavigate?.('portfolio')} variant="primary">View Projects</CRTButton>
+          <CRTButton onClick={() => onNavigate?.('contact')} variant="secondary">Contact Me</CRTButton>
+        </footer>
       </div>
     </div>
   );
