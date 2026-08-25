@@ -52,7 +52,7 @@ export default function Home({ onNavigate }: HomeProps) {
     <div className="crt-page bg-page-tint w-full h-full overflow-y-auto text-crt-text">
       <div className="crt-content-container min-h-full py-8">
         {/* Hero Section */}
-        <section className="space-y-5 border-b border-crt-border pb-12 pt-16 text-center md:pt-20">
+        <section className="space-y-5 pb-12 pt-16 text-center md:pt-20">
           <div className="space-y-2">
             <ScrambleHeading className="text-4xl font-display font-bold tracking-wide text-white md:text-6xl">
               Ericsen Semedo
@@ -70,9 +70,9 @@ export default function Home({ onNavigate }: HomeProps) {
         {/* Skills Section */}
         <section className="py-12">
           <h3 className="mb-7 text-center font-display text-2xl font-semibold tracking-wide text-crt-accent">Skills &amp; Technologies</h3>
-          <div className="grid grid-cols-2 border-t border-crt-border md:grid-cols-3">
-            {skills.map((skill) => (
-              <div key={skill} className="crt-scroll-reveal border-b border-crt-border px-2 py-3 text-center">
+          <div className="grid grid-cols-2 md:grid-cols-3">
+            {skills.map((skill, index) => (
+              <div key={skill} className={"crt-scroll-reveal px-2 py-3 text-center" + (index < skills.length - 2 ? " border-b border-crt-border" : "") + (index === skills.length - 3 ? " md:border-b-0" : "")}>
                 <span className="text-sm font-mono font-medium text-crt-text-secondary">{skill}</span>
               </div>
             ))}
@@ -82,9 +82,9 @@ export default function Home({ onNavigate }: HomeProps) {
         {/* Experience Section */}
         <section className="pb-12">
           <h3 className="mb-7 text-center font-display text-2xl font-semibold tracking-wide text-crt-accent">Experience</h3>
-          <div className="border-t border-crt-border">
-            {experience.map((item) => (
-              <article key={item.title} className="grid gap-5 border-b border-crt-border py-8 md:grid-cols-[minmax(12rem,0.7fr)_minmax(0,1.3fr)] md:gap-10">
+          <div>
+            {experience.map((item, index) => (
+              <article key={item.title} className={"grid gap-5 py-8 md:grid-cols-[minmax(12rem,0.7fr)_minmax(0,1.3fr)] md:gap-10" + (index < experience.length - 1 ? " border-b border-crt-border" : "")}>
                 <div className="crt-scroll-reveal">
                   <p className="font-mono text-xs uppercase tracking-[0.2em] text-crt-text-tertiary">{item.dates}</p>
                   <h4 className="mt-3 text-xl font-semibold text-crt-accent-hover">{item.title}</h4>
@@ -119,7 +119,7 @@ export default function Home({ onNavigate }: HomeProps) {
           </div>
         </section>
 
-        <footer className="mt-10 flex flex-wrap justify-center gap-4 border-t border-crt-border py-10" aria-label="Profile navigation">
+        <footer className="mt-10 flex flex-wrap justify-center gap-4 py-10" aria-label="Profile navigation">
           <CRTButton onClick={() => onNavigate?.('portfolio')} variant="primary">View Projects</CRTButton>
           <CRTButton onClick={() => onNavigate?.('contact')} variant="secondary">Contact Me</CRTButton>
         </footer>

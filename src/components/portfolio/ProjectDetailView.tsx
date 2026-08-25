@@ -4,6 +4,7 @@ import { useModalAccessibility } from "../../hooks/useModalAccessibility";
 import type { Project } from "../../types";
 import CRTButton from "../CRTButton";
 import CRTScanlines from "../CRTScanlines";
+import ScrambleHeading from "../ScrambleHeading";
 import DemoChannel from "./DemoChannel";
 import DescriptionChannel from "./DescriptionChannel";
 
@@ -64,11 +65,6 @@ export default function ProjectDetailView({
         exit={{ opacity: 0, scaleX: 0.18 }}
         transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
       >
-        {/* Accessible title for aria-labelledby */}
-        <h2 id={`project-detail-title-${project.id}`} className="sr-only">
-          {project.title}
-        </h2>
-
         {/* TV Screen Area */}
         <div className="relative bg-crt-shell-screen rounded border border-crt-border-secondary overflow-hidden h-full">
 
@@ -95,6 +91,15 @@ export default function ProjectDetailView({
                 Description
               </CRTButton>
             </div>
+
+            <ScrambleHeading
+              id={`project-detail-title-${project.id}`}
+              as="h2"
+              delay={180}
+              className="pointer-events-none absolute left-1/2 max-w-[38%] -translate-x-1/2 truncate font-display text-sm font-bold tracking-wide text-crt-accent sm:text-base md:text-lg"
+            >
+              {project.title}
+            </ScrambleHeading>
 
             <CRTButton
               onClick={onClose}

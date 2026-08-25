@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { type Project } from "../../types";
-import ScrambleHeading from "../ScrambleHeading";
 import StaticNoise from "../StaticNoise";
 
 interface DemoChannelProps {
@@ -78,9 +77,8 @@ export default function DemoChannel({ project }: DemoChannelProps) {
       className="h-full overflow-y-auto flex flex-col items-center justify-center p-8"
       data-crt-scroll-container
     >
-      <div className="max-w-4xl w-full">
-        <div className="text-center mb-8">
-          <ScrambleHeading as="h2" delay={180} className="text-3xl font-display font-bold text-crt-accent mb-2 tracking-wide">{project.title}</ScrambleHeading>
+      <div className="w-full max-w-6xl">
+        <div className="mb-4 text-center">
           <p className="text-crt-text-tertiary font-mono text-lg">{project.category}</p>
         </div>
         

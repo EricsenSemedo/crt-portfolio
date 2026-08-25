@@ -73,7 +73,7 @@ export function getSceneLayout(width: number, height: number): SceneLayout {
     target: [0, 0.05, -0.4],
     channelX: [-1.82, 0, 1.84],
     tvScale: 1,
-    fov: aspect > 2 ? 34 : 38,
+    fov: 38,
     promptY: 2.3,
     ballStartX: -2.88,
     pixelRatioCap: 1.75,
