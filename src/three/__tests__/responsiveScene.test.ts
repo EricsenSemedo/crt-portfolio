@@ -37,6 +37,15 @@ describe("responsive scene layout", () => {
     expect(layout.ballStartX).toBe(-2.88);
   });
 
+  it("preserves the desktop vertical framing on an ultrawide viewport", () => {
+    const desktop = getSceneLayout(1440, 900);
+    const ultrawide = getSceneLayout(3440, 1440);
+
+    expect(ultrawide.fov).toBe(desktop.fov);
+    expect(ultrawide.camera[2]).toBe(desktop.camera[2]);
+    expect(ultrawide.promptY).toBe(desktop.promptY);
+  });
+
   it("scales separate TV layers around the same responsive pivot", () => {
     const pivot = 0.11;
     const scale = 0.8;

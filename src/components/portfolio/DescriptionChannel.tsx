@@ -1,14 +1,12 @@
 import { motion } from "framer-motion";
 import type { Project } from "../../types";
-import ScrambleHeading from "../ScrambleHeading";
 
 interface DescriptionChannelProps {
   project: Project;
 }
 
 /**
- * DescriptionChannel - Project description tab with Problem/Solution/Impact cards.
- * Uses theme tokens for card backgrounds, borders, semantic colors, and text.
+ * Shared project description channel with a centered, typography-led layout.
  */
 export default function DescriptionChannel({ project }: DescriptionChannelProps) {
   const isGame = project.detailLayout === "game";
@@ -20,14 +18,14 @@ export default function DescriptionChannel({ project }: DescriptionChannelProps)
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
       transition={{ duration: 0.3 }}
-      className="h-full overflow-y-auto p-8"
+      className={isHackathon ? "h-full overflow-y-auto p-8" : "h-full overflow-y-auto px-6 py-10 sm:px-8"}
       data-crt-scroll-container
     >
-      <div className="max-w-4xl mx-auto">
-        <div className="text-center mb-8">
-          <ScrambleHeading as="h2" delay={180} className="text-3xl font-display font-bold text-crt-accent mb-2 tracking-wide">{project.title}</ScrambleHeading>
-          <p className="text-crt-text-tertiary font-mono text-lg">{project.category}</p>
-        </div>
+      <div className={isHackathon ? "" : "flex min-h-full items-center justify-center"}>
+        <div className={"mx-auto w-full " + (isHackathon ? "max-w-4xl" : "max-w-3xl text-center")}>
+          <div className={isHackathon ? "mb-8 text-center" : "mb-10"}>
+            <p className="text-crt-text-tertiary font-mono text-lg">{project.category}</p>
+          </div>
         
         <div className="space-y-8">
           {isHackathon && (
@@ -38,7 +36,7 @@ export default function DescriptionChannel({ project }: DescriptionChannelProps)
           )}
 
           {isGame ? (
-            <div className="crt-scroll-reveal bg-crt-surface-primary/50 p-6 rounded-lg border border-crt-border">
+            <div className="crt-scroll-reveal">
               <h3 className="text-xl font-display font-bold text-crt-accent mb-3">About the Game</h3>
               <p className="text-crt-text-secondary text-lg leading-relaxed">{project.description}</p>
             </div>
@@ -57,18 +55,18 @@ export default function DescriptionChannel({ project }: DescriptionChannelProps)
               </div>
             </div>
           ) : (
-            <div className="grid md:grid-cols-3 gap-6">
-              <div className="crt-scroll-reveal bg-crt-surface-primary/50 p-6 rounded-lg border border-crt-border">
+            <div className="space-y-10">
+              <div className="crt-scroll-reveal">
                 <h3 className="text-xl font-display font-bold text-crt-danger mb-3">Problem</h3>
                 <p className="text-crt-text-secondary">{project.detailedDescription.problem}</p>
               </div>
 
-              <div className="crt-scroll-reveal bg-crt-surface-primary/50 p-6 rounded-lg border border-crt-border">
+              <div className="crt-scroll-reveal">
                 <h3 className="text-xl font-display font-bold text-crt-warning mb-3">Solution</h3>
                 <p className="text-crt-text-secondary">{project.detailedDescription.solution}</p>
               </div>
 
-              <div className="crt-scroll-reveal bg-crt-surface-primary/50 p-6 rounded-lg border border-crt-border">
+              <div className="crt-scroll-reveal">
                 <h3 className="text-xl font-display font-bold text-crt-success mb-3">Impact</h3>
                 <p className="text-crt-text-secondary">{project.detailedDescription.impact}</p>
               </div>
@@ -76,12 +74,11 @@ export default function DescriptionChannel({ project }: DescriptionChannelProps)
           )}
           
           {/* Key Highlights */}
-          {!isHackathon && <div className="crt-scroll-reveal bg-crt-surface-primary/30 p-6 rounded-lg border border-crt-border">
+          {!isHackathon && <div className="crt-scroll-reveal pt-4">
             <h3 className="text-xl font-display font-bold text-crt-accent mb-4">{isGame ? "Key Features" : "Key Highlights"}</h3>
             <ul className="space-y-2">
               {project.detailedDescription.highlights.map((highlight, index) => (
-                <li key={index} className="flex items-start">
-                  <span className="text-crt-accent mr-3 mt-1">•</span>
+                <li key={index}>
                   <span className="text-crt-text-secondary">{highlight}</span>
                 </li>
               ))}
@@ -95,7 +92,10 @@ export default function DescriptionChannel({ project }: DescriptionChannelProps)
               {project.tech.map((tech) => (
                 <span
                   key={tech}
-                  className="px-4 py-2 font-mono bg-crt-accent/20 text-crt-accent-hover rounded-lg border border-crt-accent/30"
+                  className={isHackathon
+                    ? "rounded-lg border border-crt-accent/30 bg-crt-accent/20 px-4 py-2 font-mono text-crt-accent-hover"
+                    : "px-2 py-1 font-mono text-crt-accent-hover"
+                  }
                 >
                   {tech}
                 </span>
@@ -104,7 +104,7 @@ export default function DescriptionChannel({ project }: DescriptionChannelProps)
           </div>
 
           {project.sources && project.sources.length > 0 && (
-            <div className="crt-scroll-reveal flex flex-wrap justify-center gap-3 border-t border-crt-border pt-6">
+            <div className={"crt-scroll-reveal flex flex-wrap justify-center gap-3 " + (isHackathon ? "border-t border-crt-border pt-6" : "pt-4")}>
               {project.sources.map((source) => (
                 <a
                   key={source.href}
@@ -118,6 +118,7 @@ export default function DescriptionChannel({ project }: DescriptionChannelProps)
               ))}
             </div>
           )}
+          </div>
         </div>
       </div>
     </motion.div>

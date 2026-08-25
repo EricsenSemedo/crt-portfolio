@@ -10,12 +10,12 @@ interface ContactProps {
 export default function Contact({ onNavigate }: ContactProps) {
   return (
     <div className="crt-page bg-page-tint h-full w-full overflow-y-auto text-crt-text">
-      <div className="crt-content-container flex min-h-full flex-col py-8">
-        <section className="pt-12 text-center">
+      <div className="crt-content-container flex min-h-full flex-col items-center justify-center gap-12 py-16">
+        <section className="text-center">
           <ScrambleHeading className="font-display text-4xl font-bold tracking-wide text-white md:text-5xl">Connect With Me</ScrambleHeading>
         </section>
 
-        <section className="mx-auto mt-12 max-w-2xl border-y border-crt-border-secondary">
+        <section className="mx-auto w-full max-w-2xl">
           <div className="grid grid-cols-1 [&>a]:border-x-0 [&>a]:border-b-0 [&>a]:border-t-0 [&>a+*]:border-t [&>a+*]:border-crt-border-secondary">
             <CRTActionLink href="https://linkedin.com/in/ericsen-semedo" label="LinkedIn" description="Professional network & experience" primary icon={
               <svg className="h-8 w-8" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -30,7 +30,7 @@ export default function Contact({ onNavigate }: ContactProps) {
           </div>
         </section>
 
-        <footer className="mt-auto flex justify-center border-t border-crt-border pt-10" aria-label="Contact navigation">
+        <footer className="flex justify-center" aria-label="Contact navigation">
           <CRTButton onClick={() => onNavigate?.("home")} variant="secondary">Back to Home</CRTButton>
         </footer>
       </div>

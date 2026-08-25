@@ -121,7 +121,7 @@ export default function Portfolio({ onNavigate, onProjectDetailOpenChange }: Por
           </div>
         </section>
 
-        <footer className="border-t border-crt-border px-2 py-10 text-center sm:px-6" aria-label="Project gallery navigation">
+        <footer className="px-2 py-10 text-center sm:px-6" aria-label="Project gallery navigation">
           <div className="flex flex-wrap justify-center gap-4">
             <CRTButton
               onClick={() => onNavigate?.('home')}
