@@ -11,6 +11,8 @@ export interface ScrollRevealState {
   blur: number;
 }
 
+export type ScrollRevealSize = "row" | "large-card";
+
 const DESKTOP_MIN_WIDTH = 1024;
 // NOTE: Desktop smoothing starts at a laptop-sized viewport; the reveal ratios mirror PX Push's sharp-at-5%, gone-at-minus-30% exit window.
 const REVEAL_START_RATIO = 0.05;
@@ -32,13 +34,16 @@ export function getScrollRevealState(
   rowTop: number,
   viewportHeight: number,
   reducedMotion: boolean,
+  rowHeight = 0,
+  revealSize: ScrollRevealSize = "row",
 ): ScrollRevealState {
   if (reducedMotion || viewportHeight <= 0) {
     return { opacity: 1, blur: 0 };
   }
 
-  const start = viewportHeight * REVEAL_START_RATIO;
-  const end = viewportHeight * REVEAL_END_RATIO;
+  const isLargeCard = revealSize === "large-card" && rowHeight > 0;
+  const start = isLargeCard ? rowHeight * -0.6 : viewportHeight * REVEAL_START_RATIO;
+  const end = isLargeCard ? -rowHeight : viewportHeight * REVEAL_END_RATIO;
   const progress = Math.min(1, Math.max(0, (start - rowTop) / (start - end)));
 
   if (progress === 0) return { opacity: 1, blur: 0 };

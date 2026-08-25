@@ -103,7 +103,7 @@ export default function Portfolio({ onNavigate, onProjectDetailOpenChange }: Por
         </section>
 
         <section className="border-t border-crt-border-subtle px-6 pt-10">
-          <p className="font-mono text-xs uppercase tracking-[0.24em] text-crt-text-tertiary">Additional Projects</p>
+          <p className="font-mono text-xs uppercase tracking-[0.24em] text-crt-accent">Additional Projects</p>
           <p className="mt-2 max-w-2xl text-sm text-crt-text-tertiary">
             Experiments, coursework, client systems, and earlier builds that shaped the featured work above.
           </p>

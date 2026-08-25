@@ -191,6 +191,34 @@ body {
   will-change: opacity, filter;
 }
 
+@media (max-width: 420px) {
+  .project-tv__tech {
+    display: none;
+  }
+
+  .project-tv__channel {
+    padding: .55rem .75rem;
+  }
+
+  .project-tv__summary {
+    padding: .75rem;
+  }
+
+  .project-tv__title {
+    font-size: 1rem;
+    line-height: 1.25rem;
+  }
+
+  .project-tv__description {
+    display: -webkit-box;
+    overflow: hidden;
+    font-size: .75rem;
+    line-height: 1.05rem;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+  }
+}
+
 .smart-header.is-snapping {
   transition:
     transform 220ms cubic-bezier(0.22, 1, 0.36, 1),
@@ -332,7 +360,12 @@ body {
   will-change: transform;
 }
 
-.channel-marquee__track span {
+.channel-marquee__group {
+  display: flex;
+  flex: none;
+}
+
+.channel-marquee__group span {
   padding-right: clamp(3rem, 9vw, 9rem);
   white-space: nowrap;
 }

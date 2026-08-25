@@ -258,7 +258,7 @@ export const projects: Project[] = [
     id: "shadi",
     title: "SHADI",
     category: "AI / Healthcare Hackathon",
-    description: "A local multi-agent AI system we built to help emergency medicine teams reason through patient cases and produce a ranked list of possible diagnoses, confidence scores, and supporting sources before a physician reviews it.",
+    description: "A local multi-agent AI system we built to help emergency teams produce ranked diagnoses with confidence scores and supporting sources.",
     status: "2nd Place, NVIDIA DGX Track",
     detailLayout: "hackathon",
     tech: ["Python", "FastAPI", "FHIR R4", "Next.js", "Ollama", "PostgreSQL", "Redis", "Docker Compose"],

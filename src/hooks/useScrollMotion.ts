@@ -25,8 +25,10 @@ function updateSurfaceRows(surface: HTMLElement, reducedMotion: boolean) {
   const revealDisabled = reducedMotion || !hasScrollableOverflow(surface.scrollHeight, viewportHeight);
 
   for (const row of getSurfaceRows(surface)) {
-    const rowTop = row.getBoundingClientRect().top - surfaceRect.top;
-    const state = getScrollRevealState(rowTop, viewportHeight, revealDisabled);
+    const rowRect = row.getBoundingClientRect();
+    const rowTop = rowRect.top - surfaceRect.top;
+    const revealSize = row.dataset.crtRevealSize === "large-card" ? "large-card" : "row";
+    const state = getScrollRevealState(rowTop, viewportHeight, revealDisabled, rowRect.height, revealSize);
     row.style.setProperty("--crt-reveal-opacity", state.opacity.toFixed(3));
     row.style.setProperty("--crt-reveal-blur", `${state.blur.toFixed(2)}px`);
     row.classList.toggle("is-crt-revealing", state.opacity > 0 && state.opacity < 1);
