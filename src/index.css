@@ -175,6 +175,15 @@ body {
   background-color: #1a1a1a;
 }
 
+.crt-content-container {
+  width: min(calc(100% - 2rem), 72rem);
+  margin-inline: auto;
+}
+
+.crt-reading-width {
+  max-width: 70ch;
+}
+
 .crt-screen-frame {
   border: 1px solid rgb(186 186 186 / .32);
   border-radius: 0;

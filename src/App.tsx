@@ -73,7 +73,7 @@ function PortfolioApp() {
   }, [pendingId]);
 
   const byId: Record<string, React.ReactNode> = {
-    home: <Home />,
+    home: <Home onNavigate={navigateToTV} />,
     portfolio: <Portfolio onNavigate={navigateToTV} onProjectDetailOpenChange={setProjectDetailOpen} />,
     contact: <Contact onNavigate={navigateToTV} />,
   };
