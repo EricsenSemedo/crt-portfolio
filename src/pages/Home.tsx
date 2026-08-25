@@ -1,11 +1,5 @@
-import CRTButton from "../components/CRTButton";
 import ScrambleHeading from "../components/ScrambleHeading";
 import projects from "../data/projects";
-import type { NavigateFunction } from "../types";
-
-interface HomeProps {
-  onNavigate?: NavigateFunction;
-}
 
 const skills = [
   "Java", "Python", "C++", "C#", "JavaScript", "TypeScript", "Luau", "Go",
@@ -14,12 +8,45 @@ const skills = [
   "CI/CD", "Linux", "Hadoop", "Agile",
 ];
 
-export default function Home({ onNavigate }: HomeProps) {
+const experience = [
+  {
+    title: "Java Intern",
+    company: "Revature",
+    role: "Pre-Employment Program | Back-end Developer",
+    dates: "Jun 2026 - Aug 2026",
+    details: [
+      "Built functional REST APIs with Java, SQL, Spring, and test-driven development.",
+      "Completed 108 coding activities and demonstrated proficiency through 14 evaluations.",
+    ],
+  },
+  {
+    title: "Infrastructure Engineer",
+    company: "PixelMux",
+    role: "Remote",
+    dates: "Jan 2025 - Dec 2025",
+    details: [
+      "Designed granular IAM roles across multiple AWS accounts and implemented RBAC policies for secure collaboration.",
+      "Developed CI/CD integration-testing pipelines for core infrastructure modules.",
+    ],
+  },
+  {
+    title: "Freelance Programmer",
+    company: "Fiverr",
+    role: "Remote",
+    dates: "Dec 2023 - Jan 2024",
+    details: [
+      "Delivered Luau scripts for Roblox games and refactored reusable NPC and AI systems.",
+      "Added features, resolved bugs, and improved game performance.",
+    ],
+  },
+];
+
+export default function Home() {
   return (
     <div className="crt-page bg-page-tint w-full h-full overflow-y-auto text-crt-text">
-      <div className="bg-page-tint min-h-full px-6 py-8 space-y-8">
+      <div className="bg-page-tint min-h-full px-5 py-8 sm:px-6">
         {/* Hero Section */}
-        <section className="text-center space-y-4 pt-16 md:pt-20">
+        <section className="space-y-5 border-b border-crt-border pb-12 pt-16 text-center md:pt-20">
           <div className="space-y-2">
             <ScrambleHeading className="text-4xl font-display font-bold tracking-wide text-white md:text-6xl">
               Ericsen Semedo
@@ -35,11 +62,11 @@ export default function Home({ onNavigate }: HomeProps) {
         </section>
 
         {/* Skills Section */}
-        <section className="space-y-6">
-          <h3 className="text-2xl font-display font-semibold text-center text-crt-accent tracking-wide">Skills & Technologies</h3>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+        <section className="py-12">
+          <h3 className="mb-7 text-center font-display text-2xl font-semibold tracking-wide text-crt-accent">Skills &amp; Technologies</h3>
+          <div className="grid grid-cols-2 border-t border-crt-border md:grid-cols-3">
             {skills.map((skill) => (
-              <div key={skill} className="crt-scroll-reveal bg-crt-surface-primary/50 p-3 text-center border border-crt-border/50 hover:border-crt-accent/30 transition-colors">
+              <div key={skill} className="crt-scroll-reveal border-b border-crt-border px-2 py-3 text-center">
                 <span className="text-sm font-mono font-medium text-crt-text-secondary">{skill}</span>
               </div>
             ))}
@@ -47,78 +74,46 @@ export default function Home({ onNavigate }: HomeProps) {
         </section>
 
         {/* Experience Section */}
-        <section className="space-y-4">
-          <h3 className="text-2xl font-display font-semibold text-center text-crt-accent tracking-wide">Experience</h3>
-          <div className="space-y-4">
-            <div className="crt-scroll-reveal bg-crt-surface-primary/30 p-6 border border-crt-border/30">
-              <h4 className="text-lg font-semibold text-crt-accent-hover mb-1">Java Intern - Revature</h4>
-              <p className="mb-2 font-mono text-sm text-crt-accent">Pre-Employment Program | Back-end Developer</p>
-              <p className="text-crt-text-tertiary text-sm mb-3">Jun 2026 - Aug 2026</p>
-              <p className="text-crt-text-secondary leading-relaxed">
-                Built functional REST APIs with Java, SQL, Spring, and test-driven development.
-                Completed 108 coding activities and demonstrated proficiency through 14 evaluations.
-              </p>
-            </div>
-            <div className="crt-scroll-reveal bg-crt-surface-primary/30 p-6 border border-crt-border/30">
-              <h4 className="text-lg font-semibold text-crt-accent-hover mb-2">Infrastructure Engineer - PixelMux</h4>
-              <p className="text-crt-text-tertiary text-sm mb-3">Jan 2025 - Dec 2025 | Remote</p>
-              <p className="text-crt-text-secondary leading-relaxed">
-                Designed granular IAM role architecture across multiple AWS accounts, implemented RBAC policies for secure collaboration,
-                and developed CI/CD integration-testing pipelines for core infrastructure modules.
-              </p>
-            </div>
-            <div className="crt-scroll-reveal bg-crt-surface-primary/30 p-6 border border-crt-border/30">
-              <h4 className="text-lg font-semibold text-crt-accent-hover mb-2">Freelance Programmer - Fiverr</h4>
-              <p className="text-crt-text-tertiary text-sm mb-3">Dec 2023 - Jan 2024 | Remote</p>
-              <p className="text-crt-text-secondary leading-relaxed">
-                Delivered Luau scripts for Roblox games, refactored reusable NPC and AI systems,
-                added features, resolved bugs, and improved game performance.
-              </p>
-            </div>
+        <section className="pb-12">
+          <h3 className="mb-7 text-center font-display text-2xl font-semibold tracking-wide text-crt-accent">Experience</h3>
+          <div className="border-t border-crt-border">
+            {experience.map((item) => (
+              <article key={item.title} className="grid gap-5 border-b border-crt-border py-8 md:grid-cols-[minmax(12rem,0.7fr)_minmax(0,1.3fr)] md:gap-10">
+                <div className="crt-scroll-reveal">
+                  <p className="font-mono text-xs uppercase tracking-[0.2em] text-crt-text-tertiary">{item.dates}</p>
+                  <h4 className="mt-3 text-xl font-semibold text-crt-accent-hover">{item.title}</h4>
+                  <p className="mt-1 text-crt-text-secondary">{item.company}</p>
+                </div>
+                <div className="space-y-4 md:pt-1">
+                  <p className="crt-scroll-reveal font-mono text-sm text-crt-accent">{item.role}</p>
+                  {item.details.map((detail) => (
+                    <p key={detail} className="crt-scroll-reveal max-w-3xl leading-relaxed text-crt-text-secondary">{detail}</p>
+                  ))}
+                </div>
+              </article>
+            ))}
           </div>
         </section>
 
         {/* Education & Stats */}
-        <section className="space-y-4">
-          <div className="crt-scroll-reveal bg-crt-surface-primary/30 p-6 border border-crt-border/30 text-center">
-            <h4 className="text-lg font-display font-semibold text-crt-secondary mb-2 tracking-wide">Education</h4>
-            <p className="text-crt-text-secondary">University of Rhode Island</p>
-            <p className="text-crt-text-tertiary text-sm">Bachelor of Arts in Computer Science</p>
-            <p className="text-crt-text-tertiary text-sm">Graduated: May 2025</p>
+        <section className="grid border-y border-crt-border md:grid-cols-3">
+          <div className="crt-scroll-reveal py-8 md:pr-8">
+            <h4 className="font-display text-lg font-semibold tracking-wide text-crt-accent">Education</h4>
+            <p className="mt-4 text-crt-text-secondary">University of Rhode Island</p>
+            <p className="mt-1 text-sm text-crt-text-tertiary">Bachelor of Arts in Computer Science</p>
+            <p className="mt-1 text-sm text-crt-text-tertiary">Graduated May 2025</p>
           </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="crt-scroll-reveal text-center p-4 bg-crt-surface-primary/30 border border-crt-border/30">
-              <div className="text-2xl font-display font-bold text-crt-accent">1+</div>
-              <div className="text-sm text-crt-text-tertiary">Years Professional</div>
-            </div>
-            <div className="crt-scroll-reveal text-center p-4 bg-crt-surface-primary/30 border border-crt-border/30">
-              <div className="text-2xl font-display font-bold text-crt-secondary">{projects.length}+</div>
-              <div className="text-sm text-crt-text-tertiary">Projects Built</div>
-            </div>
+          <div className="crt-scroll-reveal border-t border-crt-border py-8 md:border-l md:border-t-0 md:px-8">
+            <div className="font-display text-3xl font-bold text-crt-accent">1+</div>
+            <div className="mt-3 text-sm uppercase tracking-[0.16em] text-crt-text-tertiary">Years Professional</div>
+          </div>
+          <div className="crt-scroll-reveal border-t border-crt-border py-8 md:border-l md:border-t-0 md:pl-8">
+            <div className="font-display text-3xl font-bold text-crt-secondary">{projects.length}+</div>
+            <div className="mt-3 text-sm uppercase tracking-[0.16em] text-crt-text-tertiary">Projects Built</div>
           </div>
         </section>
 
-        {/* Call to Action */}
-        <section className="text-center space-y-4 pb-8">
-          <h3 className="text-xl font-display font-semibold text-crt-text-secondary tracking-wide">Let's Build Something Amazing</h3>
-          <p className="text-crt-text-tertiary">
-            Ready to bring your ideas to life? Let's connect and discuss your next project.
-          </p>
-          <div className="flex justify-center space-x-4">
-            <CRTButton 
-              onClick={() => onNavigate?.('portfolio')}
-              variant="primary"
-            >
-              View Portfolio
-            </CRTButton>
-            <CRTButton 
-              onClick={() => onNavigate?.('contact')}
-              variant="secondary"
-            >
-              Contact Me
-            </CRTButton>
-          </div>
-        </section>
+        <div className="h-10" aria-hidden="true" />
       </div>
     </div>
   );
