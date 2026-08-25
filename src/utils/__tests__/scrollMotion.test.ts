@@ -60,6 +60,25 @@ describe("getScrollRevealState", () => {
     });
   });
 
+  it("keeps a large card sharp until sixty percent of it is above the viewport", () => {
+    expect(getScrollRevealState(-359, 800, false, 600, "large-card")).toEqual({
+      opacity: 1,
+      blur: 0,
+    });
+    expect(getScrollRevealState(-360, 800, false, 600, "large-card")).toEqual({
+      opacity: 1,
+      blur: 0,
+    });
+    expect(getScrollRevealState(-480, 800, false, 600, "large-card")).toEqual({
+      opacity: 0.5,
+      blur: 10,
+    });
+    expect(getScrollRevealState(-600, 800, false, 600, "large-card")).toEqual({
+      opacity: 0,
+      blur: 20,
+    });
+  });
+
   it("leaves content sharp when reduced motion is enabled", () => {
     expect(getScrollRevealState(-240, 800, true)).toEqual({
       opacity: 1,

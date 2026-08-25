@@ -36,7 +36,8 @@ export default function ProjectTV({ project, onClick, isSelected }: ProjectTVPro
   
   return (
     <div
-      className="crt-scroll-reveal group relative cursor-pointer"
+      className="crt-scroll-reveal project-tv group relative cursor-pointer"
+      data-crt-reveal-size="large-card"
       onClick={onClick}
       onPointerEnter={handlePointerEnter}
       onPointerLeave={fill.handlePointerLeave}
@@ -78,19 +79,19 @@ export default function ProjectTV({ project, onClick, isSelected }: ProjectTVPro
             <div className="absolute inset-0 bg-crt-surface-primary" />
           )}
 
-          <div className="absolute inset-x-0 top-0 flex items-center justify-between bg-black/80 px-4 py-3">
-            <span className="text-crt-accent text-sm font-mono">{project.category}</span>
+          <div className="project-tv__channel absolute inset-x-0 top-0 flex items-center justify-between bg-black/80 px-4 py-3">
+            <span className="min-w-0 truncate text-crt-accent text-sm font-mono">{project.category}</span>
             <div className="h-2 w-2 rounded-full bg-crt-success shadow-[0_0_10px_rgb(var(--crt-accent-success))]" />
           </div>
 
-          <div className="absolute inset-x-0 bottom-0 bg-black/85 p-4">
-            <h3 className="text-xl font-display font-bold text-crt-text transition-colors tracking-wide">
+          <div className="project-tv__summary absolute inset-x-0 bottom-0 bg-black/85 p-4">
+            <h3 className="project-tv__title text-xl font-display font-bold text-crt-text transition-colors tracking-wide">
               {title.visibleLabel}
             </h3>
-            <p className="mt-2 text-sm leading-relaxed text-crt-text-secondary">
+            <p className="project-tv__description mt-2 text-sm leading-relaxed text-crt-text-secondary">
               {project.description}
             </p>
-            <div className="mt-3 flex flex-wrap gap-1">
+            <div className="project-tv__tech mt-3 flex flex-wrap gap-1">
               {project.tech.slice(0, 3).map((tech) => (
                 <span
                   key={tech}
