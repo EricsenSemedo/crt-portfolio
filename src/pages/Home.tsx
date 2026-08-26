@@ -9,8 +9,7 @@ interface HomeProps {
 
 const skills = [
   "Java", "Python", "C++", "C#", "JavaScript", "TypeScript", "Luau", "Go",
-  "MySQL", "SQL", "PostgreSQL", "JDBC", "REST APIs", "Spring", "Spring Boot", "Spring Data JPA",
-  "Maven", "Javalin", "JUnit", "Mockito", "Logback", "Git", "Docker", "Kubernetes", "AWS", "OpenTofu",
+  "MySQL", "SQL", "PostgreSQL", "REST APIs", "Git", "Docker", "Kubernetes", "AWS", "OpenTofu",
   "CI/CD", "Linux", "Hadoop", "Agile",
 ];
 
@@ -73,8 +72,8 @@ export default function Home({ onNavigate }: HomeProps) {
         <section className="pb-12">
           <h3 className="mb-7 text-center font-display text-2xl font-semibold tracking-wide text-crt-accent">Experience</h3>
           <div>
-            {experience.map((item, index) => (
-              <article key={item.title} className={"grid gap-5 py-8 md:grid-cols-[minmax(12rem,0.7fr)_minmax(0,1.3fr)] md:gap-10" + (index < experience.length - 1 ? " border-b border-crt-border" : "")}>
+            {experience.map((item) => (
+              <article key={item.title} className="grid gap-5 py-8 md:grid-cols-[minmax(12rem,0.7fr)_minmax(0,1.3fr)] md:gap-10">
                 <div className="crt-scroll-reveal">
                   <p className="font-mono text-xs uppercase tracking-[0.2em] text-crt-text-tertiary">{item.dates}</p>
                   <h4 className="mt-3 text-xl font-semibold text-crt-accent-hover">{item.title}</h4>
@@ -92,18 +91,18 @@ export default function Home({ onNavigate }: HomeProps) {
         </section>
 
         {/* Education & Stats */}
-        <section className="grid border-y border-crt-border md:grid-cols-3">
+        <section className="grid md:grid-cols-3">
           <div className="crt-scroll-reveal py-8 md:pr-8">
             <h4 className="font-display text-lg font-semibold tracking-wide text-crt-accent">Education</h4>
             <p className="mt-4 text-crt-text-secondary">University of Rhode Island</p>
             <p className="mt-1 text-sm text-crt-text-tertiary">Bachelor of Arts in Computer Science</p>
             <p className="mt-1 text-sm text-crt-text-tertiary">Graduated May 2025</p>
           </div>
-          <div className="crt-scroll-reveal border-t border-crt-border py-8 md:border-l md:border-t-0 md:px-8">
+          <div className="crt-scroll-reveal py-8 md:px-8">
             <div className="font-display text-3xl font-bold text-crt-accent">1+</div>
             <div className="mt-3 text-sm uppercase tracking-[0.16em] text-crt-text-tertiary">Years Professional</div>
           </div>
-          <div className="crt-scroll-reveal border-t border-crt-border py-8 md:border-l md:border-t-0 md:pl-8">
+          <div className="crt-scroll-reveal py-8 md:pl-8">
             <div className="font-display text-3xl font-bold text-crt-secondary">{projects.length}+</div>
             <div className="mt-3 text-sm uppercase tracking-[0.16em] text-crt-text-tertiary">Projects Built</div>
           </div>
