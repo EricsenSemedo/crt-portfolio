@@ -16,16 +16,6 @@ const skills = [
 
 const experience = [
   {
-    title: "Java Intern",
-    company: "Revature",
-    role: "Pre-Employment Program | Back-end Developer",
-    dates: "Jun 2026 - Aug 2026",
-    details: [
-      "Built functional REST APIs with Java, SQL, Spring, and test-driven development.",
-      "Completed 108 coding activities and demonstrated proficiency through 14 evaluations.",
-    ],
-  },
-  {
     title: "Infrastructure Engineer",
     company: "PixelMux",
     role: "Remote",
