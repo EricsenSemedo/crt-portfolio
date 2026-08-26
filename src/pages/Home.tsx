@@ -15,6 +15,17 @@ const skills = [
 
 const experience = [
   {
+    title: "Data Engineering Trainee",
+    company: "Revature",
+    role: "Pre-Training Cohort",
+    dates: "Jun 2026 - Aug 2026",
+    details: [
+      "Completed hands-on training in Python, SQL, Hadoop, Hive, Spark, and PySpark.",
+      "Practiced batch data processing with RDDs, DataFrames, and Spark SQL.",
+      "Completed 58 coding labs, graded assessments, and a capstone-style project.",
+    ],
+  },
+  {
     title: "Infrastructure Engineer",
     company: "PixelMux",
     role: "Remote",
