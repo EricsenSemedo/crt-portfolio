@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { type Project } from "../../types";
 import ProjectContentHeading from "./ProjectContentHeading";
 import StaticNoise from "../StaticNoise";
@@ -13,6 +13,8 @@ interface DemoChannelProps {
  * Uses theme tokens for backgrounds, text, and accent colors.
  */
 export default function DemoChannel({ project }: DemoChannelProps) {
+  const reduceMotion = useReducedMotion();
+  const [failedSource, setFailedSource] = useState<string | null>(null);
   const demo = project.demo;
   const media = useMemo(() => project.media ?? (demo ? [demo] : []), [demo, project.media]);
   const [activeIndex, setActiveIndex] = useState(0);
@@ -20,6 +22,7 @@ export default function DemoChannel({ project }: DemoChannelProps) {
   const pendingIndex = useRef<number | null>(null);
 
   useEffect(() => {
+    setFailedSource(null);
     setActiveIndex(0);
     setIsTuning(false);
     pendingIndex.current = null;
@@ -59,6 +62,10 @@ export default function DemoChannel({ project }: DemoChannelProps) {
 
   function selectMedia(index: number) {
     if (index === activeIndex || isTuning) return;
+    if (reduceMotion) {
+      setActiveIndex(index);
+      return;
+    }
     pendingIndex.current = index;
     setIsTuning(true);
   }
@@ -87,18 +94,20 @@ export default function DemoChannel({ project }: DemoChannelProps) {
         
         {/* Demo Media */}
         <div className="relative mb-7 aspect-video overflow-hidden border border-crt-border bg-crt-surface-primary">
-          {!activeMedia ? (
+          {!activeMedia || failedSource === activeMedia.src ? (
             <div className="absolute inset-0 flex items-center justify-center bg-crt-surface-secondary">
               <div className="text-center px-6">
-                <p className="font-mono text-crt-text-tertiary">Demo media not available</p>
+                <p role="status" className="font-mono text-crt-text-tertiary">{activeMedia ? "This media could not be loaded." : "Demo media not available"}</p>
+                {activeMedia && <button type="button" className="mt-3 min-h-11 px-4 text-white underline" onClick={() => setFailedSource(null)}>Retry media</button>}
               </div>
             </div>
           ) : activeMedia.type === 'video' ? (
             <video
               key={activeMedia.src}
               src={activeMedia.src}
+              onError={() => setFailedSource(activeMedia.src)}
               className="w-full h-full object-contain"
-              autoPlay
+              autoPlay={!reduceMotion}
               loop
               muted
               playsInline
@@ -108,24 +117,26 @@ export default function DemoChannel({ project }: DemoChannelProps) {
           ) : activeMedia.type === 'gif' ? (
             <img
               src={activeMedia.src}
+              onError={() => setFailedSource(activeMedia.src)}
               alt={activeMedia.alt}
               className="w-full h-full object-contain"
             />
           ) : (
             <img
               src={activeMedia.src}
+              onError={() => setFailedSource(activeMedia.src)}
               alt={activeMedia.alt}
               className="w-full h-full object-contain"
             />
           )}
           
           {/* Overlay for placeholder only */}
-          {demo?.src.includes('placeholder') && (
+          {activeMedia?.src.includes('placeholder') && failedSource !== activeMedia.src && (
             <div className="absolute inset-0 flex items-center justify-center bg-crt-surface-secondary">
               <div className="text-center">
                 <div className="text-6xl mb-4">📹</div>
                 <p className="text-crt-text-tertiary">Demo video coming soon</p>
-                <p className="text-sm text-crt-text-muted mt-2">{demo.alt}</p>
+                <p className="text-sm text-crt-text-muted mt-2">{activeMedia.alt}</p>
               </div>
             </div>
           )}
@@ -152,7 +163,7 @@ export default function DemoChannel({ project }: DemoChannelProps) {
               <button
                 type="button"
                 onClick={() => moveMedia(-1)}
-                className="absolute left-3 top-1/2 z-20 -translate-y-1/2 border border-white/50 bg-black/70 px-3 py-2 font-mono text-white transition-colors hover:bg-white hover:text-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-crt-accent"
+                className="min-h-11 min-w-11 absolute left-3 top-1/2 z-20 -translate-y-1/2 border border-white/50 bg-black/70 px-3 py-2 font-mono text-white transition-colors hover:bg-white hover:text-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-crt-accent"
                 aria-label="Previous project media"
               >
                 ←
@@ -160,7 +171,7 @@ export default function DemoChannel({ project }: DemoChannelProps) {
               <button
                 type="button"
                 onClick={() => moveMedia(1)}
-                className="absolute right-3 top-1/2 z-20 -translate-y-1/2 border border-white/50 bg-black/70 px-3 py-2 font-mono text-white transition-colors hover:bg-white hover:text-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-crt-accent"
+                className="min-h-11 min-w-11 absolute right-3 top-1/2 z-20 -translate-y-1/2 border border-white/50 bg-black/70 px-3 py-2 font-mono text-white transition-colors hover:bg-white hover:text-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-crt-accent"
                 aria-label="Next project media"
               >
                 →
@@ -173,16 +184,18 @@ export default function DemoChannel({ project }: DemoChannelProps) {
         </div>
 
         {media.length > 1 && (
-          <div className="mb-7 flex justify-center gap-1.5" aria-label={`${project.title} media slides`}>
+          <div className="mb-7 flex flex-wrap justify-center gap-1.5" aria-label={`${project.title} media slides`}>
             {media.map((item, index) => (
               <button
                 key={item.src}
                 type="button"
                 onClick={() => selectMedia(index)}
-                className={"h-1.5 transition-[width,background-color] duration-150 " + (index === activeIndex ? "w-8 bg-crt-accent" : "w-3 bg-crt-border hover:bg-crt-text-tertiary")}
+                className="flex h-11 w-11 items-center justify-center focus-visible:outline-2 focus-visible:outline-crt-accent-text"
                 aria-label={`Show media ${index + 1} of ${media.length}`}
                 aria-current={index === activeIndex ? "true" : undefined}
-              />
+              >
+                <span aria-hidden="true" className={"h-1.5 " + (index === activeIndex ? "w-8 bg-crt-accent-text" : "w-3 bg-crt-border")} />
+              </button>
             ))}
           </div>
         )}
@@ -192,7 +205,7 @@ export default function DemoChannel({ project }: DemoChannelProps) {
           {project.tech.map((tech) => (
             <span
               key={tech}
-              className="border border-crt-accent/30 bg-crt-accent/20 px-3 py-1 font-mono text-sm text-crt-accent-hover"
+              className="border border-crt-accent/30 bg-crt-accent/20 px-3 py-1 font-mono text-sm text-crt-accent-text"
             >
               {tech}
             </span>

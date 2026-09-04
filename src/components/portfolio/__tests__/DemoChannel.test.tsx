@@ -47,4 +47,17 @@ describe("DemoChannel", () => {
     expect(container.querySelector("[data-crt-scroll-container]")).toBeNull();
     expect(container.querySelector(".crt-scroll-reveal")).toBeNull();
   });
+  it("offers a retry when the active image fails", () => {
+    const project = { ...projects[0], media: [{ type: "image" as const, src: "/missing.png", alt: "Preview" }] };
+    act(() => root.render(<DemoChannel project={project} />));
+    act(() => container.querySelector("img")!.dispatchEvent(new Event("error")));
+    expect(container.querySelector('[role="status"]')?.textContent).toContain("could not be loaded");
+    const retry = [...container.querySelectorAll("button")].find((button) => button.textContent === "Retry media")!;
+    act(() => retry.click());
+    expect(container.querySelector("img")?.getAttribute("src")).toBe("/missing.png");
+    act(() => container.querySelector("img")!.dispatchEvent(new Event("error")));
+    act(() => root.render(<DemoChannel project={{ ...project, id: "another-project" }} />));
+    expect(container.querySelector("img")?.getAttribute("src")).toBe("/missing.png");
+  });
+
 });

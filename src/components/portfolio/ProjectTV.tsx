@@ -80,7 +80,7 @@ export default function ProjectTV({ project, onClick, isSelected }: ProjectTVPro
           )}
 
           <div className="project-tv__channel absolute inset-x-0 top-0 flex items-center justify-between bg-black/80 px-4 py-3">
-            <span className="min-w-0 truncate text-crt-accent text-sm font-mono">{project.category}</span>
+            <span className="min-w-0 truncate text-crt-accent-text text-sm font-mono">{project.category}</span>
             <div className="h-2 w-2 rounded-full bg-crt-success shadow-[0_0_10px_rgb(var(--crt-accent-success))]" />
           </div>
 

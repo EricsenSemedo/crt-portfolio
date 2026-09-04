@@ -34,6 +34,7 @@
   --color-crt-border-subtle: rgb(var(--crt-border-subtle));
 
   /* Accent: Primary */
+  --color-crt-accent-text: rgb(var(--crt-text-accent));
   --color-crt-accent: rgb(var(--crt-accent-primary));
   --color-crt-accent-hover: rgb(var(--crt-accent-primary-hover));
   --color-crt-accent-muted: rgb(var(--crt-accent-primary-muted));
@@ -96,7 +97,8 @@
   --crt-text-primary: 248 250 250;
   --crt-text-secondary: 211 220 223;
   --crt-text-tertiary: 157 177 183;
-  --crt-text-muted: 103 133 141;
+  --crt-text-muted: 153 174 182;
+  --crt-text-accent: 139 168 255;
 
   /* Borders */
   --crt-border-primary: 89 89 89;
@@ -483,4 +485,11 @@ html.theme-transition *::after {
     fill var(--crt-theme-transition-duration) ease,
     stroke var(--crt-theme-transition-duration) ease,
     box-shadow var(--crt-theme-transition-duration) ease;
+}
+
+/* Text accents are brighter than filled controls to remain readable on CRT surfaces. */
+.project-tv:focus-visible,
+.additional-project-row:focus-visible {
+  outline: 2px solid rgb(var(--crt-text-accent));
+  outline-offset: 4px;
 }

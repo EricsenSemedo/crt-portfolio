@@ -112,14 +112,14 @@ export default function AssetViewer() {
           <div className="mb-5 flex items-center justify-between gap-3">
             <a
               href="/crt-portfolio/"
-              className="font-mono text-xs uppercase tracking-[0.22em] text-crt-text-tertiary hover:text-crt-accent"
+              className="font-mono text-xs uppercase tracking-[0.22em] text-crt-text-tertiary hover:text-crt-accent-text"
             >
               Portfolio
             </a>
             <span className="h-2 w-2 rounded-full bg-crt-success shadow-[0_0_14px_rgb(var(--crt-accent-success))]" />
           </div>
 
-          <h1 className="mb-5 font-display text-2xl font-bold tracking-wide text-crt-accent">
+          <h1 className="mb-5 font-display text-2xl font-bold tracking-wide text-crt-accent-text">
             Asset Bench
           </h1>
 
