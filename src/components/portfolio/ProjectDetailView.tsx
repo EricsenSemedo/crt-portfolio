@@ -3,8 +3,8 @@ import { useEffect, useRef, type RefObject } from "react";
 import { useModalAccessibility } from "../../hooks/useModalAccessibility";
 import type { Project } from "../../types";
 import CRTButton from "../CRTButton";
+import CRTIconButton from "../CRTIconButton";
 import CRTScanlines from "../CRTScanlines";
-import ScrambleHeading from "../ScrambleHeading";
 import DemoChannel from "./DemoChannel";
 import DescriptionChannel from "./DescriptionChannel";
 
@@ -54,7 +54,7 @@ export default function ProjectDetailView({
       className="fixed inset-0 z-50 bg-crt-base/50 backdrop-blur-sm"
       role="dialog"
       aria-modal="true"
-      aria-labelledby={`project-detail-title-${project.id}`}
+      aria-label={project.title}
       tabIndex={-1}
     >
       {/* Fast center-expansion transition without spring or bounce motion. */}
@@ -92,24 +92,15 @@ export default function ProjectDetailView({
               </CRTButton>
             </div>
 
-            <ScrambleHeading
-              id={`project-detail-title-${project.id}`}
-              as="h2"
-              delay={180}
-              className="pointer-events-none absolute left-1/2 max-w-[38%] -translate-x-1/2 truncate font-display text-sm font-bold tracking-wide text-crt-accent sm:text-base md:text-lg"
-            >
-              {project.title}
-            </ScrambleHeading>
-
-            <CRTButton
+            <CRTIconButton
               onClick={onClose}
-              variant="ghost"
-              size="sm"
-              className="text-crt-text-tertiary hover:text-crt-text"
-              aria-label="Close project details"
+              className="h-10 w-10 shrink-0 p-0"
+              label="Back to project gallery"
             >
-              ✕
-            </CRTButton>
+              <svg className="block h-5 w-5 fill-none stroke-current" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="m15 18-6-6 6-6" strokeWidth="2.4" strokeLinecap="square" strokeLinejoin="miter" />
+              </svg>
+            </CRTIconButton>
           </motion.div>
 
           {/* Channel Content */}

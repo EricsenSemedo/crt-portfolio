@@ -125,6 +125,7 @@ index.html
 - [ ] Navbar CRT polish: signal indicator, phosphor glow, keyboard hints (branch: `feat/navbar-crt-polish`)
 - [ ] Global keyboard shortcuts for TV navigation (branch: `feat/keyboard-shortcuts`)
 - [ ] Improve main screen aesthetic (branch: `feat/improve-main-screen-aesthetic`)
+- [ ] Production 3D CRT basement scene + asset pipeline (see `docs/issues/001-3d-crt-scene-asset-pipeline.md`)
 - [ ] Sound effects integration (Howler.js already in dependencies)
 - [ ] Replace default Vite favicon with custom CRT-themed icon
 - [ ] SEO meta tags (og:image, description, etc.)

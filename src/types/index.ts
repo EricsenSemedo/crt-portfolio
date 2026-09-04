@@ -17,6 +17,7 @@ export interface ProjectStoryStep {
 }
 
 export interface ProjectDetailedDescription {
+  contribution: string;
   problem: string;
   solution: string;
   impact: string;

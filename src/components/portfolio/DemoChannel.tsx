@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { type Project } from "../../types";
+import ProjectContentHeading from "./ProjectContentHeading";
 import StaticNoise from "../StaticNoise";
 
 interface DemoChannelProps {
@@ -74,16 +75,18 @@ export default function DemoChannel({ project }: DemoChannelProps) {
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
       transition={{ duration: 0.3 }}
-      className="h-full overflow-y-auto flex flex-col items-center justify-center p-8"
-      data-crt-scroll-container
+      className="flex h-full flex-col items-center justify-start overflow-y-auto p-4 sm:p-8"
     >
-      <div className="w-full max-w-6xl">
-        <div className="mb-4 text-center">
-          <p className="text-crt-text-tertiary font-mono text-lg">{project.category}</p>
-        </div>
+      <div className="mx-auto w-full max-w-6xl">
+        <ProjectContentHeading
+          title={project.title}
+          category={project.category}
+          className="mb-8"
+          revealOnScroll={false}
+        />
         
         {/* Demo Media */}
-        <div className="crt-scroll-reveal relative bg-crt-surface-primary overflow-hidden aspect-video border border-crt-border mb-3">
+        <div className="relative mb-7 aspect-video overflow-hidden border border-crt-border bg-crt-surface-primary">
           {!activeMedia ? (
             <div className="absolute inset-0 flex items-center justify-center bg-crt-surface-secondary">
               <div className="text-center px-6">
@@ -170,7 +173,7 @@ export default function DemoChannel({ project }: DemoChannelProps) {
         </div>
 
         {media.length > 1 && (
-          <div className="mb-6 flex justify-center gap-1.5" aria-label={`${project.title} media slides`}>
+          <div className="mb-7 flex justify-center gap-1.5" aria-label={`${project.title} media slides`}>
             {media.map((item, index) => (
               <button
                 key={item.src}
@@ -185,11 +188,11 @@ export default function DemoChannel({ project }: DemoChannelProps) {
         )}
         
         {/* Tech Stack */}
-        <div className="crt-scroll-reveal flex flex-wrap justify-center gap-2">
+        <div className="mx-auto flex w-fit max-w-full flex-wrap justify-center gap-2 text-center">
           {project.tech.map((tech) => (
             <span
               key={tech}
-              className="px-3 py-1 font-mono bg-crt-accent/20 text-crt-accent-hover text-sm rounded border border-crt-accent/30"
+              className="border border-crt-accent/30 bg-crt-accent/20 px-3 py-1 font-mono text-sm text-crt-accent-hover"
             >
               {tech}
             </span>

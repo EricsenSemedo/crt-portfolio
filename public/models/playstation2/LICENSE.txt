@@ -1,0 +1,5 @@
+Playstation 2 Console by Per F
+Source: https://www.blendkit.com/asset-gallery-detail/3e1c02c4-35b9-45ff-b69f-9479c274d3b4/
+License: Royalty Free
+
+Converted from the original Blender source to an optimized glTF binary for this portfolio.

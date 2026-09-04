@@ -16,6 +16,7 @@ const softwareProjectIds = [
 ];
 
 const gameDevelopmentProjectIds = [
+  "physics-grab",
   "dont-get-caught",
   "grow-your-plant",
 ];
@@ -61,9 +62,6 @@ export default function Portfolio({ onNavigate, onProjectDetailOpenChange }: Por
           <ScrambleHeading className="pb-2 text-4xl font-display font-bold leading-tight tracking-wide text-white md:text-5xl">
             Project Gallery
           </ScrambleHeading>
-          <p className="crt-reading-width mx-auto text-crt-text-tertiary">
-            Browse game development, software, and AI work. Select any project to explore its details.
-          </p>
         </section>
 
         <section id="software-and-ai" className="border-t border-crt-border-subtle px-2 pt-10 sm:px-6">
