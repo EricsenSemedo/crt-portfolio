@@ -2,20 +2,18 @@ import type { KeyboardEvent, PointerEvent } from "react";
 import useDirectionalFill from "../../hooks/useDirectionalFill";
 import useScrambleText from "../../hooks/useScrambleText";
 import type { Project } from "../../types";
-import CRTButton from "../CRTButton";
 import CRTScanlines from "../CRTScanlines";
 
 interface ProjectTVProps {
   project: Project;
   onClick?: () => void;
-  isSelected?: boolean;
 }
 
 /**
  * ProjectTV - Individual project card styled as a mini CRT TV.
  * Uses theme tokens for bezel, screen, and accent colors.
  */
-export default function ProjectTV({ project, onClick, isSelected }: ProjectTVProps) {
+export default function ProjectTV({ project, onClick }: ProjectTVProps) {
   const fill = useDirectionalFill<HTMLDivElement>("all");
   const title = useScrambleText(project.title);
   const previewSrc = project.image ?? project.media?.[0]?.src ?? project.demo?.src;
@@ -31,8 +29,6 @@ export default function ProjectTV({ project, onClick, isSelected }: ProjectTVPro
     onClick?.();
   }
 
-  // Don't render the card if it's selected (it's now in the detail view)
-  if (isSelected) return null;
   
   return (
     <div
@@ -120,14 +116,9 @@ export default function ProjectTV({ project, onClick, isSelected }: ProjectTVPro
         {/* TV Controls */}
         <div className="mt-3 flex justify-between items-center">
           <div className="flex space-x-2">
-            <CRTButton
-              variant="primary"
-              size="sm"
-              className="pointer-events-none"
-              tabIndex={-1}
-            >
+            <span className="border border-crt-accent bg-crt-accent px-3 py-1.5 font-mono text-xs text-white" aria-hidden="true">
               Tune In
-            </CRTButton>
+            </span>
           </div>
           
           {/* Channel Number */}
