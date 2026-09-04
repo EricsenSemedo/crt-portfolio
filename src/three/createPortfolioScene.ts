@@ -312,6 +312,7 @@ export function createPortfolioScene(): PortfolioSceneController {
   let heldScreenEffect: HeldScreenEffect | null = null;
 
   function resize(width: number, height: number) {
+    if (isDisposed) return;
     const responsiveScreenFits = getResponsiveScreenFits(width, height);
     channels.forEach((channel) => applyScreenFit(channel.id, responsiveScreenFits[channel.id]));
     sceneLayout = getSceneLayout(width, height);
@@ -350,6 +351,7 @@ export function createPortfolioScene(): PortfolioSceneController {
   }
 
   function render(time: number) {
+    if (isDisposed) return;
     const delta = Math.min(Math.max((time - lastFrameTime) / 1000, 0), 0.033);
     lastFrameTime = time;
     if (basketballBody?.active) updateBasketballPhysics(basketballBody, basketballColliders, delta);
@@ -519,6 +521,7 @@ export function createPortfolioScene(): PortfolioSceneController {
   }
 
   function transitionScreen(id: PortfolioChannelId, reducedMotion = false) {
+    if (isDisposed) return Promise.resolve("cancelled" as const);
     const channel = channels.find((item) => item.id === id);
     const display = displays.get(id);
     if (!channel || !display || reducedMotion) return Promise.resolve("completed" as const);
@@ -548,6 +551,7 @@ export function createPortfolioScene(): PortfolioSceneController {
   }
 
   async function reset(reducedMotion = false, quick = false) {
+    if (isDisposed) return;
     if (screenTransition) {
       const resolve = screenTransition.resolve;
       screenTransition = null;
@@ -570,6 +574,7 @@ export function createPortfolioScene(): PortfolioSceneController {
     } else {
       heldScreenEffect = null;
     }
+    if (isDisposed) return;
     channels.forEach((channel) => {
       const display = displays.get(channel.id);
       if (!display) return;
@@ -624,6 +629,7 @@ export function createPortfolioScene(): PortfolioSceneController {
   }
 
   function animateTo(position: Vector3, target: Vector3, duration: number, arcStrength: number) {
+    if (isDisposed) return Promise.resolve();
     if (animation) animation.resolve();
     return new Promise<void>((resolve) => {
       animation = {
@@ -640,6 +646,7 @@ export function createPortfolioScene(): PortfolioSceneController {
   }
 
   function dispose() {
+    if (isDisposed) return;
     isDisposed = true;
     if (animation) animation.resolve();
     if (screenTransition) screenTransition.resolve("cancelled");
@@ -650,6 +657,7 @@ export function createPortfolioScene(): PortfolioSceneController {
     allAssets.forEach((asset) => asset.dispose());
     importedResources.forEach((resource) => resource.dispose());
     interactionPrompt.dispose();
+    ceiling.shadow.dispose();
     renderer.dispose();
     renderer.domElement.remove();
   }

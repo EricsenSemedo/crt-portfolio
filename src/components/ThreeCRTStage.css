@@ -62,3 +62,21 @@
 @media (prefers-reduced-motion: reduce) {
   .three-stage__loader, .three-stage__channels button { transition-duration: .01ms; }
 }
+
+.three-stage__fallback {
+  position: absolute;
+  inset: 35% 1rem auto;
+  text-align: center;
+}
+.three-stage.is-unavailable .three-stage__channels {
+  position: absolute;
+  inset: 50% 1rem auto;
+  z-index: 5;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: .5rem;
+  width: auto;
+  height: auto;
+  clip-path: none;
+}
