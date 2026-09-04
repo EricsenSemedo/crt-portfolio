@@ -252,6 +252,7 @@ export function createPortfolioScene(): PortfolioSceneController {
       realisticTelevisions = televisions.group;
       scene.add(televisions.group);
       applyResponsiveLayout(sceneLayout);
+      updateCameraFraming();
       importedResources.push(televisions);
     }
   });
@@ -333,6 +334,10 @@ export function createPortfolioScene(): PortfolioSceneController {
         basketballBody.horizontalBounds.max,
       );
     }
+    updateCameraFraming();
+  }
+
+  function updateCameraFraming() {
     const destination = focusedChannel ? getFocusDestination(focusedChannel) : {
       position: overviewPosition,
       target: new Vector3(...sceneLayout.target),
