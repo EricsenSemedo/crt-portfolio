@@ -20,8 +20,9 @@ export default function CRTIconButton({
 
   return (
     <button
+      type="button"
       {...props}
-      className={"crt-action-shell crt-action-shell--close group relative inline-flex cursor-pointer items-center justify-center overflow-hidden align-middle text-white focus:outline-none focus:ring-2 focus:ring-inset focus:ring-crt-accent " + className}
+      className={"min-h-11 min-w-11 crt-action-shell crt-action-shell--close group relative inline-flex cursor-pointer items-center justify-center overflow-hidden align-middle text-white focus:outline-none focus:ring-2 focus:ring-inset focus:ring-crt-accent " + className}
       onPointerEnter={(event) => {
         onPointerEnter?.(event);
         fill.handlePointerEnter(event);

@@ -1,4 +1,4 @@
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useEffect, useRef, type RefObject } from "react";
 import { useModalAccessibility } from "../../hooks/useModalAccessibility";
 import type { Project } from "../../types";
@@ -29,6 +29,7 @@ export default function ProjectDetailView({
   onClose,
   backgroundRef,
 }: ProjectDetailViewProps) {
+  const reduceMotion = useReducedMotion();
   const dialogRef = useRef<HTMLDivElement>(null);
 
   useModalAccessibility({
@@ -60,9 +61,9 @@ export default function ProjectDetailView({
       {/* Fast center-expansion transition without spring or bounce motion. */}
       <motion.div
         className="absolute inset-4 bg-crt-surface-secondary rounded-lg p-4 border-2 border-crt-accent/50 shadow-lg shadow-crt-accent/20 overflow-hidden"
-        initial={{ opacity: 0, scaleX: 0.18 }}
+        initial={{ opacity: 0, scaleX: reduceMotion ? 1 : 0.18 }}
         animate={{ opacity: 1, scaleX: 1 }}
-        exit={{ opacity: 0, scaleX: 0.18 }}
+        exit={{ opacity: 0, scaleX: reduceMotion ? 1 : 0.18 }}
         transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
       >
         {/* TV Screen Area */}
@@ -73,11 +74,12 @@ export default function ProjectDetailView({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.1, duration: 0.2 }}
-            className="absolute top-4 left-4 right-4 z-10 flex justify-between items-center"
+            className="absolute top-2 left-2 right-2 z-10 flex justify-between items-center gap-1"
           >
-            <div className="flex space-x-2">
+            <div className="flex gap-1">
               <CRTButton
                 onClick={() => onChannelChange('demo')}
+                aria-pressed={currentChannel === 'demo'}
                 variant={currentChannel === 'demo' ? 'primary' : 'ghost'}
                 size="sm"
               >
@@ -85,6 +87,7 @@ export default function ProjectDetailView({
               </CRTButton>
               <CRTButton
                 onClick={() => onChannelChange('description')}
+                aria-pressed={currentChannel === 'description'}
                 variant={currentChannel === 'description' ? 'primary' : 'ghost'}
                 size="sm"
               >

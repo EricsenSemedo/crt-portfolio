@@ -20,7 +20,7 @@ export default function ProjectContentHeading({
       <ScrambleHeading
         as="h1"
         delay={180}
-        className={revealClass + "mb-3 font-display text-3xl font-bold tracking-wide text-crt-accent"}
+        className={revealClass + "mb-3 font-display text-3xl font-bold tracking-wide text-crt-accent-text"}
       >
         {title}
       </ScrambleHeading>
