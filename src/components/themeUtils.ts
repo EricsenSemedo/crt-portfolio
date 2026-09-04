@@ -11,12 +11,25 @@ export { STORAGE_KEY, TRANSITION_CLASS };
 export function getInitialTheme(): Theme {
   if (typeof window === "undefined") return "dark";
 
-  const stored = localStorage.getItem(STORAGE_KEY);
-  if (stored === "light" || stored === "dark") return stored;
+  try {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    if (stored === "light" || stored === "dark") return stored;
+  } catch {
+    // Browser privacy settings may deny storage access; keep the portfolio usable.
+  }
 
   return window.matchMedia("(prefers-color-scheme: light)").matches
     ? "light"
     : "dark";
+}
+
+/** Theme persistence is optional: denied storage must not prevent rendering. */
+export function persistTheme(theme: Theme) {
+  try {
+    localStorage.setItem(STORAGE_KEY, theme);
+  } catch {
+    // Retain the preference in React state for this session.
+  }
 }
 
 /** Track whether applyTheme has been called before (skip transition on first call). */

@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { applyTheme, getInitialTheme, resetFirstApply } from "../themeUtils";
+import { applyTheme, getInitialTheme, persistTheme, resetFirstApply } from "../themeUtils";
 
 describe("applyTheme", () => {
   let root: HTMLElement;
@@ -211,5 +211,18 @@ describe("getInitialTheme", () => {
     mockLocalStorage({ "crt-portfolio-theme": "invalid" });
     window.matchMedia = vi.fn().mockReturnValue({ matches: false });
     expect(getInitialTheme()).toBe("dark");
+  });
+});
+
+describe("unavailable theme storage", () => {
+  afterEach(() => vi.unstubAllGlobals());
+  it("uses the OS preference when reading storage throws", () => {
+    vi.stubGlobal("localStorage", { getItem: () => { throw new DOMException("Denied", "SecurityError"); } });
+    vi.stubGlobal("matchMedia", () => ({ matches: true }));
+    expect(getInitialTheme()).toBe("light");
+  });
+  it("keeps rendering when saving the preference fails", () => {
+    vi.stubGlobal("localStorage", { setItem: () => { throw new DOMException("Full", "QuotaExceededError"); } });
+    expect(() => persistTheme("dark")).not.toThrow();
   });
 });

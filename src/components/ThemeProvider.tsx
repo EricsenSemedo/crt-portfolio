@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback, type ReactNode } from "react";
 import { ThemeContext } from "../hooks/useTheme";
 import type { Theme } from "../types";
-import { STORAGE_KEY, getInitialTheme, applyTheme } from "./themeUtils";
+import { persistTheme, getInitialTheme, applyTheme } from "./themeUtils";
 
 interface ThemeProviderProps {
   children: ReactNode;
@@ -16,7 +16,7 @@ export default function ThemeProvider({ children }: ThemeProviderProps) {
   // Apply theme to DOM on mount and changes
   useEffect(() => {
     applyTheme(theme);
-    localStorage.setItem(STORAGE_KEY, theme);
+    persistTheme(theme);
   }, [theme]);
 
   const setTheme = useCallback((newTheme: Theme) => {
