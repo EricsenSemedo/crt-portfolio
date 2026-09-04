@@ -224,7 +224,7 @@ export function createPortfolioScene(): PortfolioSceneController {
   let basketballBody: BasketballBody | null = null;
   let realisticTelevisions: Group | null = null;
   let isDisposed = false;
-  void loadGarageEnvironment(renderer, scene).then((environment) => {
+  void loadGarageEnvironment(renderer, scene, () => isDisposed).then((environment) => {
     if (!environment) return;
     if (isDisposed) environment.dispose();
     else importedResources.push(environment);
@@ -826,22 +826,28 @@ function createInteractionPrompt() {
   };
 }
 
-async function loadGarageEnvironment(renderer: WebGLRenderer, scene: Scene) {
+async function loadGarageEnvironment(renderer: WebGLRenderer, scene: Scene, disposed: () => boolean) {
   try {
     const source = await new HDRLoader().loadAsync(`${import.meta.env.BASE_URL}environments/garage-1k.hdr`);
-    const generator = new PMREMGenerator(renderer);
-    generator.compileEquirectangularShader();
-    const environment = generator.fromEquirectangular(source).texture;
-    source.dispose();
-    generator.dispose();
-    scene.environment = environment;
-    scene.environmentIntensity = 0.42;
-    return {
-      dispose: () => {
-        if (scene.environment === environment) scene.environment = null;
-        environment.dispose();
-      },
-    };
+    try {
+      if (disposed()) return null;
+      const generator = new PMREMGenerator(renderer);
+      try {
+        const environment = generator.fromEquirectangular(source);
+        scene.environment = environment.texture;
+        scene.environmentIntensity = 0.42;
+        return {
+          dispose: () => {
+            if (scene.environment === environment.texture) scene.environment = null;
+            environment.dispose();
+          },
+        };
+      } finally {
+        generator.dispose();
+      }
+    } finally {
+      source.dispose();
+    }
   } catch {
     return null;
   }
