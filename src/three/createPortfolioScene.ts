@@ -23,8 +23,6 @@ import {
   Vector2,
   Vector3,
   WebGLRenderer,
-  type Material,
-  type Texture,
 } from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { HDRLoader } from "three/examples/jsm/loaders/HDRLoader.js";
@@ -39,6 +37,7 @@ import {
   getRandomScreenTransitionKind,
   type ScreenTransitionKind,
 } from "./screenTransition";
+import { disposeObjectTree } from "./disposeObjectTree";
 import { attachTelevisionScreen } from "./televisionScreen";
 import {
   getBasketballHorizontalBounds,
@@ -927,17 +926,25 @@ async function loadPlayStation2Model() {
 }
 
 async function loadRealisticTelevisions(channels: ChannelConfig[], disposed: () => boolean) {
-  let loadedModels: Awaited<ReturnType<GLTFLoader["loadAsync"]>>[] = [];
+  const group = new Group();
+  let source: Group | null = null;
+  const originalScreens = channels.map(({ asset }) => ({
+    parent: asset.screenPlane.parent!, geometry: asset.screenPlane.geometry,
+    position: asset.screenPlane.position.clone(), scale: asset.screenPlane.scale.clone(),
+  }));
+  function dispose() {
+    const owned = new Group();
+    owned.add(group);
+    if (source) owned.add(source);
+    disposeObjectTree(owned);
+  }
   try {
-    const results = await Promise.allSettled(channels.map(() => (
-      new GLTFLoader().loadAsync(`${import.meta.env.BASE_URL}models/television-01/television-01.gltf`)
-    )));
-    loadedModels = results.flatMap((result) => result.status === "fulfilled" ? [result.value] : []);
-    if (loadedModels.length !== channels.length || disposed()) {
-      loadedModels.forEach((result) => disposeObjectTree(result.scene));
+    const result = await new GLTFLoader().loadAsync(`${import.meta.env.BASE_URL}models/television-01/television-01.gltf`);
+    source = result.scene;
+    if (disposed()) {
+      dispose();
       return null;
     }
-    const group = new Group();
     group.name = "RealisticTelevisionLineup";
     const variants = [
       { scale: 3.25, tint: "#aaa38e", y: 0.2, z: -0.46 },
@@ -945,10 +952,9 @@ async function loadRealisticTelevisions(channels: ChannelConfig[], disposed: () 
       { scale: 3.45, tint: "#777d82", y: 0.2, z: -0.48 },
     ];
 
-    loadedModels.forEach((result, index) => {
-      const channel = channels[index];
+    channels.forEach((channel, index) => {
       const variant = variants[index];
-      const television = result.scene;
+      const television = result.scene.clone(true);
       television.name = `RealisticTelevision-${channel.id}`;
       television.position.set(channel.position[0], variant.y, variant.z);
       television.rotation.y = channel.rotationY;
@@ -977,31 +983,21 @@ async function loadRealisticTelevisions(channels: ChannelConfig[], disposed: () 
 
     return {
       group,
-      dispose: () => disposeObjectTree(group),
+      dispose,
     };
   } catch {
-    loadedModels.forEach((result) => disposeObjectTree(result.scene));
+    channels.forEach(({ asset }, index) => {
+      const original = originalScreens[index];
+      if (asset.screenPlane.geometry !== original.geometry) asset.screenPlane.geometry.dispose();
+      original.parent.add(asset.screenPlane);
+      asset.screenPlane.geometry = original.geometry;
+      asset.screenPlane.position.copy(original.position);
+      asset.screenPlane.scale.copy(original.scale);
+      asset.group.traverse((object) => { if (object instanceof Mesh) object.visible = true; });
+    });
+    dispose();
     return null;
   }
-}
-
-function disposeObjectTree(root: Object3D) {
-  root.traverse((object) => {
-    if (!(object instanceof Mesh)) return;
-    object.geometry.dispose();
-    const materials = Array.isArray(object.material) ? object.material : [object.material];
-    materials.forEach(disposeMaterial);
-  });
-  root.removeFromParent();
-}
-
-function disposeMaterial(material: Material) {
-  Object.values(material).forEach((value) => {
-    if (value && typeof value === "object" && "isTexture" in value) {
-      (value as Texture).dispose();
-    }
-  });
-  material.dispose();
 }
 
 function createScreenDisplay(label: string, subtitle: string): ScreenDisplay {
