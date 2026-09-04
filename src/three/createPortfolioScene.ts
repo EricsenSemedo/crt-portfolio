@@ -907,7 +907,7 @@ async function loadPlayStation2Model() {
     const scaledCenter = scaledBounds.getCenter(new Vector3());
     group.position.set(
       0.78 - scaledCenter.x,
-      -1.12 - scaledBounds.min.y,
+      TABLE_COLLIDER.topY + 0.01 - scaledBounds.min.y,
       0.02 - scaledCenter.z,
     );
     group.rotation.y = -0.2;

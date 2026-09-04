@@ -65,10 +65,10 @@ The temp design lab proved the direction, but it also showed the limit of proced
 
 ### Phase 1: Production Three.js Scene Scaffold
 
-- Add Three.js to the real React app.
-- Create a `ThreeCRTStage` component for the main Home/Portfolio/Contact TV selection scene.
-- Keep existing `TVZoomOverlay` and page content initially, but trigger it from the 3D scene.
-- Preserve keyboard/button fallback navigation for accessibility.
+- Extend the existing `ThreeCRTStage`, which owns the canvas and wraps `createPortfolioScene()`.
+- Keep scene selection on the shared `PortfolioChannelId` contract. `ThreeCRTStage` emits the selected ID, and the app passes it through the selected item consumed as `TVZoomOverlay.selectedId`.
+- Preserve the current close path: closing the overlay clears the selection, requests a scene reset, and returns the camera to the overview before another selection.
+- Preserve the accessible channel buttons as keyboard and non-canvas fallbacks for selecting Profile, Projects, and Contact.
 - Use responsive camera presets for mobile, desktop, and ultrawide.
 
 ### Phase 2: Build Placeholder Assets In Code
@@ -128,10 +128,13 @@ That keeps the Three.js interaction code stable while replacing geometry.
 - Static roll hover feels nostalgic and personal, without cartoon scaling.
 - Selecting any TV zooms into the screen with only a small amount of bezel visible.
 - The game/controller/basketball props are visible but do not distract from the TVs.
-- Scene remains performant enough for portfolio use.
+- Performance meets these cold-load budgets with the browser cache disabled and no other active page interactions:
+  - Desktop at 1440×900 on a current four-core laptop, 25 Mbps / 40 ms network: at least 55 average FPS during the overview and camera transition, no more than 6 MB of initial scene assets, and an interactive scene within 3.5 seconds.
+  - Ultrawide at 2560×1080 on the same desktop profile and network: at least 50 average FPS, no more than 6 MB of initial scene assets, and an interactive scene within 4 seconds.
+  - Mid-range mobile at 390×844 on a 2022-class Android device, 10 Mbps / 80 ms network: at least 30 average FPS, no more than 6 MB of initial scene assets, and an interactive scene within 6 seconds.
 - Reduced-motion mode avoids aggressive camera animation.
 - Existing Home, Portfolio, and Contact content remains reachable.
 
 ## Notes
 
-The temp prototype lives at `temp/3d-crt-design-lab/` and should be treated as a design reference, not production code. It is useful for camera/mood exploration, but production should use modular assets and eventually Blender-authored models.
+Treat the current `ThreeCRTStage` and modules under `src/three/` as the behavior reference. Production revisions should preserve their interaction contract while moving visual assets toward modular, Blender-authored models.

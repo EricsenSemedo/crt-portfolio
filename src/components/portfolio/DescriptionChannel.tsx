@@ -25,6 +25,10 @@ export default function DescriptionChannel({ project }: DescriptionChannelProps)
         { label: "Approach", title: "What I built", description: project.detailedDescription.solution },
         { label: "Outcome", title: project.status, description: project.detailedDescription.impact },
       ];
+  const hackathonSteps = [
+    { label: "My Contribution", title: "What I owned", description: project.detailedDescription.contribution },
+    ...(project.storySteps ?? []).filter((step) => step.label !== "My Contribution"),
+  ];
 
   return (
     <motion.div
@@ -55,7 +59,7 @@ export default function DescriptionChannel({ project }: DescriptionChannelProps)
             <div>
               <p className="crt-scroll-reveal mb-10 max-w-3xl font-display text-2xl leading-relaxed text-crt-text">{project.description}</p>
               <div className="ml-2 border-l border-crt-accent pl-7">
-                {project.storySteps?.map((step, index) => (
+                {hackathonSteps.map((step, index) => (
                   <div key={step.label} className="relative pb-8 last:pb-0">
                     <span className="absolute -left-[2rem] top-1 block h-2.5 w-2.5 bg-crt-accent" aria-hidden="true" />
                     <p className="crt-scroll-reveal font-mono text-xs uppercase tracking-[.2em] text-crt-accent">{String(index + 1).padStart(2, "0")} / {step.label}</p>
