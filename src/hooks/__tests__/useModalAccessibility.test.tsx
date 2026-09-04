@@ -12,20 +12,23 @@ it("contains keyboard focus, includes media controls, and restores the opener", 
   opener.focus();
   const root = createRoot(host);
   const close = vi.fn();
+  let unmounted = false;
   function Dialog() {
     const dialogRef = useRef<HTMLDivElement>(null);
     useModalAccessibility({ isOpen: true, dialogRef, initialFocus: "dialog", onClose: close });
     return <div ref={dialogRef} tabIndex={-1}>
       <div aria-hidden="true"><button>Hidden</button></div>
+      <div style={{ display: "none" }}><button>Hidden by parent</button></div>
       <button>First</button>
       <video controls tabIndex={0} />
+      <video controls tabIndex={-1} />
     </div>;
   }
   try {
     act(() => root.render(<Dialog />));
     act(() => vi.advanceTimersByTime(20));
     const dialog = host.firstElementChild!;
-    const first = host.querySelectorAll("button")[1];
+    const first = [...host.querySelectorAll("button")].find((button) => button.textContent === "First")!;
     const last = host.querySelector("video")!;
     expect(document.activeElement).toBe(dialog);
     document.dispatchEvent(new KeyboardEvent("keydown", { key: "Tab", shiftKey: true, cancelable: true }));
@@ -35,8 +38,10 @@ it("contains keyboard focus, includes media controls, and restores the opener", 
     document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", cancelable: true }));
     expect(close).toHaveBeenCalledOnce();
     act(() => root.unmount());
+    unmounted = true;
     expect(document.activeElement).toBe(opener);
   } finally {
+    if (!unmounted) act(() => root.unmount());
     host.remove();
     opener.remove();
     vi.useRealTimers();

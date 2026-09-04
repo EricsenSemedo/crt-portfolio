@@ -23,7 +23,12 @@ function getFocusableElements(container: HTMLElement): HTMLElement[] {
   ];
 
   return Array.from(container.querySelectorAll<HTMLElement>(selectors.join(","))).filter((element) => {
-    return !element.hasAttribute("disabled") &&
+    for (let ancestor = element.parentElement; ancestor; ancestor = ancestor.parentElement) {
+      if (getComputedStyle(ancestor).display === "none") return false;
+      if (ancestor === container) break;
+    }
+    return element.getAttribute("tabindex") !== "-1" &&
+      !element.hasAttribute("disabled") &&
       !element.inert &&
       element.closest("[inert]") === null &&
       element.closest('[hidden], [aria-hidden="true"]') === null &&
