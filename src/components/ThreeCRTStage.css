@@ -59,9 +59,6 @@
 .three-stage__loader { position: absolute; inset: 0; z-index: 10; display: grid; place-items: center; background: #111; color: var(--phosphor); font-size: .68rem; letter-spacing: .28em; transition: opacity 500ms ease, visibility 500ms; }
 .three-stage__loader.is-ready { opacity: 0; visibility: hidden; }
 
-@media (prefers-reduced-motion: reduce) {
-  .three-stage__loader, .three-stage__channels button { transition-duration: .01ms; }
-}
 
 .three-stage__fallback {
   position: absolute;
@@ -79,4 +76,8 @@
   width: auto;
   height: auto;
   clip-path: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .three-stage__loader, .three-stage__channels button { transition-duration: .01ms; }
 }
