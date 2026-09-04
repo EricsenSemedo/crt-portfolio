@@ -127,6 +127,7 @@ const OVERVIEW_TARGET = new Vector3(0, 0.05, -0.4);
 const TABLE_COLLIDER = { centerZ: -0.65, halfWidth: 2.95, halfDepth: 0.925, topY: 0.11 };
 
 export function createPortfolioScene(): PortfolioSceneController {
+  const motionPreference = window.matchMedia("(prefers-reduced-motion: reduce)");
   const scene = new Scene();
   scene.background = new Color("#111111");
   scene.fog = new Fog("#111111", 8, 17);
@@ -223,7 +224,7 @@ export function createPortfolioScene(): PortfolioSceneController {
   let basketballBody: BasketballBody | null = null;
   let realisticTelevisions: Group | null = null;
   let isDisposed = false;
-  void loadGarageEnvironment(renderer, scene).then((environment) => {
+  void loadGarageEnvironment(renderer, scene, () => isDisposed).then((environment) => {
     if (!environment) return;
     if (isDisposed) environment.dispose();
     else importedResources.push(environment);
@@ -306,6 +307,7 @@ export function createPortfolioScene(): PortfolioSceneController {
   let heldScreenEffect: HeldScreenEffect | null = null;
 
   function resize(width: number, height: number) {
+    if (isDisposed) return;
     sceneLayout = getSceneLayout(width, height);
     camera.aspect = width / Math.max(height, 1);
     camera.fov = sceneLayout.fov;
@@ -355,12 +357,13 @@ export function createPortfolioScene(): PortfolioSceneController {
   }
 
   function render(time: number) {
+    if (isDisposed) return;
     const delta = Math.min(Math.max((time - lastFrameTime) / 1000, 0), 0.033);
     lastFrameTime = time;
     if (basketballBody?.active) updateBasketballPhysics(basketballBody, basketballColliders, delta);
     if (interactionPrompt.sprite.visible) {
-      interactionPrompt.sprite.position.y = interactionPrompt.baseY + Math.sin(time * 0.0032) * 0.07;
-      interactionPrompt.material.opacity = 0.88 + Math.sin(time * 0.0024) * 0.08;
+      interactionPrompt.sprite.position.y = interactionPrompt.baseY + (motionPreference.matches ? 0 : Math.sin(time * 0.0032) * 0.07);
+      interactionPrompt.material.opacity = 0.88 + (motionPreference.matches ? 0 : Math.sin(time * 0.0024) * 0.08);
     }
     if (animation) {
       const progress = Math.min((time - animation.startedAt) / animation.duration, 1);
@@ -426,7 +429,7 @@ export function createPortfolioScene(): PortfolioSceneController {
       );
       heldScreenEffect.display.texture.needsUpdate = true;
       heldScreenEffect.display.lastFrame = time;
-    } else if (hovered) {
+    } else if (hovered && !motionPreference.matches) {
       const display = displays.get(hovered);
       const channel = channels.find((item) => item.id === hovered);
       if (display && channel && time - display.lastFrame > 70) {
@@ -470,7 +473,7 @@ export function createPortfolioScene(): PortfolioSceneController {
   }
 
   function setParallax(x: number, y: number) {
-    parallaxTarget.set(MathUtils.clamp(x, -1, 1), MathUtils.clamp(y, -1, 1));
+    parallaxTarget.set(motionPreference.matches ? 0 : MathUtils.clamp(x, -1, 1), motionPreference.matches ? 0 : MathUtils.clamp(y, -1, 1));
   }
 
   function setHovered(next: PortfolioChannelId | null) {
@@ -522,6 +525,7 @@ export function createPortfolioScene(): PortfolioSceneController {
   }
 
   function transitionScreen(id: PortfolioChannelId, reducedMotion = false) {
+    if (isDisposed) return Promise.resolve("cancelled" as const);
     const channel = channels.find((item) => item.id === id);
     const display = displays.get(id);
     if (!channel || !display || reducedMotion) return Promise.resolve("completed" as const);
@@ -551,6 +555,7 @@ export function createPortfolioScene(): PortfolioSceneController {
   }
 
   async function reset(reducedMotion = false, quick = false) {
+    if (isDisposed) return;
     if (screenTransition) {
       const resolve = screenTransition.resolve;
       screenTransition = null;
@@ -573,6 +578,7 @@ export function createPortfolioScene(): PortfolioSceneController {
     } else {
       heldScreenEffect = null;
     }
+    if (isDisposed) return;
     channels.forEach((channel) => {
       const display = displays.get(channel.id);
       if (!display) return;
@@ -628,6 +634,7 @@ export function createPortfolioScene(): PortfolioSceneController {
   }
 
   function animateTo(position: Vector3, target: Vector3, duration: number, arcStrength: number) {
+    if (isDisposed) return Promise.resolve();
     if (animation) animation.resolve();
     return new Promise<void>((resolve) => {
       animation = {
@@ -644,6 +651,7 @@ export function createPortfolioScene(): PortfolioSceneController {
   }
 
   function dispose() {
+    if (isDisposed) return;
     isDisposed = true;
     if (animation) animation.resolve();
     if (screenTransition) screenTransition.resolve("cancelled");
@@ -654,6 +662,7 @@ export function createPortfolioScene(): PortfolioSceneController {
     allAssets.forEach((asset) => asset.dispose());
     importedResources.forEach((resource) => resource.dispose());
     interactionPrompt.dispose();
+    ceiling.shadow.dispose();
     renderer.dispose();
     renderer.domElement.remove();
   }
@@ -817,22 +826,28 @@ function createInteractionPrompt() {
   };
 }
 
-async function loadGarageEnvironment(renderer: WebGLRenderer, scene: Scene) {
+async function loadGarageEnvironment(renderer: WebGLRenderer, scene: Scene, disposed: () => boolean) {
   try {
     const source = await new HDRLoader().loadAsync(`${import.meta.env.BASE_URL}environments/garage-1k.hdr`);
-    const generator = new PMREMGenerator(renderer);
-    generator.compileEquirectangularShader();
-    const environment = generator.fromEquirectangular(source).texture;
-    source.dispose();
-    generator.dispose();
-    scene.environment = environment;
-    scene.environmentIntensity = 0.42;
-    return {
-      dispose: () => {
-        if (scene.environment === environment) scene.environment = null;
-        environment.dispose();
-      },
-    };
+    try {
+      if (disposed()) return null;
+      const generator = new PMREMGenerator(renderer);
+      try {
+        const environment = generator.fromEquirectangular(source);
+        scene.environment = environment.texture;
+        scene.environmentIntensity = 0.42;
+        return {
+          dispose: () => {
+            if (scene.environment === environment.texture) scene.environment = null;
+            environment.dispose();
+          },
+        };
+      } finally {
+        generator.dispose();
+      }
+    } finally {
+      source.dispose();
+    }
   } catch {
     return null;
   }

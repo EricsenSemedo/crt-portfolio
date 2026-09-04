@@ -13,6 +13,7 @@ interface ThreeCRTStageProps {
   screenEffectActive?: boolean;
   onRequestedFocusComplete?: (id: PortfolioChannelId) => void;
   onOverviewComplete?: () => void;
+  paused?: boolean;
 }
 
 export default function ThreeCRTStage({
@@ -22,6 +23,7 @@ export default function ThreeCRTStage({
   screenEffectActive = false,
   onRequestedFocusComplete,
   onOverviewComplete,
+  paused = false,
 }: ThreeCRTStageProps) {
   const mountRef = useRef<HTMLDivElement>(null);
   const sceneRef = useRef<PortfolioSceneController | null>(null);
@@ -29,13 +31,23 @@ export default function ThreeCRTStage({
   const focusedRef = useRef<PortfolioChannelId | null>(null);
   const pointerGestureRef = useRef<{ id: number; x: number; y: number; moved: boolean } | null>(null);
   const suppressClickRef = useRef(false);
+  const pausedRef = useRef(paused);
+  const syncLoopRef = useRef<(() => void) | null>(null);
+  const [unavailable, setUnavailable] = useState(false);
   const [ready, setReady] = useState(false);
   const [hovered, setHovered] = useState<PortfolioChannelId | null>(null);
 
   useEffect(() => {
     const mount = mountRef.current;
     if (!mount) return;
-    const controller = createPortfolioScene();
+    let controller: PortfolioSceneController;
+    try {
+      controller = createPortfolioScene();
+    } catch {
+      setUnavailable(true);
+      setReady(true);
+      return;
+    }
     sceneRef.current = controller;
     mount.appendChild(controller.canvas);
 
@@ -53,33 +65,58 @@ export default function ThreeCRTStage({
 
     function handleVisibilityChange() {
       cancelAnimationFrame(frame);
-      if (!document.hidden) frame = requestAnimationFrame(draw);
+      if (!document.hidden && !pausedRef.current && sceneRef.current === controller) frame = requestAnimationFrame(draw);
     }
 
+    function handleContextLost(event: Event) {
+      event.preventDefault();
+      cancelAnimationFrame(frame);
+      sceneRef.current = null;
+      resizeObserver.disconnect();
+      controller.dispose();
+      selectingRef.current = false;
+      setUnavailable(true);
+    }
+    controller.canvas.addEventListener("webglcontextlost", handleContextLost);
+    syncLoopRef.current = handleVisibilityChange;
     document.addEventListener("visibilitychange", handleVisibilityChange);
-    frame = requestAnimationFrame(draw);
+    handleVisibilityChange();
     setReady(true);
 
     return () => {
       cancelAnimationFrame(frame);
       document.removeEventListener("visibilitychange", handleVisibilityChange);
       resizeObserver.disconnect();
+      controller.canvas.removeEventListener("webglcontextlost", handleContextLost);
       controller.dispose();
       sceneRef.current = null;
+      syncLoopRef.current = null;
     };
   }, []);
+
+  useEffect(() => {
+    pausedRef.current = paused;
+    syncLoopRef.current?.();
+  }, [paused]);
 
   useEffect(() => {
     sceneRef.current?.setScreenEffectActive(screenEffectActive);
   }, [screenEffectActive]);
 
   useEffect(() => {
+    const controller = sceneRef.current;
+    if (unavailable) {
+      if (requestedChannel) onRequestedFocusComplete?.(requestedChannel);
+      else onOverviewComplete?.();
+      return;
+    }
     if (!requestedChannel) {
       selectingRef.current = true;
       focusedRef.current = null;
-      void sceneRef.current
+      void controller
         ?.reset(window.matchMedia("(prefers-reduced-motion: reduce)").matches, quickTransition)
         .then(() => {
+          if (sceneRef.current !== controller) return;
           selectingRef.current = false;
           onOverviewComplete?.();
         });
@@ -88,10 +125,11 @@ export default function ThreeCRTStage({
     if (focusedRef.current === requestedChannel || selectingRef.current) return;
     selectingRef.current = true;
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    void sceneRef.current
+    void controller
       ?.focus(requestedChannel, reducedMotion, quickTransition)
-      .then(() => sceneRef.current?.transitionScreen(requestedChannel, reducedMotion))
+      .then(() => sceneRef.current === controller ? controller.transitionScreen(requestedChannel, reducedMotion) : "cancelled")
       .then((result) => {
+        if (sceneRef.current !== controller) return;
         if (result !== "completed") {
           selectingRef.current = false;
           return;
@@ -100,17 +138,23 @@ export default function ThreeCRTStage({
         selectingRef.current = false;
         onRequestedFocusComplete?.(requestedChannel);
       });
-  }, [onOverviewComplete, onRequestedFocusComplete, quickTransition, requestedChannel]);
+  }, [onOverviewComplete, onRequestedFocusComplete, quickTransition, requestedChannel, unavailable]);
 
   async function selectChannel(id: PortfolioChannelId) {
     const controller = sceneRef.current;
+    if (unavailable) {
+      onSelect(id);
+      return;
+    }
     if (!controller || selectingRef.current) return;
     selectingRef.current = true;
     setHovered(null);
     controller.setHovered(null);
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     await controller.focus(id, reducedMotion);
+    if (sceneRef.current !== controller) return;
     const transitionResult = await controller.transitionScreen(id, reducedMotion);
+    if (sceneRef.current !== controller) return;
     if (transitionResult !== "completed") {
       selectingRef.current = false;
       return;
@@ -139,7 +183,7 @@ export default function ThreeCRTStage({
   }
 
   return (
-    <main className="three-stage" aria-label="Eric Semedo portfolio channels">
+    <main className={"three-stage" + (unavailable ? " is-unavailable" : "")} aria-label="Eric Semedo portfolio channels">
       <div
         ref={mountRef}
         className={"three-stage__canvas " + (hovered ? "is-hovering" : "")}
@@ -172,6 +216,7 @@ export default function ThreeCRTStage({
         aria-hidden="true"
       />
 
+      {unavailable && <p className="three-stage__fallback" role="status">3D view unavailable. Choose a section below.</p>}
       <nav id="channels" className="three-stage__channels" aria-label="Portfolio sections">
         {PORTFOLIO_CHANNEL_LIST.map((channel) => (
           <button
