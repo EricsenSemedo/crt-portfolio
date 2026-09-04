@@ -132,6 +132,7 @@ const OVERVIEW_TARGET = new Vector3(0, 0.05, -0.4);
 const TABLE_COLLIDER = { centerZ: -0.65, halfWidth: 2.95, halfDepth: 0.925, topY: 0.11 };
 
 export function createPortfolioScene(): PortfolioSceneController {
+  const motionPreference = window.matchMedia("(prefers-reduced-motion: reduce)");
   const scene = new Scene();
   scene.background = new Color("#111111");
   scene.fog = new Fog("#111111", 8, 17);
@@ -356,8 +357,8 @@ export function createPortfolioScene(): PortfolioSceneController {
     lastFrameTime = time;
     if (basketballBody?.active) updateBasketballPhysics(basketballBody, basketballColliders, delta);
     if (interactionPrompt.sprite.visible) {
-      interactionPrompt.sprite.position.y = interactionPrompt.baseY + Math.sin(time * 0.0032) * 0.07;
-      interactionPrompt.material.opacity = 0.88 + Math.sin(time * 0.0024) * 0.08;
+      interactionPrompt.sprite.position.y = interactionPrompt.baseY + (motionPreference.matches ? 0 : Math.sin(time * 0.0032) * 0.07);
+      interactionPrompt.material.opacity = 0.88 + (motionPreference.matches ? 0 : Math.sin(time * 0.0024) * 0.08);
     }
     if (animation) {
       const progress = Math.min((time - animation.startedAt) / animation.duration, 1);
@@ -423,7 +424,7 @@ export function createPortfolioScene(): PortfolioSceneController {
       );
       heldScreenEffect.display.texture.needsUpdate = true;
       heldScreenEffect.display.lastFrame = time;
-    } else if (hovered) {
+    } else if (hovered && !motionPreference.matches) {
       const display = displays.get(hovered);
       const channel = channels.find((item) => item.id === hovered);
       if (display && channel && time - display.lastFrame > 70) {
@@ -467,7 +468,7 @@ export function createPortfolioScene(): PortfolioSceneController {
   }
 
   function setParallax(x: number, y: number) {
-    parallaxTarget.set(MathUtils.clamp(x, -1, 1), MathUtils.clamp(y, -1, 1));
+    parallaxTarget.set(motionPreference.matches ? 0 : MathUtils.clamp(x, -1, 1), motionPreference.matches ? 0 : MathUtils.clamp(y, -1, 1));
   }
 
   function applyScreenFit(id: PortfolioChannelId, fit: ScreenFit) {
