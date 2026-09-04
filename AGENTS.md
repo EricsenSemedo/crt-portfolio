@@ -36,7 +36,7 @@ Type-check without building: `bunx tsc --noEmit`
 
 ## PRs
 
-Keep PRs small (50–150 lines). Run `cr review --plain --base main` before submitting.
+Keep PRs small (50–150 lines). Run `cr review --base main` before submitting.
 
 ## Cursor Cloud specific instructions
 
@@ -48,3 +48,7 @@ Keep PRs small (50–150 lines). Run `cr review --plain --base main` before subm
 
 - **[PRD.md](./PRD.md)** — Product requirements, architecture, and task tracker.
 - **[LEARNING.md](./LEARNING.md)** — Technology proficiency tracker.
+
+## Learned Workspace Facts
+
+- This project is in "ship and stop" mode — finite work, not a recurring polish track. Land the queued design PRs, declare the CRT aesthetic done, and move on. Do not propose additional polish PRs once the stacked queue ships; the portfolio earns more time only when a new showcaseable project (e.g. plant, robingo) is shipped.
