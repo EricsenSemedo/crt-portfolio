@@ -16,6 +16,7 @@ export const projects: Project[] = [
       alt: "PullWorth scan-to-valuation workflow",
     },
     detailedDescription: {
+      contribution: "Designed and built the product workflow, responsive interface, valuation model, provider boundaries, and local-first fallback behavior.",
       problem: "Junkyard buyers make fast purchasing decisions with fragmented identification, pricing, fee, and resale information.",
       solution: "Built a responsive field workflow that turns part photos into editable identification, market evidence, fee-aware valuation, and saved BUY/REVIEW/PASS reports.",
       impact: "Proved the complete scan-to-history workflow with private local-first AI options, immutable valuation snapshots, and deterministic fallbacks.",
@@ -24,6 +25,65 @@ export const projects: Project[] = [
         "Implemented replaceable identification and marketplace provider contracts",
         "Built explainable profit, margin, ROI, and purchase-ceiling calculations",
         "Protected private yard notes from buyer-facing selling copy",
+      ],
+    },
+  },
+  {
+    id: "physics-grab",
+    title: "Physics Grab & Fling",
+    category: "Roblox / Physics Systems",
+    description: "A multiplayer physics vertical slice that pairs immediate client prediction with server-authoritative grabbing, rotation, and flinging.",
+    status: "Technical Prototype",
+    tech: ["Luau", "Roblox", "Server Authority", "React Lua"],
+    image: "/crt-portfolio/projects/physics-grab/preview.webp",
+    demo: {
+      type: "video",
+      src: "/crt-portfolio/projects/physics-grab/demo.webm",
+      alt: "Two-client Physics Grab and Fling multiplayer demonstration",
+    },
+    media: [
+      {
+        type: "video",
+        src: "/crt-portfolio/projects/physics-grab/demo.webm",
+        alt: "Two-client Physics Grab and Fling multiplayer demonstration",
+      },
+      {
+        type: "image",
+        src: "/crt-portfolio/projects/physics-grab/01-system-overview.png",
+        alt: "System overview of client prediction, server authority, and presentation",
+      },
+      {
+        type: "image",
+        src: "/crt-portfolio/projects/physics-grab/04-rotation-jitter-fix.png",
+        alt: "Before-and-after explanation of the fixed-step rotation jitter solution",
+      },
+      {
+        type: "image",
+        src: "/crt-portfolio/projects/physics-grab/03-server-validation.png",
+        alt: "Server-side validation and bounded physics decision flow",
+      },
+      {
+        type: "image",
+        src: "/crt-portfolio/projects/physics-grab/05-module-structure.png",
+        alt: "Physics Grab module structure and ownership boundaries",
+      },
+      {
+        type: "image",
+        src: "/crt-portfolio/projects/physics-grab/02-click-to-motion.png",
+        alt: "Input-to-motion sequence across client and server simulation",
+      },
+    ],
+    detailLayout: "game",
+    detailedDescription: {
+      contribution: "Designed and built the shared grab simulation, client prediction, server validation, humanoid handling, replicated presentation, impact effects, and bounded cleanup lifecycle.",
+      problem: "Multiplayer grabbing needs to feel immediate without letting a client choose authoritative outcomes, while rapid rotate input can push physics constraints into visible catch-up jitter.",
+      solution: "Ran the same bounded simulation at 60 Hz on the predicting client and authoritative server, validated acquisition and motion server-side, and converted mouse movement into cumulative input consumed once per fixed step with capped orientation advances.",
+      impact: "Delivered a tested two-client vertical slice for props and humanoids with replicated tethers, exclusive claims, escape and recovery, bounded fling outcomes, and stable high-speed rotation.",
+      highlights: [
+        "Shared 60 Hz simulation through BindToSimulation and timeline-aligned InputActions",
+        "Server-owned raycasts, exclusive claims, movement limits, and fling outcomes",
+        "Diagnosed fast-rotation jitter and fixed it with cumulative fixed-step input consumption",
+        "Replicated tethers and impact feedback without moving gameplay authority into remotes",
       ],
     },
   },
@@ -54,6 +114,7 @@ export const projects: Project[] = [
     ],
     detailLayout: "game",
     detailedDescription: {
+      contribution: "Built the round system, AI Looker behavior, cross-platform controls, persistence, networking, and progression systems.",
       problem: "Turn one readable social bluff into a complete round-based game that remains fair across desktop, gamepad, and touch.",
       solution: "Built a server-authoritative match system with role assignment, AI Looker behavior, synchronized action windows, persistence, and adaptive input UI.",
       impact: "Produced a shippable multiplayer loop with clean game-state contracts and gameplay-neutral cosmetic progression.",
@@ -97,6 +158,7 @@ export const projects: Project[] = [
     ],
     detailLayout: "game",
     detailedDescription: {
+      contribution: "Designed and built the server-authoritative economy, progression services, networking contracts, persistence, and React Lua interface.",
       problem: "Create an extensible progression game whose economy and random rewards cannot be trusted to the client.",
       solution: "Separated authoritative services for wallets, growth, seed RNG, temporary upgrades, permanent upgrades, and prestige behind type-safe networking.",
       impact: "Delivered a production-shaped MVP with isolated UI stories, release preflight checks, persistence, and monetization-ready boundaries.",
@@ -122,6 +184,7 @@ export const projects: Project[] = [
       alt: "Edgewood Remodeling website homepage and approach section",
     },
     detailedDescription: {
+      contribution: "Redesigned and implemented the responsive site, reusable service and project layouts, optimized media pipeline, navigation, and inquiry paths.",
       problem: "The client's existing website needed a current, professional replacement that represented the business clearly and helped Rhode Island homeowners evaluate its services and work.",
       solution: "Redesigned it as a responsive, photography-led experience with six service pages, three project galleries, optimized media, accessible navigation, clear inquiry paths, and technical SEO foundations.",
       impact: "Created a launch-ready client-review site that turns supplied job photography and legacy business content into a clear, credible modern web presence.",
@@ -147,6 +210,7 @@ export const projects: Project[] = [
       alt: "Stitch framework documentation",
     },
     detailedDescription: {
+      contribution: "Designed the framework architecture, package API, styling utilities, theme system, documentation, demos, and hot-reload workflow.",
       problem: "Roblox teams need repeatable visual primitives and fast iteration without rebuilding styling conventions in every experience.",
       solution: "Created a package-first UI framework with React integration, theme tokens, Tailwind-style utilities, custom components, documentation, and hot reload.",
       impact: "Established a shared interface foundation consumable by multiple games through pinned package releases.",
@@ -173,6 +237,7 @@ export const projects: Project[] = [
       alt: "ToonSync social discovery homepage and recommendation feed",
     },
     detailedDescription: {
+      contribution: "Built the responsive application, authentication and data model, social flows, recommendation feeds, custom lists, and external catalog integrations.",
       problem: "Media discovery is scattered across separate movie, television, and music services, while recommendations from friends get lost in messages.",
       solution: "Built a unified responsive app with guest libraries, accounts, friend requests, recommendation feeds, custom lists, and external catalog integrations.",
       impact: "Created one social layer for discovering and sharing entertainment across TMDB and Deezer-backed catalogs.",
@@ -243,6 +308,7 @@ export const projects: Project[] = [
       },
     ],
     detailedDescription: {
+      contribution: "Designed and developed the Flutter interface and coordinated its image, classification, and confidence-result exchange with the Flask backend.",
       problem: "Dermatologists need fast, consistent decision support when reviewing skin-lesion images without replacing clinical judgment.",
       solution: "Developed the Flutter frontend for a real-time screening workflow and collaborated on a cloud-deployed YOLO system trained on roughly 10,000 images.",
       impact: "Earned 2nd Place in the NVIDIA Track at Hack@URI.",
@@ -294,6 +360,7 @@ export const projects: Project[] = [
       },
     ],
     detailedDescription: {
+      contribution: "Helped build and integrate the local multi-agent clinical reasoning system for the NVIDIA DGX deployment target.",
       problem: "Emergency clinicians need useful differential reasoning in the short window between triage and physician assessment without sending PHI to cloud services.",
       solution: "Built a local pipeline that normalizes FHIR cases, runs four specialist agents in parallel, grounds claims, debates disagreements, synthesizes a differential, and vetoes unsafe recommendations.",
       impact: "Earned 2nd Place in the NVIDIA DGX Track with an architecture optimized for DGX systems.",
@@ -320,6 +387,7 @@ export const projects: Project[] = [
       alt: "Maze generator in action",
     },
     detailedDescription: {
+      contribution: "Implemented the maze representation, iterative backtracking generator, wall encoding, command-line controls, and export flow in C++.",
       problem: "Learning algorithmic thinking and data structure optimization",
       solution:
         "Explored C++ maze generation using iterative backtracking with stack-based approach",
@@ -347,6 +415,7 @@ export const projects: Project[] = [
       alt: "Zombies multiplayer gameplay",
     },
     detailedDescription: {
+      contribution: "Led a 10-person team and built the inventory, weapons, projectile physics, and collision systems.",
       problem:
         "Learning game development and team collaboration through hands-on project",
       solution:
@@ -376,6 +445,7 @@ export const projects: Project[] = [
       alt: "Project Manager Pro interface",
     },
     detailedDescription: {
+      contribution: "Collaborated in a four-person team and focused on the normalized SQL schema, full-stack integration, performance, and accessible UI.",
       problem: "Learning full-stack development and database design principles",
       solution:
         "Built project management app to explore SQL normalization and web development",
@@ -397,6 +467,7 @@ export const projects: Project[] = [
     status: "Freelance Client Work",
     tech: ["Luau", "Roblox Studio", "NPC State Machines", "Roblox Physics"],
     detailedDescription: {
+      contribution: "Implemented and revised Lime and The Returned, including their state-driven behavior, object interactions, transformation logic, and client-specific perception.",
       problem: "Corruption Co. needed horror enemies that reacted to player attention, distance, pursuit, thrown objects, and misleading client-side information instead of following a basic chase loop.",
       solution: "Implemented and revised state-driven behavior for Lime, Baby Purple, and The Returned, including pursuit and retreat thresholds, capture interactions, item handling, hidden role changes, and client-specific perception.",
       impact: "Delivered the revised Lime behavior and The Returned transformation system, then traced a remaining spawn hitch to a roughly 100,000-triangle character model and advised the client to optimize the asset.",

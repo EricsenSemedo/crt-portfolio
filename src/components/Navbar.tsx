@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
-import useDirectionalFill from "../hooks/useDirectionalFill";
 import useScrambleText from "../hooks/useScrambleText";
 import { getSmartHeaderVisualState } from "../utils/smartHeaderMotion";
+import CRTIconButton from "./CRTIconButton";
 
 interface NavbarProps {
   title: string;
@@ -15,8 +15,6 @@ interface NavbarProps {
 export default function Navbar({ title, onClose }: NavbarProps) {
   const headerRef = useRef<HTMLDivElement>(null);
   const offsetRef = useRef(0);
-  const closeFill = useDirectionalFill<HTMLButtonElement>();
-  const closeLabel = useScrambleText("X");
   const marqueeLabel = useScrambleText(title, false, { autoPlay: "touch", delay: 300 });
   const marqueeItems = Array.from({ length: 12 }, (_, index) => (
     <span key={index}>{marqueeLabel.visibleLabel}</span>
@@ -119,26 +117,15 @@ export default function Navbar({ title, onClose }: NavbarProps) {
           <div className="channel-marquee__group h-full items-center">{marqueeItems}</div>
         </div>
       </div>
-      <button
+      <CRTIconButton
         onClick={onClose}
-        onPointerEnter={(event) => {
-          if (closeFill.handlePointerEnter(event)) closeLabel.scramble();
-        }}
-        onPointerLeave={closeFill.handlePointerLeave}
-        onFocus={(event) => {
-          if (!event.currentTarget.matches(":focus-visible")) return;
-          closeFill.handleFocus();
-          closeLabel.scramble();
-        }}
-        onBlur={closeFill.handleBlur}
-        className="crt-action-shell crt-action-shell--close group pointer-events-auto relative h-full overflow-hidden border-l border-white/30 px-5 text-crt-text/80 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-crt-accent cursor-pointer"
-        aria-label="Close"
+        className="pointer-events-auto h-full border-l border-white/30 px-5"
+        label="Return to TV room"
       >
-        <span className={"absolute inset-0 bg-white transition-transform duration-200 ease-out " + (closeFill.fillOrigin === "top" ? "origin-top " : "origin-bottom ") + (closeFill.fillVisible ? "scale-y-100" : "scale-y-0")} aria-hidden="true" />
-        <span className={"crt-action-content relative z-10 block w-5 text-center font-mono text-xl leading-none transition-colors " + (closeFill.fillVisible ? "text-[#111]" : "text-crt-text/80")} aria-hidden="true">
-          {closeLabel.visibleLabel}
-        </span>
-      </button>
+        <svg className="h-5 w-5 fill-current" viewBox="0 0 24 24">
+          <path d="M12 2.7 2.5 10.5l1.3 1.6 1.2-1v9.4h5.5v-5.7h3v5.7H19v-9.4l1.2 1 1.3-1.6L12 2.7Z" />
+        </svg>
+      </CRTIconButton>
     </div>
   );
 }

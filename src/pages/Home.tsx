@@ -61,10 +61,14 @@ export default function Home({ onNavigate }: HomeProps) {
               Computer Science Graduate | Software Developer
             </h2>
           </div>
-          <p className="crt-reading-width mx-auto leading-relaxed text-crt-text-tertiary">
-            Computer science graduate and software developer working across cloud infrastructure,
-            full-stack applications, AI systems, and games.
-          </p>
+        </section>
+
+        {/* Education Section */}
+        <section className="crt-scroll-reveal py-12 text-center">
+          <h3 className="font-display text-2xl font-semibold tracking-wide text-crt-accent">Education</h3>
+          <p className="mt-5 text-crt-text-secondary">University of Rhode Island</p>
+          <p className="mt-2 text-sm text-crt-text-tertiary">Bachelor of Arts in Computer Science</p>
+          <p className="mt-1 text-sm text-crt-text-tertiary">Graduated May 2025</p>
         </section>
 
         {/* Skills Section */}
@@ -101,19 +105,13 @@ export default function Home({ onNavigate }: HomeProps) {
           </div>
         </section>
 
-        {/* Education & Stats */}
-        <section className="grid md:grid-cols-3">
-          <div className="crt-scroll-reveal py-8 md:pr-8">
-            <h4 className="font-display text-lg font-semibold tracking-wide text-crt-accent">Education</h4>
-            <p className="mt-4 text-crt-text-secondary">University of Rhode Island</p>
-            <p className="mt-1 text-sm text-crt-text-tertiary">Bachelor of Arts in Computer Science</p>
-            <p className="mt-1 text-sm text-crt-text-tertiary">Graduated May 2025</p>
-          </div>
-          <div className="crt-scroll-reveal py-8 md:px-8">
+        {/* Stats */}
+        <section className="grid gap-10 py-8 text-center sm:grid-cols-2">
+          <div className="crt-scroll-reveal">
             <div className="font-display text-3xl font-bold text-crt-accent">1+</div>
             <div className="mt-3 text-sm uppercase tracking-[0.16em] text-crt-text-tertiary">Years Professional</div>
           </div>
-          <div className="crt-scroll-reveal py-8 md:pl-8">
+          <div className="crt-scroll-reveal">
             <div className="font-display text-3xl font-bold text-crt-secondary">{projects.length}+</div>
             <div className="mt-3 text-sm uppercase tracking-[0.16em] text-crt-text-tertiary">Projects Built</div>
           </div>

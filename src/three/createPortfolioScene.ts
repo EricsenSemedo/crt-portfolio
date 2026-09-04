@@ -245,6 +245,14 @@ export function createPortfolioScene(): PortfolioSceneController {
       importedResources.push(importedTable);
     }
   });
+  void loadPlayStation2Model().then((playStation) => {
+    if (!playStation) return;
+    if (isDisposed) playStation.dispose();
+    else {
+      scene.add(playStation.group);
+      importedResources.push(playStation);
+    }
+  });
   void loadRealisticTelevisions(channels, () => isDisposed).then((televisions) => {
     if (!televisions) return;
     if (isDisposed) televisions.dispose();
@@ -872,6 +880,37 @@ async function loadIndustrialTable() {
     const scaledBounds = new Box3().setFromObject(group);
     const scaledCenter = scaledBounds.getCenter(new Vector3());
     group.position.set(-scaledCenter.x, -1.14 - scaledBounds.min.y, TABLE_COLLIDER.centerZ - scaledCenter.z);
+    group.traverse((object) => {
+      if (!(object instanceof Mesh)) return;
+      object.castShadow = true;
+      object.receiveShadow = true;
+    });
+    return { group, dispose: () => disposeObjectTree(group) };
+  } catch {
+    return null;
+  }
+}
+
+async function loadPlayStation2Model() {
+  try {
+    const result = await new GLTFLoader().loadAsync(
+      `${import.meta.env.BASE_URL}models/playstation2/playstation2.glb`,
+    );
+    const group = result.scene;
+    group.name = "PlayStation2-Blendkit";
+    group.updateMatrixWorld(true);
+    const sourceBounds = new Box3().setFromObject(group);
+    const sourceSize = sourceBounds.getSize(new Vector3());
+    group.scale.setScalar(1.08 / Math.max(sourceSize.x, 0.001));
+    group.updateMatrixWorld(true);
+    const scaledBounds = new Box3().setFromObject(group);
+    const scaledCenter = scaledBounds.getCenter(new Vector3());
+    group.position.set(
+      0.78 - scaledCenter.x,
+      -1.12 - scaledBounds.min.y,
+      0.02 - scaledCenter.z,
+    );
+    group.rotation.y = -0.2;
     group.traverse((object) => {
       if (!(object instanceof Mesh)) return;
       object.castShadow = true;
