@@ -1,54 +1,27 @@
 # CRT Portfolio
 
-Retro CRT television portfolio site. React 19, TypeScript, Vite 7, Tailwind CSS v4, Framer Motion v12. Deployed to GitHub Pages at `/crt-portfolio/`.
+Frontend-only React/TypeScript SPA with Three.js, Vite, Tailwind CSS, and Framer Motion.
 
-## Core Priorities
+## Working rules
 
-Performance first. Reliability first. Keep behavior predictable under load and during failures (session restarts, reconnects, partial streams).
+- Prefer Bun and `bunx`. Scripts are listed in `package.json`; run `bun run lint`,
+  `bun run test`, and `bun run build` before submitting changes. Build includes type-checking.
+- Favor correctness, performance, and reliability. Keep shared behavior in one module
+  rather than duplicating it across callers.
+- Match surrounding formatting; no Prettier. Use relative imports, function declarations
+  for components, and inline `type` imports. Use string unions instead of enums.
+- Use React state and refs; do not introduce an external state library or clsx.
+- Keep PRs focused (normally 50–150 lines). Run `cr review --base main` before submitting.
 
-If a tradeoff is required, choose correctness and robustness over short-term convenience.
+## Local preview
 
-## Maintainability
+GitHub Pages and Vite use `/crt-portfolio/`, including in development.
+Run `bun run dev --host 0.0.0.0 --port 5173` and open
+`http://localhost:5173/crt-portfolio/`.
 
-Long-term maintainability is a core priority. Before adding functionality, check if there is shared logic that can be extracted to a separate module. Duplicate logic across files is a code smell. Don't take shortcuts by adding local logic — change existing code instead.
+## Project scope
 
-## Commands
-
-| Command | Description |
-| --- | --- |
-| `bun run dev` | Vite dev server with HMR |
-| `bun run build` | Production build (also type-checks) |
-| `bun run lint` | ESLint |
-| `bun run test` | Vitest (single run) |
-| `bun run test:watch` | Vitest (watch mode) |
-
-Type-check without building: `bunx tsc --noEmit`
-
-## Non-obvious conventions
-
-- **No Prettier.** Semicolons are inconsistent across files — match the file you're editing.
-- **Relative imports only.** `@/*` alias exists in tsconfig but is unused — stay consistent with relative paths.
-- **Function declarations** for components, not arrow functions: `export default function Name(...)`.
-- **No enums.** Use string literal unions.
-- **No clsx.** Use string concatenation for conditional classes.
-- **No external state library.** `useState`/`useRef` only.
-- **Inline `type` keyword** in imports: `import { useState, type ReactNode } from "react"`.
-
-## PRs
-
-Keep PRs small (50–150 lines). Run `cr review --base main` before submitting.
-
-## Cursor Cloud specific instructions
-
-- **Frontend-only SPA.** No backend, database, Docker, secrets, or external services required.
-- **Base path gotcha**: Dev server serves at `/crt-portfolio/`, not `/`. Navigate to `http://localhost:5173/crt-portfolio/` when testing.
-- Start dev server with `bun run dev --host 0.0.0.0 --port 5173` for remote access.
-
-## Living Documents
-
-- **[PRD.md](./PRD.md)** — Product requirements, architecture, and task tracker.
-- **[LEARNING.md](./LEARNING.md)** — Technology proficiency tracker.
-
-## Learned Workspace Facts
-
-- This project is in "ship and stop" mode — finite work, not a recurring polish track. Land the queued design PRs, declare the CRT aesthetic done, and move on. Do not propose additional polish PRs once the stacked queue ships; the portfolio earns more time only when a new showcaseable project (e.g. plant, robingo) is shipped.
+[PRD.md](./PRD.md) tracks product requirements and architecture;
+[LEARNING.md](./LEARNING.md) tracks technology proficiency.
+This is finite, ship-and-stop work. Finish the requested queue without proposing
+ongoing aesthetic polish; further portfolio expansion should follow a new showcaseable project.

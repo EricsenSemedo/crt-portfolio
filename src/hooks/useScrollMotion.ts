@@ -41,8 +41,8 @@ export default function useScrollMotion(
   initializationDelay = 0,
 ) {
   useEffect(() => {
-    const root = rootRef.current;
-    if (!root || !lifecycleKey) return;
+    if (!rootRef.current || !lifecycleKey) return;
+    const root: HTMLElement = rootRef.current;
 
     const lenisBySurface = new Map<HTMLElement, Lenis>();
     const nativeSurfaces = new Set<HTMLElement>();
