@@ -55,6 +55,9 @@ describe("DemoChannel", () => {
     const retry = [...container.querySelectorAll("button")].find((button) => button.textContent === "Retry media")!;
     act(() => retry.click());
     expect(container.querySelector("img")?.getAttribute("src")).toBe("/missing.png");
+    act(() => container.querySelector("img")!.dispatchEvent(new Event("error")));
+    act(() => root.render(<DemoChannel project={{ ...project, id: "another-project" }} />));
+    expect(container.querySelector("img")?.getAttribute("src")).toBe("/missing.png");
   });
 
 });

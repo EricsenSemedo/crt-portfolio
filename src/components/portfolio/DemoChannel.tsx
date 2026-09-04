@@ -22,6 +22,7 @@ export default function DemoChannel({ project }: DemoChannelProps) {
   const pendingIndex = useRef<number | null>(null);
 
   useEffect(() => {
+    setFailedSource(null);
     setActiveIndex(0);
     setIsTuning(false);
     pendingIndex.current = null;
@@ -130,12 +131,12 @@ export default function DemoChannel({ project }: DemoChannelProps) {
           )}
           
           {/* Overlay for placeholder only */}
-          {demo?.src.includes('placeholder') && (
+          {activeMedia?.src.includes('placeholder') && failedSource !== activeMedia.src && (
             <div className="absolute inset-0 flex items-center justify-center bg-crt-surface-secondary">
               <div className="text-center">
                 <div className="text-6xl mb-4">📹</div>
                 <p className="text-crt-text-tertiary">Demo video coming soon</p>
-                <p className="text-sm text-crt-text-muted mt-2">{demo.alt}</p>
+                <p className="text-sm text-crt-text-muted mt-2">{activeMedia.alt}</p>
               </div>
             </div>
           )}
