@@ -22,6 +22,7 @@ it("contains keyboard focus, includes media controls, and restores the opener", 
       <button>First</button>
       <video controls tabIndex={0} />
       <video controls tabIndex={-1} />
+      <video controls tabIndex={-2} />
     </div>;
   }
   try {
