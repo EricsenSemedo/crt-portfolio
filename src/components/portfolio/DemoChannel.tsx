@@ -82,7 +82,8 @@ export default function DemoChannel({ project }: DemoChannelProps) {
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
       transition={{ duration: 0.3 }}
-      className="flex h-full flex-col items-center justify-start overflow-y-auto p-4 sm:p-8"
+      className="flex h-full flex-col items-center justify-start overflow-y-auto overscroll-y-contain p-4 sm:p-8"
+      data-lenis-prevent
     >
       <div className="mx-auto w-full max-w-6xl">
         <ProjectContentHeading

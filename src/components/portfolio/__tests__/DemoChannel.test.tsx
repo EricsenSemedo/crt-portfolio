@@ -1,4 +1,5 @@
 import { act } from "react";
+import Lenis from "lenis";
 import { createRoot, type Root } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import projects from "../../../data/projects";
@@ -58,6 +59,29 @@ describe("DemoChannel", () => {
     act(() => container.querySelector("img")!.dispatchEvent(new Event("error")));
     act(() => root.render(<DemoChannel project={{ ...project, id: "another-project" }} />));
     expect(container.querySelector("img")?.getAttribute("src")).toBe("/missing.png");
+  });
+
+  it("keeps demo wheel input native while the surrounding gallery uses Lenis", () => {
+    act(() => root.render(<DemoChannel project={projects[0]} />));
+    const gallery = new Lenis({
+      wrapper: container,
+      content: container.firstElementChild as HTMLElement,
+      autoResize: false,
+      autoRaf: false,
+      smoothWheel: true,
+    });
+
+    try {
+      const demoWheel = new WheelEvent("wheel", { deltaY: 500, bubbles: true, cancelable: true });
+      container.querySelector("video")!.dispatchEvent(demoWheel);
+      expect(demoWheel.defaultPrevented).toBe(false);
+
+      const galleryWheel = new WheelEvent("wheel", { deltaY: 500, bubbles: true, cancelable: true });
+      container.dispatchEvent(galleryWheel);
+      expect(galleryWheel.defaultPrevented).toBe(true);
+    } finally {
+      gallery.destroy();
+    }
   });
 
 });
