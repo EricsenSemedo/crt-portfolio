@@ -77,7 +77,6 @@ export default function Portfolio({ onNavigate, onProjectDetailOpenChange }: Por
               key={project.id}
               project={project}
               onClick={() => openProject(project)}
-              isSelected={selectedProject?.id === project.id}
             />
           ))}
         </section>
@@ -95,7 +94,6 @@ export default function Portfolio({ onNavigate, onProjectDetailOpenChange }: Por
               key={project.id}
               project={project}
               onClick={() => openProject(project)}
-              isSelected={selectedProject?.id === project.id}
             />
           ))}
         </section>
