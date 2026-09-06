@@ -50,7 +50,7 @@ export default function DescriptionChannel({ project }: DescriptionChannelProps)
         <div className="space-y-8">
           {isHackathon && (
             <div className="border border-crt-accent p-6">
-              <p className="crt-scroll-reveal font-mono text-xs uppercase tracking-[.2em] text-crt-accent mb-2">Competition Result</p>
+              <p className="crt-scroll-reveal font-mono text-xs uppercase tracking-[.2em] text-crt-accent-text mb-2">Competition Result</p>
               <p className="crt-scroll-reveal font-display text-3xl font-bold text-crt-text">{project.status}</p>
             </div>
           )}
@@ -62,7 +62,7 @@ export default function DescriptionChannel({ project }: DescriptionChannelProps)
                 {hackathonSteps.map((step, index) => (
                   <div key={step.label} className="relative pb-8 last:pb-0">
                     <span className="absolute -left-[2rem] top-1 block h-2.5 w-2.5 bg-crt-accent" aria-hidden="true" />
-                    <p className="crt-scroll-reveal font-mono text-xs uppercase tracking-[.2em] text-crt-accent">{String(index + 1).padStart(2, "0")} / {step.label}</p>
+                    <p className="crt-scroll-reveal font-mono text-xs uppercase tracking-[.2em] text-crt-accent-text">{String(index + 1).padStart(2, "0")} / {step.label}</p>
                     <h3 className="crt-scroll-reveal mt-2 text-xl font-display font-bold text-crt-text">{step.title}</h3>
                     <p className="crt-scroll-reveal mt-2 max-w-3xl leading-relaxed text-crt-text-secondary">{step.description}</p>
                   </div>
@@ -76,7 +76,7 @@ export default function DescriptionChannel({ project }: DescriptionChannelProps)
                 {overviewSteps.map((step, index) => (
                   <div key={step.label} className="relative pb-8 last:pb-0">
                     <span className="absolute -left-[2rem] top-1 block h-2.5 w-2.5 bg-crt-accent" aria-hidden="true" />
-                    <p className="crt-scroll-reveal font-mono text-xs uppercase tracking-[.2em] text-crt-accent">
+                    <p className="crt-scroll-reveal font-mono text-xs uppercase tracking-[.2em] text-crt-accent-text">
                       {String(index + 1).padStart(2, "0")} / {step.label}
                     </p>
                     <h3 className="crt-scroll-reveal mt-2 font-display text-xl font-bold text-crt-text">{step.title}</h3>
@@ -89,7 +89,7 @@ export default function DescriptionChannel({ project }: DescriptionChannelProps)
           
           {/* Key Highlights */}
           {!isHackathon && <div className="pt-4">
-            <h3 className="crt-scroll-reveal mb-4 font-display text-xl font-bold text-crt-accent">{isGame ? "Key Systems" : "Technical Highlights"}</h3>
+            <h3 className="crt-scroll-reveal mb-4 font-display text-xl font-bold text-crt-accent-text">{isGame ? "Key Systems" : "Technical Highlights"}</h3>
             <ul className="space-y-2">
               {project.detailedDescription.highlights.map((highlight, index) => (
                 <li key={index} className="crt-scroll-reveal">
@@ -101,12 +101,12 @@ export default function DescriptionChannel({ project }: DescriptionChannelProps)
           
           {/* Tech Stack */}
           <div className="text-center">
-            <h3 className="crt-scroll-reveal text-xl font-display font-bold text-crt-accent mb-4">Technologies Used</h3>
+            <h3 className="crt-scroll-reveal text-xl font-display font-bold text-crt-accent-text mb-4">Technologies Used</h3>
             <div className="flex flex-wrap justify-center gap-2">
               {project.tech.map((tech) => (
                 <span
                   key={tech}
-                  className="border border-crt-accent/30 bg-crt-accent/20 px-4 py-2 font-mono text-crt-accent-hover"
+                  className="border border-crt-accent/30 bg-crt-accent/20 px-4 py-2 font-mono text-crt-accent-text"
                 >
                   <span className="crt-scroll-reveal inline-block">{tech}</span>
                 </span>
