@@ -10,7 +10,7 @@ interface TVShellProps {
 
 /**
  * TVShell - The physical CRT television hardware: plastic body, bezel, screen, vents, indicators.
- * All colors use theme tokens so the shell adapts to dark/light mode.
+ * All colors use shared CRT palette tokens.
  */
 export default function TVShell({
   children,

@@ -6,8 +6,8 @@ interface CRTVignetteProps {
 
 /**
  * CRTVignette - Subtle vignette effect that mimics CRT monitor darkening at edges.
- * Uses --crt-vignette-color token (always dark, even in light mode).
- * Scales with --crt-vignette-opacity for theme-aware intensity.
+ * Uses --crt-vignette-color for the darkened edges.
+ * Scales with --crt-vignette-opacity for the effect intensity.
  */
 export default function CRTVignette({ 
   intensity = 0.3, 
