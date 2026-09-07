@@ -17,14 +17,24 @@ function getFocusableElements(container: HTMLElement): HTMLElement[] {
     'input:not([disabled])',
     'select:not([disabled])',
     'textarea:not([disabled])',
-    '[tabindex]:not([tabindex="-1"])',
+    '[tabindex]',
+    'video[controls]',
+    'audio[controls]',
   ];
 
   return Array.from(container.querySelectorAll<HTMLElement>(selectors.join(","))).filter((element) => {
-    return !element.hasAttribute("disabled") &&
+    for (let ancestor = element.parentElement; ancestor; ancestor = ancestor.parentElement) {
+      if (getComputedStyle(ancestor).display === "none") return false;
+      if (ancestor === container) break;
+    }
+    const tabIndex = Number(element.getAttribute("tabindex"));
+    return !(Number.isInteger(tabIndex) && tabIndex < 0) &&
+      !element.hasAttribute("disabled") &&
       !element.inert &&
       element.closest("[inert]") === null &&
-      element.getAttribute("aria-hidden") !== "true";
+      element.closest('[hidden], [aria-hidden="true"]') === null &&
+      getComputedStyle(element).display !== "none" &&
+      getComputedStyle(element).visibility !== "hidden";
   });
 }
 
@@ -102,7 +112,7 @@ export function useModalAccessibility({
       const firstFocusable = focusableElements[0];
       const lastFocusable = focusableElements[focusableElements.length - 1];
       const activeElement = document.activeElement instanceof HTMLElement ? document.activeElement : null;
-      const isOutsideDialog = !activeElement || !dialogEl.contains(activeElement);
+      const isOutsideDialog = !activeElement || !dialogEl.contains(activeElement) || activeElement === dialogEl;
 
       if (event.shiftKey) {
         if (isOutsideDialog || activeElement === firstFocusable) {
