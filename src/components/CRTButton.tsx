@@ -15,7 +15,7 @@ interface CRTButtonProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, '
 
 /**
  * CRTButton - Button component with nostalgic CRT TV-themed hover and click animations.
- * Uses theme tokens for colors so variants adapt to dark/light mode.
+ * Uses shared CRT color tokens for button variants.
  */
 export default function CRTButton({ 
   children, 

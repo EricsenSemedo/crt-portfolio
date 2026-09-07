@@ -6,7 +6,7 @@ Personal portfolio website styled as a retro CRT television interface. Three TV 
 (Home, Portfolio, Contact) are arranged on a pannable/zoomable stage. Clicking a TV
 zooms the camera in and opens a full-screen overlay with page content rendered inside
 CRT visual effects (scanlines, vignette, static noise, sweep-line animation). The site
-supports dark/light theming with effect intensities that scale per mode.
+uses one authored dark CRT palette with shared color and effect tokens.
 
 ## Problem
 
@@ -19,8 +19,7 @@ interaction design skills while presenting project work.
 - [x] CRT television metaphor with physical TV shells, scanlines, vignette, and static noise
 - [x] Camera/zoom system for TV selection with smooth Framer Motion animations
 - [x] Full-screen TVZoomOverlay with CRT sweep-line reveal animation
-- [x] Dark/light theming via CSS custom properties with View Transitions API
-- [x] Theme-aware CRT effect intensity scaling (opacity multipliers per mode)
+- [x] One dark CRT palette via CSS custom properties and shared effect intensities
 - [x] Portfolio gallery with per-project detail views (demo channel + description channel)
 - [x] Parallax mouse-following background with spring physics
 - [x] Responsive layout (mobile-first, flex-based TV arrangement)
@@ -33,13 +32,14 @@ interaction design skills while presenting project work.
 - [ ] Global keyboard shortcuts for TV navigation
 - [ ] Sound effects via Howler.js (dependency already installed but unused)
 - [ ] SEO and social sharing meta tags
-- [ ] Comprehensive test coverage beyond ThemeProvider
+- [ ] Expand utility, hook, component, and scene test coverage
 
 ## Non-Goals
 
 - No backend, database, or server-side rendering
 - No CMS or dynamic content management
 - No user authentication or form submissions (contact is links-only)
+- No light/dark mode switch or saved theme preference
 - No routing library (single-page app with modal-based navigation)
 - No external analytics or tracking scripts
 - No IE or legacy browser support
@@ -49,18 +49,16 @@ interaction design skills while presenting project work.
 ```
 index.html
   └─ main.tsx
-      └─ ThemeProvider (context: theme, toggleTheme, setTheme)
-          └─ App
-              ├─ ThemeToggle (fixed position, bottom-right)
-              ├─ ParallaxBackground (mouse-tracking spring offset)
-              │   └─ PanStage (camera: translate/scale via Framer Motion controls)
-              │       └─ TVShell x3 (Home, Portfolio, Contact)
-              │           └─ StaticNoise (idle state)
-              └─ TVZoomOverlay (when selectedId && !isAnimating)
-                  ├─ Navbar (title + close button)
-                  ├─ CRTScanlines + CRTVignette
-                  └─ Page content (Home | Portfolio | Contact)
-                      └─ Portfolio ─→ ProjectDetailView (nested modal)
+      └─ App
+          ├─ ParallaxBackground (mouse-tracking spring offset)
+          │   └─ PanStage (camera: translate/scale via Framer Motion controls)
+          │       └─ TVShell x3 (Home, Portfolio, Contact)
+          │           └─ StaticNoise (idle state)
+          └─ TVZoomOverlay (when selectedId && !isAnimating)
+              ├─ Navbar (title + close button)
+              ├─ CRTScanlines + CRTVignette
+              └─ Page content (Home | Portfolio | Contact)
+                  └─ Portfolio ─→ ProjectDetailView (nested modal)
 ```
 
 ### Key Patterns
@@ -75,18 +73,19 @@ index.html
   `inert`/`aria-hidden` on background, and an `activeModalStack` array for nested modals
   (TVZoomOverlay > ProjectDetailView).
 
-- **Theme system:** CSS custom properties with `rgb(var(--token))` pattern for
+- **CRT palette:** CSS custom properties with `rgb(var(--token))` pattern for
   alpha-composable colors. Tailwind v4 `@theme` directive maps tokens to utility classes.
-  `ThemeProvider` with localStorage persistence. `applyTheme` uses View Transitions API
-  with CSS transition-class fallback.
+  The root palette and browser color scheme are always dark; no theme state or storage is used.
 
 - **CRT effects:** Composable overlay components (CRTScanlines, CRTVignette, StaticNoise)
   with intensity props. Effect opacities multiply with CSS variable multipliers
-  (`--crt-scanline-opacity`, etc.) that differ between dark (1.0) and light (0.4–0.6) themes.
+  (`--crt-scanline-opacity`, etc.) for the authored dark palette.
 
 ## Task Tracker
 
 ### Completed
+
+Historical theme work below was retired in PR #60; shared CRT palette tokens remain.
 
 - [x] Initial project scaffold (Vite + React + TypeScript)
 - [x] PanStage camera system with zoom animations
@@ -140,9 +139,8 @@ index.html
 | Lighthouse Performance | > 90 | TBD |
 | Lighthouse Accessibility | > 90 | TBD |
 | TypeScript strict mode | Zero errors | Achieved |
-| Theme transition smoothness | No layout shift | Achieved |
 | Mobile performance | Smooth zoom on mid-range devices | Achieved (Firefox fallback) |
-| Test coverage | Key utilities + hooks | ThemeProvider only |
+| Test coverage | Key utilities + hooks | Utilities, hooks, components, and scene geometry |
 
 ## Learning-First Philosophy
 
@@ -156,3 +154,4 @@ and `AGENTS.md` "Learning-First Development" section for full requirements.
 | Date | Change |
 |------|--------|
 | 2026-04-04 | Initial PRD created |
+| 2026-09-07 | Removed unused theme switching, persistence, and transitions; kept the dark CRT palette (PR #60) |

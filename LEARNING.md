@@ -24,7 +24,7 @@ Owner knowledge profile for calibrating PR explanations and code comments.
 | `useState` / `useRef` / `useEffect` | familiar | Core state management, no external libraries |
 | `useCallback` / `useMemo` | learning | Used in PanStage and App to prevent stale closures and unnecessary re-renders |
 | `forwardRef` / `useImperativeHandle` | learning | PanStage exposes imperative API (`reset`, `centerOn`, `selectTV`) |
-| Context API (`createContext`, `useContext`) | familiar | ThemeProvider / `useTheme` pattern |
+| Context API (`createContext`, `useContext`) | familiar | Previously practiced with theme context; feature retired in PR #60 |
 | `Children.toArray` / ReactElement casting | learning | PanStage iterates children to inject click handlers dynamically |
 | TypeScript strict mode | familiar | Zero errors, `noUnusedLocals`, `noUnusedParameters` |
 | String literal union types | learning | Used instead of enums per project convention |
@@ -42,7 +42,7 @@ Owner knowledge profile for calibrating PR explanations and code comments.
 | `useMotionValue` / `useSpring` | learning | ParallaxBackground mouse-following with spring physics |
 | `layoutId` animations | learning | ProjectTV to ProjectDetailView iOS App Store-style expansion |
 | `whileHover` / `whileTap` | familiar | Micro-interactions on buttons, TV shells |
-| `useReducedMotion` | learning | ThemeToggle respects `prefers-reduced-motion` media query |
+| `useReducedMotion` | learning | CRTButton respects the reduced-motion preference |
 
 ### Tailwind CSS v4
 
@@ -51,7 +51,7 @@ Owner knowledge profile for calibrating PR explanations and code comments.
 | `@theme` directive | new | Maps CSS custom properties to Tailwind utility classes in v4 |
 | `@import "tailwindcss"` | new | v4 replaces `@tailwind base/components/utilities` directives with single import |
 | CSS custom properties with `rgb()` pattern | learning | `rgb(var(--token))` enables alpha composition in Tailwind utilities |
-| Class-based theme toggling | familiar | `.light` class on `<html>`, `@theme` reads same CSS tokens |
+| Class-based theme toggling | familiar | Previously used a `.light` class; now one dark palette (PR #60) |
 | `bg-linear-to-r` | new | v4 canonical name replaces `bg-gradient-to-r` |
 | `shrink-0` vs `flex-shrink-0` | new | v4 canonical utility names differ from v3 |
 | Content configuration | familiar | `content` array in tailwind.config.js |
@@ -66,21 +66,21 @@ Owner knowledge profile for calibrating PR explanations and code comments.
 | `role="dialog"` | familiar | Applied to overlay containers |
 | `role="button"` + `tabIndex` | learning | PanStage child items are interactive divs, need keyboard semantics |
 | `focus-visible` ring | familiar | Consistent `:focus-visible` styling across interactive elements |
-| `prefers-reduced-motion` | learning | Respected in ParallaxBackground, ThemeToggle, theme transitions |
+| `prefers-reduced-motion` | learning | Respected in ParallaxBackground and CRTButton |
 | Modal stack management | learning | `activeModalStack` array for nested modals (TVZoomOverlay > ProjectDetailView) |
-| Color contrast across themes | learning | Separate accent values for dark (400-level) vs light (600-level) to meet WCAG AA |
+| Color contrast across themes | learning | Previously practiced with light/dark palettes; current text accents are separate from filled controls |
 
 ### Tooling
 
 | Concept | Level | Notes |
 |---------|-------|-------|
 | Vite 7 (dev server, HMR, build) | familiar | Base path `/crt-portfolio/` configured for GitHub Pages |
-| Vitest 4 with jsdom | learning | Unit tests for ThemeProvider / themeUtils |
+| Vitest 4 with jsdom | learning | Tests for components, accessibility hooks, scrolling, and scene geometry |
 | ESLint 9 flat config | learning | typescript-eslint, react-hooks, react-refresh plugins |
 | bun package manager | new | Project uses `bun run` commands, `bun.lock` |
 | GitHub Pages deployment | familiar | Automated via `.github/workflows/deploy.yml` on push to main |
 | PostCSS + autoprefixer | familiar | Tailwind v4 build pipeline |
-| View Transitions API | new | `document.startViewTransition()` for smooth theme crossfade |
+| View Transitions API | new | Previously used for theme crossfade; feature retired in PR #60 |
 | Howler.js | new | Audio library in dependencies, not yet integrated |
 
 ### Architecture / Patterns
@@ -90,7 +90,7 @@ Owner knowledge profile for calibrating PR explanations and code comments.
 | Camera / zoom system | learning | PanStage: viewport-relative centering, `requestAnimationFrame` timing, ref-backed state |
 | CRT visual effects pipeline | familiar | Composable overlays: scanlines, vignette, noise, bloom, sweep-line reveal |
 | CSS design token architecture | learning | Layered: CSS vars -> `@theme` -> Tailwind utilities -> components |
-| Theme intensity multipliers | new | `--crt-scanline-opacity` etc. scale CRT effect intensity per theme mode |
+| CRT intensity multipliers | new | `--crt-scanline-opacity` etc. scale CRT effects within the dark palette |
 | Imperative ref API for navigation | learning | `useImperativeHandle` exposing `selectTV`, `reset`, `centerOn` on PanStage |
 | Pending navigation pattern | learning | `pendingNavigation` state in App for sequential zoom-out-then-zoom-in transitions |
 | Progressive 3D asset loading and placeholder handoff | learning | Procedural scene renders immediately; GLTF/HDR assets replace it only after asynchronous downloads finish |

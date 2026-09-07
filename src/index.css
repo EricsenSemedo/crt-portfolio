@@ -66,9 +66,7 @@
 /*
  * CRT Portfolio Design Tokens
  *
- * Theme strategy: class-based toggling on <html>.
- * Dark = CRT in a dim room (phosphor glow, deep blacks).
- * Light = CRT in a bright room (washed phosphor, warm plastic casing).
+ * One CRT palette: phosphor glow and deep blacks in a dim room.
  *
  * Token naming follows the pattern:
  *   --crt-{category}-{role}
@@ -77,7 +75,7 @@
  */
 
 /* ========================================
- * Dark Theme (default)
+ * CRT dark palette
  * ======================================== */
 :root {
   color-scheme: dark;
@@ -149,18 +147,10 @@
   --crt-gradient-to: 36 87 255;
 }
 
-/* The portfolio has one authored CRT-dark palette. Keep legacy theme state from
- * changing its contrast or visual direction. */
-.light {
-  color-scheme: dark;
-}
-
 /* ========================================
  * Global base styles
  * ======================================== */
 html {
-  --crt-theme-transition-duration: 0.3s;
-
   background-color: rgb(var(--crt-bg-base));
   color: rgb(var(--crt-text-primary));
 }
@@ -457,34 +447,6 @@ body {
   .global-crt-overlay::before,
   .global-crt-overlay::after,
   .global-crt-overlay__scan-beam { animation: none; }
-}
-
-/* View Transitions API -- smooth crossfade for theme switches */
-::view-transition-old(root),
-::view-transition-new(root) {
-  animation-duration: var(--crt-theme-transition-duration);
-  animation-timing-function: ease-in-out;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  ::view-transition-group(*),
-  ::view-transition-old(*),
-  ::view-transition-new(*) {
-    animation-duration: 0.01s !important;
-  }
-}
-
-/* Fallback: animate theme transitions when View Transitions API is unavailable */
-html.theme-transition,
-html.theme-transition *,
-html.theme-transition *::before,
-html.theme-transition *::after {
-  transition: background-color var(--crt-theme-transition-duration) ease,
-    border-color var(--crt-theme-transition-duration) ease,
-    color var(--crt-theme-transition-duration) ease,
-    fill var(--crt-theme-transition-duration) ease,
-    stroke var(--crt-theme-transition-duration) ease,
-    box-shadow var(--crt-theme-transition-duration) ease;
 }
 
 /* Text accents are brighter than filled controls to remain readable on CRT surfaces. */
