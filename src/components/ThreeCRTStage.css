@@ -42,7 +42,7 @@
   border: 1px solid rgba(236, 240, 223, .24);
   background: rgba(5, 7, 5, .6);
   color: #ecf0df;
-  font: 500 .68rem/1 "DM Mono", monospace;
+  font: 500 .68rem/1 "IBM Plex Mono", monospace;
   letter-spacing: .12em;
   text-transform: uppercase;
   backdrop-filter: blur(8px);
@@ -50,9 +50,9 @@
   transition: border-color 160ms ease, background-color 160ms ease, color 160ms ease;
 }
 
-.three-stage__channels button span { color: var(--acid); font-size: .56rem; }
+.three-stage__channels button span { color: var(--phosphor); font-size: .56rem; }
 .three-stage__channels button:hover,
-.three-stage__channels button:focus-visible { outline: none; border-color: var(--acid); background: var(--acid); color: #0a0c07; }
+.three-stage__channels button:focus-visible { outline: none; border-color: var(--phosphor); background: var(--phosphor); color: #0a0c07; }
 .three-stage__channels button:hover span,
 .three-stage__channels button:focus-visible span { color: #0a0c07; }
 
@@ -61,4 +61,17 @@
 
 @media (prefers-reduced-motion: reduce) {
   .three-stage__loader, .three-stage__channels button { transition-duration: .01ms; }
+}
+
+.three-stage__channels:focus-within {
+  z-index: 5;
+  inset: auto 1rem 1rem;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: .5rem;
+  width: auto;
+  height: auto;
+  overflow: visible;
+  clip-path: none;
 }

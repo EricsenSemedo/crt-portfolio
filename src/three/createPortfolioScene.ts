@@ -39,7 +39,7 @@ import {
   getRandomScreenTransitionKind,
   type ScreenTransitionKind,
 } from "./screenTransition";
-import { getResponsiveScreenFits } from "./screenFitProfiles";
+import { attachTelevisionScreen } from "./televisionScreen";
 import {
   getBasketballHorizontalBounds,
   getCameraCoverDistance,
@@ -50,10 +50,6 @@ import {
 } from "./responsiveScene";
 
 export type ScreenTransitionResult = "completed" | "cancelled";
-export interface ScreenFit {
-  scale: [number, number];
-  offset: [number, number];
-}
 
 interface SceneAsset {
   group: Group;
@@ -74,7 +70,6 @@ interface ChannelConfig {
   position: [number, number, number];
   rotationY: number;
   scale: number;
-  screenFit: ScreenFit;
 }
 
 interface ScreenDisplay {
@@ -176,7 +171,6 @@ export function createPortfolioScene(): PortfolioSceneController {
       position: [-1.82, 1.08, -0.48],
       rotationY: 0.11,
       scale: 0.72,
-      screenFit: { scale: [1.19, 1.58], offset: [0.12, -0.1] },
     },
     {
       id: "portfolio",
@@ -186,7 +180,6 @@ export function createPortfolioScene(): PortfolioSceneController {
       position: [0, 1.04, -0.76],
       rotationY: 0,
       scale: 0.78,
-      screenFit: { scale: [1.25, 1.83], offset: [0.08, -0.16] },
     },
     {
       id: "contact",
@@ -196,7 +189,6 @@ export function createPortfolioScene(): PortfolioSceneController {
       position: [1.84, 1.02, -0.5],
       rotationY: -0.11,
       scale: 0.67,
-      screenFit: { scale: [1.44, 2.11], offset: [-0.12, 0.05] },
     },
   ];
 
@@ -260,6 +252,7 @@ export function createPortfolioScene(): PortfolioSceneController {
       realisticTelevisions = televisions.group;
       scene.add(televisions.group);
       applyResponsiveLayout(sceneLayout);
+      updateCameraFraming();
       importedResources.push(televisions);
     }
   });
@@ -298,6 +291,7 @@ export function createPortfolioScene(): PortfolioSceneController {
   let lastFrameTime = performance.now();
   let hovered: PortfolioChannelId | null = null;
   let isOverview = true;
+  let focusedChannel: PortfolioChannelId | null = null;
   let animation: {
     startedAt: number;
     duration: number;
@@ -312,8 +306,6 @@ export function createPortfolioScene(): PortfolioSceneController {
   let heldScreenEffect: HeldScreenEffect | null = null;
 
   function resize(width: number, height: number) {
-    const responsiveScreenFits = getResponsiveScreenFits(width, height);
-    channels.forEach((channel) => applyScreenFit(channel.id, responsiveScreenFits[channel.id]));
     sceneLayout = getSceneLayout(width, height);
     camera.aspect = width / Math.max(height, 1);
     camera.fov = sceneLayout.fov;
@@ -342,10 +334,23 @@ export function createPortfolioScene(): PortfolioSceneController {
         basketballBody.horizontalBounds.max,
       );
     }
-    if (!animation && isOverview) {
-      camera.position.copy(overviewPosition);
-      lookTarget.set(...sceneLayout.target);
-      camera.lookAt(lookTarget);
+    updateCameraFraming();
+  }
+
+  function updateCameraFraming() {
+    const destination = focusedChannel ? getFocusDestination(focusedChannel) : {
+      position: overviewPosition,
+      target: new Vector3(...sceneLayout.target),
+    };
+    if (destination) {
+      if (animation) {
+        animation.toPosition.copy(destination.position);
+        animation.toTarget.copy(destination.target);
+      } else {
+        camera.position.copy(destination.position);
+        lookTarget.copy(destination.target);
+        camera.lookAt(lookTarget);
+      }
     }
   }
 
@@ -468,15 +473,6 @@ export function createPortfolioScene(): PortfolioSceneController {
     parallaxTarget.set(MathUtils.clamp(x, -1, 1), MathUtils.clamp(y, -1, 1));
   }
 
-  function applyScreenFit(id: PortfolioChannelId, fit: ScreenFit) {
-    const channel = channels.find((item) => item.id === id);
-    if (!channel) return;
-    channel.screenFit = fit;
-    channel.asset.screenPlane.scale.set(fit.scale[0], fit.scale[1], 1);
-    channel.asset.screenPlane.position.x = fit.offset[0];
-    channel.asset.screenPlane.position.y = fit.offset[1];
-  }
-
   function setHovered(next: PortfolioChannelId | null) {
     if (hovered === next) return;
     channels.forEach((channel) => {
@@ -494,11 +490,9 @@ export function createPortfolioScene(): PortfolioSceneController {
     hovered = next;
   }
 
-  function focus(id: PortfolioChannelId, reducedMotion = false, quick = false) {
+  function getFocusDestination(id: PortfolioChannelId) {
     const channel = channels.find((item) => item.id === id);
-    if (!channel) return Promise.resolve();
-    interactionPrompt.sprite.visible = false;
-    isOverview = false;
+    if (!channel) return null;
     const screenPosition = channel.asset.screenPlane.getWorldPosition(new Vector3());
     const screenDirection = new Vector3(0, 0, 1).applyQuaternion(
       channel.asset.screenPlane.getWorldQuaternion(new Quaternion()),
@@ -515,7 +509,16 @@ export function createPortfolioScene(): PortfolioSceneController {
     const destination = screenPosition.clone().add(
       screenDirection.multiplyScalar(coverDistance),
     );
-    return animateTo(destination, screenPosition, reducedMotion ? 1 : quick ? 380 : 760, 0.18);
+    return { position: destination, target: screenPosition };
+  }
+
+  function focus(id: PortfolioChannelId, reducedMotion = false, quick = false) {
+    const destination = getFocusDestination(id);
+    if (!destination) return Promise.resolve();
+    focusedChannel = id;
+    interactionPrompt.sprite.visible = false;
+    isOverview = false;
+    return animateTo(destination.position, destination.target, reducedMotion ? 1 : quick ? 380 : 760, 0.18);
   }
 
   function transitionScreen(id: PortfolioChannelId, reducedMotion = false) {
@@ -577,6 +580,7 @@ export function createPortfolioScene(): PortfolioSceneController {
       display.texture.needsUpdate = true;
     });
     isOverview = true;
+    focusedChannel = null;
     interactionPrompt.sprite.visible = true;
     return animateTo(
       overviewPosition,
@@ -966,10 +970,9 @@ async function loadRealisticTelevisions(channels: ChannelConfig[], disposed: () 
       channel.asset.group.traverse((object) => {
         if (object instanceof Mesh && object !== channel.asset.screenPlane) object.visible = false;
       });
-      channel.asset.screenPlane.scale.set(channel.screenFit.scale[0], channel.screenFit.scale[1], 1);
-      channel.asset.screenPlane.position.x = channel.screenFit.offset[0];
-      channel.asset.screenPlane.position.y = channel.screenFit.offset[1];
-      channel.asset.screenPlane.position.z = 0.68;
+      const sourceMesh = television.getObjectByName("Television_01");
+      if (!(sourceMesh instanceof Mesh)) throw new Error("Missing Television_01 mesh");
+      attachTelevisionScreen(channel.asset.screenPlane, sourceMesh);
     });
 
     return {
