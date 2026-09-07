@@ -44,7 +44,7 @@ export default function CRTButton({
 
   const baseClasses = `
     crt-action-shell font-mono font-medium rounded-none transition-colors duration-150 cursor-pointer
-    relative overflow-hidden group
+    relative overflow-hidden group min-h-11
     focus:outline-none focus:ring-2 focus:ring-crt-accent/50
     disabled:opacity-50 disabled:cursor-not-allowed
     ${sizeClasses[size]}
@@ -54,6 +54,8 @@ export default function CRTButton({
 
   return (
     <button
+      type="button"
+      aria-label={label ?? undefined}
       onClick={onClick}
       disabled={disabled}
       className={baseClasses}
