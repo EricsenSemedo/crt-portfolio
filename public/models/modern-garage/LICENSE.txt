@@ -1,0 +1,14 @@
+Modern residential garage — geometry authored for CRT Portfolio.
+Rebuild source: scripts/build-modern-garage.py
+
+Surface asset: Painted Plaster Wall — Amal Kumar / Poly Haven
+https://polyhaven.com/a/painted_plaster_wall
+Downloaded 2026-09-08. CC0 1.0 Universal.
+https://creativecommons.org/publicdomain/zero/1.0/
+Modifications: 1K JPEG color/roughness maps, 512px JPEG normal map;
+repeating UVs at the source two-meter scale, reduced normal strength.
+
+The garage shell, sectional door, curved tracks, hinges, opener, ceiling,
+cabinets, lights and floor are custom geometry. No third-party garage model
+or BlenderKit royalty-free geometry is included in this asset.
+Static geometry merged by material and Meshopt-compressed for web delivery.

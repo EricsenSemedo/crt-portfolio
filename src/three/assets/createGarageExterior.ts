@@ -71,7 +71,6 @@ export async function createGarageExterior() {
       textured("garage_floor", [3, 4]),
     ]);
     grass.color.set("#4b9b38");
-    ground(9.55, 13.6, 0, 3.2, concrete, -1.151);
     ground(100, 80, 0, -44, grass, -1.19);
     ground(9.1, 10.4, 0, -8.8, drive);
     ground(48, 5, 0, -16.5, road, -1.17);

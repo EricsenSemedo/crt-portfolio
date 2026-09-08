@@ -7,7 +7,8 @@ Use imported assets selectively. The authored CRT layout and camera anchors rema
 | Asset | Creator | Source | License | Modified | Notes |
 | --- | --- | --- | --- | --- | --- |
 | Basketball | DigitalN8m4r3 / Miodrag Sejic | [OpenGameArt](https://opengameart.org/content/basketballs) | CC0 | Yes | Smooth mesh with classic leather textures; 512px JPEG maps embedded in GLB, loaded asynchronously |
-| Wooden Table 02 | Serhii Khromov | [Poly Haven](https://polyhaven.com/a/wooden_table_02) | CC0 | Yes | Downloaded 2026-09-08; 1K glTF, scaled into a low wooden media table; 196 triangles and about 485 KB |
+| Wooden Table 01 | Ethan Place | [Poly Haven](https://polyhaven.com/a/WoodenTable_01) | CC0 | Yes | Downloaded 2026-09-08; worn wooden media table with shaped legs; 952 triangles, 1K textures, Meshopt GLB about 523 KB |
+| Modern residential garage | Project-authored geometry; plaster by Amal Kumar | [Painted Plaster Wall, Poly Haven](https://polyhaven.com/a/painted_plaster_wall) | Plaster: CC0 | Yes | Finished walls and ceiling, sealed floor, sectional door hardware and cabinets; Meshopt GLB, 8,268 triangles, 7 materials, about 272 KB |
 
 ## Recommended sources
 
@@ -47,7 +48,7 @@ For each downloaded model, add its title, creator, source URL, download date, an
 4. Two or three silhouette props: shelf, tool chest, drill press, storage box.
 5. Personal props already represented procedurally: basketball, game console, controller, VHS/CD media.
 
-Do not download a complete photoreal garage scene. It will make the portfolio generic, increase draw calls, and make art direction harder.
+When using a complete source scene, extract only the architecture needed by the portfolio. Keep the source archive out of the website, remove clutter and scene dependencies, and optimize the exported shell independently.
 
 ## Web asset pipeline
 
@@ -58,7 +59,7 @@ Do not download a complete photoreal garage scene. It will make the portfolio ge
 5. Optimize with glTF Transform, for example:
 
    ```bash
-   npx @gltf-transform/cli optimize source.glb optimized.glb \
+   bunx @gltf-transform/cli optimize source.glb optimized.glb \
      --texture-compress webp
    ```
 
@@ -80,10 +81,22 @@ Do not download a complete photoreal garage scene. It will make the portfolio ge
 
 ### Sunset garage
 
-`createGarageRoom.ts` owns the immediate garage shell and shelf. `createGarageExterior.ts` asynchronously adds an asphalt driveway and road, open lawn, and a ranch house. Material maps are 512px JPEG; static architectural boxes are merged by material. Sources and licenses are recorded alongside the assets.
+`createGarageRoom.ts` provides the immediate fallback garage shell and shelf. `loadGarageStructure.ts` replaces it asynchronously with a project-authored modern residential garage. The finished walls use Poly Haven Painted Plaster Wall maps. The flat ceiling, sealed floor, cabinets, sectional door, curved tracks, hinges and opener are modeled offline, fitted to `GARAGE_BOUNDS`, and merged by material. Color/roughness maps are 1K and the normal map is 512px. The former distressed Shed asset is no longer shipped. The worn Wooden Table 01 loads separately with the same decoder and fits the existing tabletop bounds; the procedural table remains its download fallback. `createGarageExterior.ts` asynchronously adds an asphalt driveway and road, open lawn, and a ranch house. Material maps are 512px JPEG; static architectural boxes are merged by material. Sources and licenses are recorded alongside the assets.
 
 The lawn has a green material tint to retain its color under sunset lighting. `createGarageTrees.ts` adds a staggered tree line and smaller understory behind the house, plus three nearer trees. All 35 trees share one simplified, Meshopt-compressed [Poly Haven Jacaranda](https://polyhaven.com/a/jacaranda_tree) model (19,508 triangles) in three instanced draws, without extra shadow passes. Placement preserves the source transforms and seats each base slightly below the lawn. Geometry, materials, textures, and instance buffers are released with the exterior.
 
 The sky follows [Three.js's equirectangular background setup](https://threejs.org/manual/en/backgrounds.html). Industrial Sunset 02 (Pure Sky) supplies a 4K JPEG background at infinity and a matching 1K HDR for reflections. Both use the same rotation; the directional light follows the source sun's measured direction. This avoids a landscape horizon on a nearby sphere. The global CRT filter covers both the garage and expanded content; the TVs also retain their own screen effects.
 
 `garageBounds.ts` shares the doorway, roof, and raised-door heights with basketball containment. A fast upward throw is clamped beneath the ceiling and rebounds downward. The floor extends beneath the seated viewer while the ball stays within reach. Environment downloads do not block TV navigation, and late results dispose themselves after the scene closes.
+
+### Rebuilding the modern garage
+
+Download the 1K JPG Diffuse, Rough and OpenGL normal maps from [Painted Plaster Wall](https://polyhaven.com/a/painted_plaster_wall) into a local directory, named `plaster-diff.jpg`, `plaster-rough.jpg` and `plaster-nor_gl.jpg`. Run:
+
+```bash
+blender --background --factory-startup --disable-autoexec \
+  --python scripts/build-modern-garage.py -- \
+  --textures /path/to/textures --output /tmp/garage-raw.glb
+```
+
+The builder reads the room dimensions from `garageBounds.ts`. Optimize the export with glTF Transform: resize the normal map to 512px, encode maps as JPEG quality 82, then deduplicate, flatten, join, prune and Meshopt-compress. Save the result to `public/models/modern-garage/garage.glb`. Large source files and texture downloads stay outside the repository.
