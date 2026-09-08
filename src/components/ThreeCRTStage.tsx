@@ -167,6 +167,7 @@ export default function ThreeCRTStage({
       return;
     }
     focusedRef.current = id;
+    selectingRef.current = false;
     onSelect(id);
   }
 

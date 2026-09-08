@@ -94,3 +94,19 @@ it("ignores an older overview reset after a channel is requested", async () => {
   expect(overview).not.toHaveBeenCalled();
   expect(complete).toHaveBeenCalledExactlyOnceWith("portfolio");
 });
+
+it("allows local selections after a superseded channel-button request", async () => {
+  let finish!: () => void;
+  vi.mocked(controller.focus).mockImplementationOnce(() => new Promise<void>((resolve) => { finish = resolve; }));
+  const select = vi.fn();
+  const complete = vi.fn();
+  await act(async () => root.render(<ThreeCRTStage onSelect={select} onRequestedFocusComplete={complete} />));
+  act(() => host.querySelectorAll("button")[0].click());
+  await act(async () => root.render(<ThreeCRTStage onSelect={select} requestedChannel="portfolio" onRequestedFocusComplete={complete} />));
+  await act(async () => finish());
+  expect(select).not.toHaveBeenCalled();
+  expect(complete).toHaveBeenCalledExactlyOnceWith("portfolio");
+  await act(async () => host.querySelectorAll("button")[2].click());
+  await act(async () => host.querySelectorAll("button")[0].click());
+  expect(select.mock.calls).toEqual([["contact"], ["home"]]);
+});
