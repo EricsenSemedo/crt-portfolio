@@ -57,8 +57,8 @@ export function getSceneLayout(width: number, height: number): SceneLayout {
   if (portrait) {
     return {
       portrait: true,
-      camera: [0, 4.2, 10.5],
-      target: [0, 0.35, -2],
+      camera: [0, 1.3, 9.3],
+      target: [0, 0.65, -1.5],
       channelX: [-1.68, 0, 1.68],
       tvScale: 0.8,
       fov: 60,
@@ -70,8 +70,8 @@ export function getSceneLayout(width: number, height: number): SceneLayout {
 
   return {
     portrait: false,
-    camera: [0, 3.8, 9.5],
-    target: [0, 0.25, -1.5],
+    camera: [0, 1.3, 8.7],
+    target: [0, 0.65, -1.5],
     channelX: [-2.06, 0, 2.1],
     tvScale: 1,
     fov: 42,
