@@ -321,6 +321,7 @@ export function createPortfolioScene(): PortfolioSceneController {
   } | null = null;
   let screenTransition: ActiveScreenTransition | null = null;
   let heldScreenEffect: HeldScreenEffect | null = null;
+  let navigationRequest = 0;
 
   function resize(width: number, height: number) {
     if (isDisposed) return;
@@ -532,8 +533,15 @@ export function createPortfolioScene(): PortfolioSceneController {
   }
 
   function focus(id: PortfolioChannelId, reducedMotion = false, quick = false) {
+    if (isDisposed) return Promise.resolve();
     const destination = getFocusDestination(id);
     if (!destination) return Promise.resolve();
+    navigationRequest++;
+    if (screenTransition) {
+      screenTransition.resolve("cancelled");
+      screenTransition = null;
+    }
+    heldScreenEffect = null;
     focusedChannel = id;
     interactionPrompt.sprite.visible = false;
     isOverview = false;
@@ -572,6 +580,7 @@ export function createPortfolioScene(): PortfolioSceneController {
 
   async function reset(reducedMotion = false, quick = false) {
     if (isDisposed) return;
+    const request = ++navigationRequest;
     if (screenTransition) {
       const resolve = screenTransition.resolve;
       screenTransition = null;
@@ -594,7 +603,7 @@ export function createPortfolioScene(): PortfolioSceneController {
     } else {
       heldScreenEffect = null;
     }
-    if (isDisposed) return;
+    if (isDisposed || request !== navigationRequest) return;
     channels.forEach((channel) => {
       const display = displays.get(channel.id);
       if (!display) return;

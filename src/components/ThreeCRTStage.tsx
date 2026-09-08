@@ -28,6 +28,7 @@ export default function ThreeCRTStage({
   const mountRef = useRef<HTMLDivElement>(null);
   const sceneRef = useRef<PortfolioSceneController | null>(null);
   const selectingRef = useRef(false);
+  const focusRequestRef = useRef(0);
   const focusedRef = useRef<PortfolioChannelId | null>(null);
   const pointerGestureRef = useRef<{ id: number; x: number; y: number; moved: boolean } | null>(null);
   const suppressClickRef = useRef(false);
@@ -105,6 +106,8 @@ export default function ThreeCRTStage({
 
   useEffect(() => {
     const controller = sceneRef.current;
+    const request = ++focusRequestRef.current;
+    const isCurrent = () => sceneRef.current === controller && focusRequestRef.current === request;
     if (unavailable) {
       if (requestedChannel) onRequestedFocusComplete?.(requestedChannel);
       else onOverviewComplete?.();
@@ -116,20 +119,21 @@ export default function ThreeCRTStage({
       void controller
         ?.reset(window.matchMedia("(prefers-reduced-motion: reduce)").matches, quickTransition)
         .then(() => {
-          if (sceneRef.current !== controller) return;
+          if (!isCurrent()) return;
           selectingRef.current = false;
           onOverviewComplete?.();
         });
       return;
     }
-    if (focusedRef.current === requestedChannel || selectingRef.current) return;
+    if (focusedRef.current === requestedChannel) return;
     selectingRef.current = true;
+    focusedRef.current = null;
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     void controller
       ?.focus(requestedChannel, reducedMotion, quickTransition)
-      .then(() => sceneRef.current === controller ? controller.transitionScreen(requestedChannel, reducedMotion) : "cancelled")
+      .then(() => isCurrent() ? controller.transitionScreen(requestedChannel, reducedMotion) : "cancelled")
       .then((result) => {
-        if (sceneRef.current !== controller) return;
+        if (!isCurrent()) return;
         if (result !== "completed") {
           selectingRef.current = false;
           return;
@@ -147,14 +151,17 @@ export default function ThreeCRTStage({
       return;
     }
     if (!controller || selectingRef.current) return;
+    const request = ++focusRequestRef.current;
+    const isCurrent = () => sceneRef.current === controller && focusRequestRef.current === request;
     selectingRef.current = true;
+    focusedRef.current = null;
     setHovered(null);
     controller.setHovered(null);
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     await controller.focus(id, reducedMotion);
-    if (sceneRef.current !== controller) return;
+    if (!isCurrent()) return;
     const transitionResult = await controller.transitionScreen(id, reducedMotion);
-    if (sceneRef.current !== controller) return;
+    if (!isCurrent()) return;
     if (transitionResult !== "completed") {
       selectingRef.current = false;
       return;

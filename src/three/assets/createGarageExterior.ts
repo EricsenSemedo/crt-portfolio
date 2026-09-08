@@ -66,7 +66,7 @@ export async function createGarageExterior() {
   }
   try {
     const [drive, road, grass, roof, concrete] = await Promise.all([
-      textured("grooved_concrete_driveway", [3, 5]), textured("asphalt_02", [10, 2]),
+      textured("asphalt_02", [2, 4]), textured("asphalt_02", [10, 2]),
       textured("leafy_grass", [24, 24]), textured("roof_slates_02", [4, 2]),
       textured("garage_floor", [3, 4]),
     ]);

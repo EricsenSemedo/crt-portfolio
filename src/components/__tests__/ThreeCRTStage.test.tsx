@@ -64,3 +64,33 @@ it("does not continue a focus transition after unmount", async () => {
   await act(async () => finish());
   expect(controller.transitionScreen).not.toHaveBeenCalled();
 });
+
+it.each(["focus", "screen"])("ignores an older requested channel while its %s transition finishes", async (phase) => {
+  const complete = vi.fn();
+  const select = vi.fn();
+  let finish!: () => void;
+  if (phase === "focus") {
+    vi.mocked(controller.focus).mockImplementationOnce(() => new Promise<void>((resolve) => { finish = resolve; }));
+  } else {
+    vi.mocked(controller.transitionScreen).mockImplementationOnce(() => new Promise((resolve) => { finish = () => resolve("completed"); }));
+  }
+  await act(async () => root.render(<ThreeCRTStage onSelect={select} requestedChannel="home" onRequestedFocusComplete={complete} />));
+  await act(async () => root.render(<ThreeCRTStage onSelect={select} requestedChannel="portfolio" onRequestedFocusComplete={complete} />));
+  await act(async () => finish());
+  expect(controller.focus).toHaveBeenCalledWith("portfolio", false, false);
+  expect(complete).toHaveBeenCalledExactlyOnceWith("portfolio");
+  if (phase === "focus") expect(controller.transitionScreen).not.toHaveBeenCalledWith("home", false);
+});
+
+it("ignores an older overview reset after a channel is requested", async () => {
+  let finish!: () => void;
+  vi.mocked(controller.reset).mockReturnValue(new Promise<void>((resolve) => { finish = resolve; }));
+  const overview = vi.fn();
+  const select = vi.fn();
+  const complete = vi.fn();
+  await act(async () => root.render(<ThreeCRTStage onSelect={select} onOverviewComplete={overview} />));
+  await act(async () => root.render(<ThreeCRTStage onSelect={select} requestedChannel="portfolio" onOverviewComplete={overview} onRequestedFocusComplete={complete} />));
+  await act(async () => finish());
+  expect(overview).not.toHaveBeenCalled();
+  expect(complete).toHaveBeenCalledExactlyOnceWith("portfolio");
+});
