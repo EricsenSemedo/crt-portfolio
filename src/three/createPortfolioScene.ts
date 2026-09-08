@@ -920,16 +920,16 @@ async function loadPlayStation2Model() {
     group.updateMatrixWorld(true);
     const sourceBounds = new Box3().setFromObject(group);
     const sourceSize = sourceBounds.getSize(new Vector3());
-    group.scale.setScalar(1.08 / Math.max(sourceSize.x, 0.001));
+    // Fit the console in the clear tabletop strip in front of the center TV.
+    group.scale.setScalar(0.48 / Math.max(sourceSize.x, 0.001));
     group.updateMatrixWorld(true);
     const scaledBounds = new Box3().setFromObject(group);
     const scaledCenter = scaledBounds.getCenter(new Vector3());
     group.position.set(
-      0.78 - scaledCenter.x,
+      -scaledCenter.x,
       TABLE_COLLIDER.topY + 0.01 - scaledBounds.min.y,
-      0.02 - scaledCenter.z,
+      TABLE_COLLIDER.centerZ + TABLE_COLLIDER.halfDepth - 0.02 - scaledBounds.max.z,
     );
-    group.rotation.y = -0.2;
     group.traverse((object) => {
       if (!(object instanceof Mesh)) return;
       object.castShadow = true;
