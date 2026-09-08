@@ -5,7 +5,7 @@ import {
   CanvasTexture,
   Color,
   DirectionalLight,
-  Fog,
+  EquirectangularReflectionMapping,
   Group,
   MathUtils,
   Mesh,
@@ -20,6 +20,7 @@ import {
   Sprite,
   SpriteMaterial,
   SRGBColorSpace,
+  TextureLoader,
   Vector2,
   Vector3,
   WebGLRenderer,
@@ -29,11 +30,11 @@ import {
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { HDRLoader } from "three/examples/jsm/loaders/HDRLoader.js";
 import { PORTFOLIO_CHANNELS, type PortfolioChannelId } from "../data/channels";
-import { createBasementRoom } from "./assets/createBasementRoom";
-import { createDiscTV } from "./assets/createDiscTV";
-import { createGameTV } from "./assets/createGameTV";
-import { createTable } from "./assets/createTable";
-import { createVhsTV } from "./assets/createVhsTV";
+import { createGarageExterior } from "./assets/createGarageExterior";
+import { containBasketball } from "./assets/garageBounds";
+import { createGarageRoom } from "./assets/createGarageRoom";
+import { createTelevisionPreview } from "./assets/createTelevisionPreview";
+import { createTable, TABLE_LAYOUT } from "./assets/createTable";
 import {
   getScreenTransitionDuration,
   getRandomScreenTransitionKind,
@@ -70,6 +71,7 @@ interface ChannelConfig {
   position: [number, number, number];
   rotationY: number;
   scale: number;
+  tint: string;
 }
 
 interface ScreenDisplay {
@@ -124,14 +126,13 @@ export interface PortfolioSceneController {
 
 const OVERVIEW_POSITION = new Vector3(0, 1.82, 7.55);
 const OVERVIEW_TARGET = new Vector3(0, 0.05, -0.4);
-const TABLE_COLLIDER = { centerZ: -0.65, halfWidth: 2.95, halfDepth: 0.925, topY: 0.11 };
 
 export function createPortfolioScene(): PortfolioSceneController {
+  const motionPreference = window.matchMedia("(prefers-reduced-motion: reduce)");
   const scene = new Scene();
   scene.background = new Color("#111111");
-  scene.fog = new Fog("#111111", 8, 17);
 
-  const camera = new PerspectiveCamera(38, 1, 0.1, 40);
+  const camera = new PerspectiveCamera(38, 1, 0.1, 120);
   camera.position.copy(OVERVIEW_POSITION);
   camera.lookAt(OVERVIEW_TARGET);
   const overviewPosition = OVERVIEW_POSITION.clone();
@@ -147,19 +148,25 @@ export function createPortfolioScene(): PortfolioSceneController {
   renderer.toneMappingExposure = 0.92;
   renderer.shadowMap.enabled = true;
 
-  const ambient = new AmbientLight("#d3dcdf", 0.42);
-  const ceiling = new PointLight("#f8fafa", 20, 12, 1.8);
+  const ambient = new AmbientLight("#d5c1aa", 0.32);
+  const ceiling = new PointLight("#ffdbb1", 10, 12, 1.8);
   ceiling.position.set(-1.2, 4.2, 2.2);
-  ceiling.castShadow = true;
-  ceiling.shadow.mapSize.set(1024, 1024);
+  const sunlight = new DirectionalLight("#ffc379", 2.6);
+  // Same low sun direction as the rotated Industrial Sunset 02 panorama.
+  sunlight.position.set(-13.204, 0.435, -34.724);
+  sunlight.target.position.set(0, -1.16, 3);
+  sunlight.castShadow = true;
+  sunlight.shadow.mapSize.set(1024, 1024);
+  Object.assign(sunlight.shadow.camera, { left: -8, right: 8, top: 6, bottom: -6, near: 0.5, far: 80 });
+  sunlight.shadow.bias = -0.001;
+  sunlight.shadow.normalBias = 0.025;
   const fill = new DirectionalLight("#2457ff", 0.28);
   fill.position.set(4, 2.4, 5);
-  scene.add(ambient, ceiling, fill);
+  scene.add(ambient, ceiling, fill, sunlight, sunlight.target);
 
-  const room = createBasementRoom();
-  room.group.position.set(0, 0, -0.4);
+  const room = createGarageRoom();
   const table = createTable();
-  table.group.position.set(0, -0.06, -0.65);
+  table.group.position.set(0, TABLE_LAYOUT.topY, TABLE_LAYOUT.centerZ);
   scene.add(room.group, table.group);
 
   const channels: ChannelConfig[] = [
@@ -167,28 +174,31 @@ export function createPortfolioScene(): PortfolioSceneController {
       id: "home",
       label: PORTFOLIO_CHANNELS.home.title.toUpperCase(),
       subtitle: `CH ${PORTFOLIO_CHANNELS.home.number}`,
-      asset: createVhsTV(),
-      position: [-1.82, 1.08, -0.48],
+      asset: createTelevisionPreview("#aaa38e"),
+      position: [-2.06, 0.11, -0.46],
       rotationY: 0.11,
-      scale: 0.72,
+      scale: 3.25,
+      tint: "#aaa38e",
     },
     {
       id: "portfolio",
       label: PORTFOLIO_CHANNELS.portfolio.title.toUpperCase(),
       subtitle: `CH ${PORTFOLIO_CHANNELS.portfolio.number}`,
-      asset: createDiscTV(),
-      position: [0, 1.04, -0.76],
+      asset: createTelevisionPreview("#8d958b"),
+      position: [0, 0.11, -0.72],
       rotationY: 0,
-      scale: 0.78,
+      scale: 3.15,
+      tint: "#8d958b",
     },
     {
       id: "contact",
       label: PORTFOLIO_CHANNELS.contact.title.toUpperCase(),
       subtitle: `CH ${PORTFOLIO_CHANNELS.contact.number}`,
-      asset: createGameTV(),
-      position: [1.84, 1.02, -0.5],
+      asset: createTelevisionPreview("#777d82"),
+      position: [2.1, 0.11, -0.48],
       rotationY: -0.11,
-      scale: 0.67,
+      scale: 3.45,
+      tint: "#777d82",
     },
   ];
 
@@ -223,12 +233,19 @@ export function createPortfolioScene(): PortfolioSceneController {
   let basketballBody: BasketballBody | null = null;
   let realisticTelevisions: Group | null = null;
   let isDisposed = false;
-  void loadGarageEnvironment(renderer, scene).then((environment) => {
+  void loadSunsetEnvironment(renderer, scene, () => isDisposed).then((environment) => {
     if (!environment) return;
     if (isDisposed) environment.dispose();
     else importedResources.push(environment);
   });
-  void loadIndustrialTable().then((importedTable) => {
+  void createGarageExterior().then((exterior) => {
+    if (isDisposed) exterior.dispose();
+    else {
+      scene.add(exterior.group);
+      importedResources.push(exterior);
+    }
+  });
+  void loadWoodenTable().then((importedTable) => {
     if (!importedTable) return;
     if (isDisposed) importedTable.dispose();
     else {
@@ -272,7 +289,7 @@ export function createPortfolioScene(): PortfolioSceneController {
         radius: 0.41,
         floorY: -0.68,
         active: false,
-        horizontalBounds: getBasketballHorizontalBounds(sceneLayout, camera.aspect, 0.42, 0.41),
+        horizontalBounds: getBasketballHorizontalBounds(sceneLayout, camera.aspect, basketball.group.position.z, 0.41),
       };
       basketball.group.position.x = sceneLayout.ballStartX;
     }
@@ -304,8 +321,10 @@ export function createPortfolioScene(): PortfolioSceneController {
   } | null = null;
   let screenTransition: ActiveScreenTransition | null = null;
   let heldScreenEffect: HeldScreenEffect | null = null;
+  let navigationRequest = 0;
 
   function resize(width: number, height: number) {
+    if (isDisposed) return;
     sceneLayout = getSceneLayout(width, height);
     camera.aspect = width / Math.max(height, 1);
     camera.fov = sceneLayout.fov;
@@ -355,12 +374,13 @@ export function createPortfolioScene(): PortfolioSceneController {
   }
 
   function render(time: number) {
+    if (isDisposed) return;
     const delta = Math.min(Math.max((time - lastFrameTime) / 1000, 0), 0.033);
     lastFrameTime = time;
     if (basketballBody?.active) updateBasketballPhysics(basketballBody, basketballColliders, delta);
     if (interactionPrompt.sprite.visible) {
-      interactionPrompt.sprite.position.y = interactionPrompt.baseY + Math.sin(time * 0.0032) * 0.07;
-      interactionPrompt.material.opacity = 0.88 + Math.sin(time * 0.0024) * 0.08;
+      interactionPrompt.sprite.position.y = interactionPrompt.baseY + (motionPreference.matches ? 0 : Math.sin(time * 0.0032) * 0.07);
+      interactionPrompt.material.opacity = 0.88 + (motionPreference.matches ? 0 : Math.sin(time * 0.0024) * 0.08);
     }
     if (animation) {
       const progress = Math.min((time - animation.startedAt) / animation.duration, 1);
@@ -426,7 +446,7 @@ export function createPortfolioScene(): PortfolioSceneController {
       );
       heldScreenEffect.display.texture.needsUpdate = true;
       heldScreenEffect.display.lastFrame = time;
-    } else if (hovered) {
+    } else if (hovered && !motionPreference.matches) {
       const display = displays.get(hovered);
       const channel = channels.find((item) => item.id === hovered);
       if (display && channel && time - display.lastFrame > 70) {
@@ -470,7 +490,7 @@ export function createPortfolioScene(): PortfolioSceneController {
   }
 
   function setParallax(x: number, y: number) {
-    parallaxTarget.set(MathUtils.clamp(x, -1, 1), MathUtils.clamp(y, -1, 1));
+    parallaxTarget.set(motionPreference.matches ? 0 : MathUtils.clamp(x, -1, 1), motionPreference.matches ? 0 : MathUtils.clamp(y, -1, 1));
   }
 
   function setHovered(next: PortfolioChannelId | null) {
@@ -513,8 +533,15 @@ export function createPortfolioScene(): PortfolioSceneController {
   }
 
   function focus(id: PortfolioChannelId, reducedMotion = false, quick = false) {
+    if (isDisposed) return Promise.resolve();
     const destination = getFocusDestination(id);
     if (!destination) return Promise.resolve();
+    navigationRequest++;
+    if (screenTransition) {
+      screenTransition.resolve("cancelled");
+      screenTransition = null;
+    }
+    heldScreenEffect = null;
     focusedChannel = id;
     interactionPrompt.sprite.visible = false;
     isOverview = false;
@@ -522,6 +549,7 @@ export function createPortfolioScene(): PortfolioSceneController {
   }
 
   function transitionScreen(id: PortfolioChannelId, reducedMotion = false) {
+    if (isDisposed) return Promise.resolve("cancelled" as const);
     const channel = channels.find((item) => item.id === id);
     const display = displays.get(id);
     if (!channel || !display || reducedMotion) return Promise.resolve("completed" as const);
@@ -551,6 +579,8 @@ export function createPortfolioScene(): PortfolioSceneController {
   }
 
   async function reset(reducedMotion = false, quick = false) {
+    if (isDisposed) return;
+    const request = ++navigationRequest;
     if (screenTransition) {
       const resolve = screenTransition.resolve;
       screenTransition = null;
@@ -573,6 +603,7 @@ export function createPortfolioScene(): PortfolioSceneController {
     } else {
       heldScreenEffect = null;
     }
+    if (isDisposed || request !== navigationRequest) return;
     channels.forEach((channel) => {
       const display = displays.get(channel.id);
       if (!display) return;
@@ -596,12 +627,12 @@ export function createPortfolioScene(): PortfolioSceneController {
       channel.asset.group.position.x = layout.channelX[index];
       channel.asset.group.position.y = scaleCoordinateAroundPivot(
         channel.position[1],
-        TABLE_COLLIDER.topY,
+        TABLE_LAYOUT.topY,
         layout.tvScale,
       );
       channel.asset.group.position.z = scaleCoordinateAroundPivot(
         channel.position[2],
-        TABLE_COLLIDER.centerZ,
+        TABLE_LAYOUT.centerZ,
         layout.tvScale,
       );
       channel.asset.group.scale.setScalar(channel.scale * layout.tvScale);
@@ -614,8 +645,8 @@ export function createPortfolioScene(): PortfolioSceneController {
       television.userData.desktopScale = desktopScale;
       television.userData.desktopY = desktopY;
       television.userData.desktopZ = desktopZ;
-      television.position.y = scaleCoordinateAroundPivot(desktopY, TABLE_COLLIDER.topY, layout.tvScale);
-      television.position.z = scaleCoordinateAroundPivot(desktopZ, TABLE_COLLIDER.centerZ, layout.tvScale);
+      television.position.y = scaleCoordinateAroundPivot(desktopY, TABLE_LAYOUT.topY, layout.tvScale);
+      television.position.z = scaleCoordinateAroundPivot(desktopZ, TABLE_LAYOUT.centerZ, layout.tvScale);
       television.scale.setScalar(desktopScale * layout.tvScale);
     });
     if (realisticTelevisions) {
@@ -628,6 +659,7 @@ export function createPortfolioScene(): PortfolioSceneController {
   }
 
   function animateTo(position: Vector3, target: Vector3, duration: number, arcStrength: number) {
+    if (isDisposed) return Promise.resolve();
     if (animation) animation.resolve();
     return new Promise<void>((resolve) => {
       animation = {
@@ -644,6 +676,7 @@ export function createPortfolioScene(): PortfolioSceneController {
   }
 
   function dispose() {
+    if (isDisposed) return;
     isDisposed = true;
     if (animation) animation.resolve();
     if (screenTransition) screenTransition.resolve("cancelled");
@@ -654,6 +687,7 @@ export function createPortfolioScene(): PortfolioSceneController {
     allAssets.forEach((asset) => asset.dispose());
     importedResources.forEach((resource) => resource.dispose());
     interactionPrompt.dispose();
+    sunlight.shadow.dispose();
     renderer.dispose();
     renderer.domElement.remove();
   }
@@ -696,12 +730,7 @@ function updateBasketballPhysics(body: BasketballBody, colliders: Box3[], delta:
     body.group.position.x = MathUtils.clamp(body.group.position.x, xMin, xMax);
     body.velocity.x *= -0.66;
   }
-  const zMin = -3.6 + body.radius;
-  const zMax = 3.2 - body.radius;
-  if (body.group.position.z < zMin || body.group.position.z > zMax) {
-    body.group.position.z = MathUtils.clamp(body.group.position.z, zMin, zMax);
-    body.velocity.z *= -0.66;
-  }
+  containBasketball(body.group.position, body.velocity, body.radius);
 
   if (body.velocity.lengthSq() < 0.0025 && body.group.position.y === body.floorY) {
     body.velocity.set(0, 0, 0);
@@ -710,17 +739,22 @@ function updateBasketballPhysics(body: BasketballBody, colliders: Box3[], delta:
 }
 
 function createBasketballColliders() {
-  const tableMinZ = TABLE_COLLIDER.centerZ - TABLE_COLLIDER.halfDepth;
-  const tableMaxZ = TABLE_COLLIDER.centerZ + TABLE_COLLIDER.halfDepth;
+  const tableMinZ = TABLE_LAYOUT.centerZ - TABLE_LAYOUT.halfDepth;
+  const tableMaxZ = TABLE_LAYOUT.centerZ + TABLE_LAYOUT.halfDepth;
   return [
     new Box3(
-      new Vector3(-TABLE_COLLIDER.halfWidth, -0.05, tableMinZ),
-      new Vector3(TABLE_COLLIDER.halfWidth, TABLE_COLLIDER.topY, tableMaxZ),
+      new Vector3(-TABLE_LAYOUT.halfWidth, TABLE_LAYOUT.topY - TABLE_LAYOUT.topThickness, tableMinZ),
+      new Vector3(TABLE_LAYOUT.halfWidth, TABLE_LAYOUT.topY, tableMaxZ),
     ),
-    ...[-2.55, 2.55].flatMap((x) => [-1.25, -0.05].map((z) => new Box3(
-      new Vector3(x - 0.12, -1.14, z - 0.12),
-      new Vector3(x + 0.12, -0.05, z + 0.12),
-    ))),
+    ...[-TABLE_LAYOUT.legX, TABLE_LAYOUT.legX].flatMap((x) => (
+      [-TABLE_LAYOUT.legZ, TABLE_LAYOUT.legZ].map((offsetZ) => {
+        const z = TABLE_LAYOUT.centerZ + offsetZ;
+        return new Box3(
+          new Vector3(x - TABLE_LAYOUT.legHalfWidth, TABLE_LAYOUT.floorY, z - TABLE_LAYOUT.legHalfDepth),
+          new Vector3(x + TABLE_LAYOUT.legHalfWidth, TABLE_LAYOUT.topY - TABLE_LAYOUT.topThickness, z + TABLE_LAYOUT.legHalfDepth),
+        );
+      })
+    )),
   ];
 }
 
@@ -817,25 +851,47 @@ function createInteractionPrompt() {
   };
 }
 
-async function loadGarageEnvironment(renderer: WebGLRenderer, scene: Scene) {
-  try {
-    const source = await new HDRLoader().loadAsync(`${import.meta.env.BASE_URL}environments/garage-1k.hdr`);
-    const generator = new PMREMGenerator(renderer);
-    generator.compileEquirectangularShader();
-    const environment = generator.fromEquirectangular(source).texture;
-    source.dispose();
-    generator.dispose();
-    scene.environment = environment;
-    scene.environmentIntensity = 0.42;
-    return {
-      dispose: () => {
-        if (scene.environment === environment) scene.environment = null;
-        environment.dispose();
-      },
-    };
-  } catch {
+async function loadSunsetEnvironment(renderer: WebGLRenderer, scene: Scene, disposed: () => boolean) {
+  const root = `${import.meta.env.BASE_URL}environments/`;
+  const [hdrResult, skyResult] = await Promise.allSettled([
+    new HDRLoader().loadAsync(root + "sunset-1k.hdr"),
+    new TextureLoader().loadAsync(root + "sunset-4k.jpg"),
+  ]);
+  const source = hdrResult.status === "fulfilled" ? hdrResult.value : null;
+  const sky = skyResult.status === "fulfilled" ? skyResult.value : null;
+  if (disposed()) {
+    source?.dispose();
+    sky?.dispose();
     return null;
   }
+  // Native environment backgrounds stay at infinity as the camera moves.
+  scene.backgroundRotation.y = scene.environmentRotation.y = 2.5364;
+  if (sky) {
+    sky.mapping = EquirectangularReflectionMapping;
+    sky.colorSpace = SRGBColorSpace;
+    scene.background = sky;
+  }
+  let environment: ReturnType<PMREMGenerator["fromEquirectangular"]> | null = null;
+  if (source) {
+    const generator = new PMREMGenerator(renderer);
+    try {
+      environment = generator.fromEquirectangular(source);
+      scene.environment = environment.texture;
+      scene.environmentIntensity = 0.3;
+      if (!sky) scene.background = environment.texture;
+    } catch {
+      // The high-resolution background can still work without reflections.
+    } finally {
+      generator.dispose();
+      source.dispose();
+    }
+  }
+  return { dispose() {
+    if (scene.background === sky || scene.background === environment?.texture) scene.background = null;
+    if (scene.environment === environment?.texture) scene.environment = null;
+    sky?.dispose();
+    environment?.dispose();
+  } };
 }
 
 async function loadBasketballModel() {
@@ -849,7 +905,7 @@ async function loadBasketballModel() {
     const sourceDiameter = Math.max(modelSize.x, modelSize.y, modelSize.z);
     const displayDiameter = 0.82;
     group.scale.setScalar(displayDiameter / Math.max(sourceDiameter, 0.001));
-    group.position.set(-2.88, -0.68, 0.42);
+    group.position.set(-2.88, -0.68, 1.4);
     group.rotation.set(0.12, -0.45, -0.18);
     group.traverse((object) => {
       if (!(object instanceof Mesh)) return;
@@ -865,25 +921,25 @@ async function loadBasketballModel() {
   }
 }
 
-async function loadIndustrialTable() {
+async function loadWoodenTable() {
   try {
     const result = await new GLTFLoader().loadAsync(
-      `${import.meta.env.BASE_URL}models/industrial-coffee-table-cc0/industrial_coffee_table_1k.gltf`,
+      `${import.meta.env.BASE_URL}models/wooden-table-cc0/wooden_table_02_1k.gltf`,
     );
     const group = result.scene;
-    group.name = "IndustrialCoffeeTable-PolyHaven-CC0";
+    group.name = "WoodenTable-PolyHaven-CC0";
     group.updateMatrixWorld(true);
     const sourceBounds = new Box3().setFromObject(group);
     const sourceSize = sourceBounds.getSize(new Vector3());
     group.scale.set(
-      5.9 / Math.max(sourceSize.x, 0.001),
-      1.25 / Math.max(sourceSize.y, 0.001),
-      1.85 / Math.max(sourceSize.z, 0.001),
+      TABLE_LAYOUT.halfWidth * 2 / Math.max(sourceSize.x, 0.001),
+      (TABLE_LAYOUT.topY - TABLE_LAYOUT.floorY) / Math.max(sourceSize.y, 0.001),
+      TABLE_LAYOUT.halfDepth * 2 / Math.max(sourceSize.z, 0.001),
     );
     group.updateMatrixWorld(true);
     const scaledBounds = new Box3().setFromObject(group);
     const scaledCenter = scaledBounds.getCenter(new Vector3());
-    group.position.set(-scaledCenter.x, -1.14 - scaledBounds.min.y, TABLE_COLLIDER.centerZ - scaledCenter.z);
+    group.position.set(-scaledCenter.x, TABLE_LAYOUT.floorY - scaledBounds.min.y, TABLE_LAYOUT.centerZ - scaledCenter.z);
     group.traverse((object) => {
       if (!(object instanceof Mesh)) return;
       object.castShadow = true;
@@ -905,16 +961,16 @@ async function loadPlayStation2Model() {
     group.updateMatrixWorld(true);
     const sourceBounds = new Box3().setFromObject(group);
     const sourceSize = sourceBounds.getSize(new Vector3());
+    // Fit the console in the clear tabletop strip in front of the center TV.
     group.scale.setScalar(1.08 / Math.max(sourceSize.x, 0.001));
     group.updateMatrixWorld(true);
     const scaledBounds = new Box3().setFromObject(group);
     const scaledCenter = scaledBounds.getCenter(new Vector3());
     group.position.set(
-      0.78 - scaledCenter.x,
-      TABLE_COLLIDER.topY + 0.01 - scaledBounds.min.y,
-      0.02 - scaledCenter.z,
+      -scaledCenter.x,
+      TABLE_LAYOUT.topY + 0.01 - scaledBounds.min.y,
+      TABLE_LAYOUT.centerZ + TABLE_LAYOUT.halfDepth - 0.07 - scaledBounds.max.z,
     );
-    group.rotation.y = -0.2;
     group.traverse((object) => {
       if (!(object instanceof Mesh)) return;
       object.castShadow = true;
@@ -939,20 +995,13 @@ async function loadRealisticTelevisions(channels: ChannelConfig[], disposed: () 
     }
     const group = new Group();
     group.name = "RealisticTelevisionLineup";
-    const variants = [
-      { scale: 3.25, tint: "#aaa38e", y: 0.2, z: -0.46 },
-      { scale: 3.15, tint: "#8d958b", y: 0.2, z: -0.72 },
-      { scale: 3.45, tint: "#777d82", y: 0.2, z: -0.48 },
-    ];
-
     loadedModels.forEach((result, index) => {
       const channel = channels[index];
-      const variant = variants[index];
       const television = result.scene;
       television.name = `RealisticTelevision-${channel.id}`;
-      television.position.set(channel.position[0], variant.y, variant.z);
+      television.position.set(...channel.position);
       television.rotation.y = channel.rotationY;
-      television.scale.setScalar(variant.scale);
+      television.scale.setScalar(channel.scale);
       television.traverse((object) => {
         if (!(object instanceof Mesh)) return;
         object.castShadow = true;
@@ -960,7 +1009,7 @@ async function loadRealisticTelevisions(channels: ChannelConfig[], disposed: () 
         const sourceMaterials = Array.isArray(object.material) ? object.material : [object.material];
         const clonedMaterials = sourceMaterials.map((sourceMaterial) => {
           const cloned = sourceMaterial.clone();
-          if ("color" in cloned && cloned.color instanceof Color) cloned.color.multiply(new Color(variant.tint));
+          if ("color" in cloned && cloned.color instanceof Color) cloned.color.multiply(new Color(channel.tint));
           return cloned;
         });
         object.material = Array.isArray(object.material) ? clonedMaterials : clonedMaterials[0];
@@ -1036,7 +1085,7 @@ function drawScreen(canvas: HTMLCanvasElement, label: string, subtitle: string, 
   context.shadowColor = "#2457ff";
   context.shadowBlur = 6;
   context.fillStyle = "#f8fafa";
-  context.font = "700 64px monospace";
+  context.font = "700 88px monospace";
   const visibleLabel = time > 0 && time < 260 ? scrambleScreenLabel(label, time) : label;
   context.fillText(visibleLabel, width / 2, height / 2 + 12);
   context.shadowBlur = 3;

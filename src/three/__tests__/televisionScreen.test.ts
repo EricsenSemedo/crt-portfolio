@@ -1,6 +1,9 @@
+import { createHash } from "node:crypto";
+import { diffuseDigest } from "../assets/televisionPreviewData";
 import { readFileSync } from "node:fs";
 import { BufferAttribute, BufferGeometry, Group, Mesh, PerspectiveCamera, PlaneGeometry, Raycaster, Vector3 } from "three";
 import { describe, expect, it } from "vitest";
+import { createTelevisionPreview } from "../assets/createTelevisionPreview";
 import { attachTelevisionScreen } from "../televisionScreen";
 
 function loadTelevisionGeometry() {
@@ -46,4 +49,24 @@ describe("model-owned television display", () => {
       expect(screen.geometry.boundingBox!.max.z - screen.geometry.boundingBox!.min.z).toBeGreaterThan(0.02);
     }
   });
+});
+
+// Catch stale generated previews when the shipped model changes.
+it("keeps preview geometry and glass identical to the detailed TV", () => {
+  const preview = createTelevisionPreview("#aaa38e");
+  const source = loadTelevisionGeometry();
+  const body = preview.group.getObjectByName("Television_01") as Mesh;
+  expect(Array.from(body.geometry.getAttribute("position").array)).toEqual(Array.from(source.getAttribute("position").array));
+  expect(Array.from(body.geometry.getAttribute("normal").array)).toEqual(Array.from(source.getAttribute("normal").array));
+  expect(diffuseDigest).toBe(createHash("sha256").update(readFileSync("public/models/television-01/textures/Television_01_diff_1k.jpg")).digest("hex"));
+  expect(Array.from(body.geometry.index!.array)).toEqual(Array.from(source.index!.array));
+  const before = Array.from(preview.screenPlane.geometry.getAttribute("position").array);
+  const center = preview.screenPlane.position.clone();
+  const detailed = new Mesh(source);
+  attachTelevisionScreen(preview.screenPlane, detailed);
+  expect(Array.from(preview.screenPlane.geometry.getAttribute("position").array)).toEqual(before);
+  expect(preview.screenPlane.position.equals(center)).toBe(true);
+  preview.screenPlane.geometry.dispose();
+  source.dispose();
+  preview.dispose();
 });

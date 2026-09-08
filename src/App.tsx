@@ -92,6 +92,7 @@ function PortfolioApp() {
             requestedChannel={sceneChannel}
             quickTransition={Boolean(pendingId)}
             screenEffectActive={screenEffectActive}
+            paused={Boolean(selectedId) && !screenEffectActive}
             onOverviewComplete={handleOverviewComplete}
             onRequestedFocusComplete={handleRequestedFocusComplete}
           />

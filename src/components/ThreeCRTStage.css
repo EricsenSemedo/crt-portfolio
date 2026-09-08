@@ -59,6 +59,25 @@
 .three-stage__loader { position: absolute; inset: 0; z-index: 10; display: grid; place-items: center; background: #111; color: var(--phosphor); font-size: .68rem; letter-spacing: .28em; transition: opacity 500ms ease, visibility 500ms; }
 .three-stage__loader.is-ready { opacity: 0; visibility: hidden; }
 
+
+.three-stage__fallback {
+  position: absolute;
+  inset: 35% 1rem auto;
+  text-align: center;
+}
+.three-stage.is-unavailable .three-stage__channels {
+  position: absolute;
+  inset: 50% 1rem auto;
+  z-index: 5;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: .5rem;
+  width: auto;
+  height: auto;
+  clip-path: none;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .three-stage__loader, .three-stage__channels button { transition-duration: .01ms; }
 }

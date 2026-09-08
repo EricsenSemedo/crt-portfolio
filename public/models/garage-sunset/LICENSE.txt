@@ -1,0 +1,24 @@
+Garage sunset assets — downloaded 2026-09-08
+All source assets: CC0 1.0 Universal
+https://creativecommons.org/publicdomain/zero/1.0/
+
+garage_floor — Jenelle van Heerden
+https://polyhaven.com/a/garage_floor
+
+asphalt_02 — Rob Tuytel
+https://polyhaven.com/a/asphalt_02
+
+roof_slates_02 — Rob Tuytel
+https://polyhaven.com/a/roof_slates_02
+
+leafy_grass — Charlotte Baglioni
+https://polyhaven.com/a/leafy_grass
+
+jacaranda_tree — Rico Cilliers (All), Rob Tuytel (guidance)
+https://polyhaven.com/a/jacaranda_tree
+
+Modifications: material texture maps resized to 512px JPEG.
+Jacaranda simplified to 19,508 triangles, with 512px JPEG color maps and
+Meshopt compression. Normal and ORM maps removed for distant rendering.
+Leaves use opaque rendering because the simplified texture is JPEG without alpha.
+The house and garage architecture are authored in code.

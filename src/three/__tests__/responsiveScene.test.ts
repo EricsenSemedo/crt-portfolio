@@ -13,7 +13,7 @@ describe("responsive scene layout", () => {
 
     expect(layout.portrait).toBe(true);
     expect(layout.fov).toBeGreaterThan(50);
-    expect(layout.channelX[2] - layout.channelX[0]).toBeLessThan(3);
+    expect(layout.channelX[2] - layout.channelX[0]).toBeLessThan(3.5);
     expect(layout.tvScale).toBeLessThan(1);
   });
 
@@ -25,14 +25,14 @@ describe("responsive scene layout", () => {
 
     expect(layout.ballStartX).toBeGreaterThan(bounds.min);
     expect(layout.ballStartX).toBeLessThan(bounds.max);
-    expect(bounds.min).toBeGreaterThan(-1.5);
+    expect(bounds.min).toBeGreaterThan(-2);
   });
 
   it("preserves the wider desktop arrangement", () => {
     const layout = getSceneLayout(1440, 900);
 
     expect(layout.portrait).toBe(false);
-    expect(layout.channelX).toEqual([-1.82, 0, 1.84]);
+    expect(layout.channelX).toEqual([-2.06, 0, 2.1]);
     expect(layout.tvScale).toBe(1);
     expect(layout.ballStartX).toBe(-2.88);
   });
