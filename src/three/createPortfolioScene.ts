@@ -31,7 +31,7 @@ import { HDRLoader } from "three/examples/jsm/loaders/HDRLoader.js";
 import { PORTFOLIO_CHANNELS, type PortfolioChannelId } from "../data/channels";
 import { createBasementRoom } from "./assets/createBasementRoom";
 import { createTelevisionPreview } from "./assets/createTelevisionPreview";
-import { createTable } from "./assets/createTable";
+import { createTable, TABLE_LAYOUT } from "./assets/createTable";
 import {
   getScreenTransitionDuration,
   getRandomScreenTransitionKind,
@@ -123,7 +123,6 @@ export interface PortfolioSceneController {
 
 const OVERVIEW_POSITION = new Vector3(0, 1.82, 7.55);
 const OVERVIEW_TARGET = new Vector3(0, 0.05, -0.4);
-const TABLE_COLLIDER = { centerZ: -0.65, halfWidth: 2.95, halfDepth: 0.925, topY: 0.11 };
 
 export function createPortfolioScene(): PortfolioSceneController {
   const motionPreference = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -159,7 +158,7 @@ export function createPortfolioScene(): PortfolioSceneController {
   const room = createBasementRoom();
   room.group.position.set(0, 0, -0.4);
   const table = createTable();
-  table.group.position.set(0, -0.06, -0.65);
+  table.group.position.set(0, TABLE_LAYOUT.topY, TABLE_LAYOUT.centerZ);
   scene.add(room.group, table.group);
 
   const channels: ChannelConfig[] = [
@@ -231,7 +230,7 @@ export function createPortfolioScene(): PortfolioSceneController {
     if (isDisposed) environment.dispose();
     else importedResources.push(environment);
   });
-  void loadIndustrialTable().then((importedTable) => {
+  void loadWoodenTable().then((importedTable) => {
     if (!importedTable) return;
     if (isDisposed) importedTable.dispose();
     else {
@@ -275,7 +274,7 @@ export function createPortfolioScene(): PortfolioSceneController {
         radius: 0.41,
         floorY: -0.68,
         active: false,
-        horizontalBounds: getBasketballHorizontalBounds(sceneLayout, camera.aspect, 0.42, 0.41),
+        horizontalBounds: getBasketballHorizontalBounds(sceneLayout, camera.aspect, basketball.group.position.z, 0.41),
       };
       basketball.group.position.x = sceneLayout.ballStartX;
     }
@@ -604,12 +603,12 @@ export function createPortfolioScene(): PortfolioSceneController {
       channel.asset.group.position.x = layout.channelX[index];
       channel.asset.group.position.y = scaleCoordinateAroundPivot(
         channel.position[1],
-        TABLE_COLLIDER.topY,
+        TABLE_LAYOUT.topY,
         layout.tvScale,
       );
       channel.asset.group.position.z = scaleCoordinateAroundPivot(
         channel.position[2],
-        TABLE_COLLIDER.centerZ,
+        TABLE_LAYOUT.centerZ,
         layout.tvScale,
       );
       channel.asset.group.scale.setScalar(channel.scale * layout.tvScale);
@@ -622,8 +621,8 @@ export function createPortfolioScene(): PortfolioSceneController {
       television.userData.desktopScale = desktopScale;
       television.userData.desktopY = desktopY;
       television.userData.desktopZ = desktopZ;
-      television.position.y = scaleCoordinateAroundPivot(desktopY, TABLE_COLLIDER.topY, layout.tvScale);
-      television.position.z = scaleCoordinateAroundPivot(desktopZ, TABLE_COLLIDER.centerZ, layout.tvScale);
+      television.position.y = scaleCoordinateAroundPivot(desktopY, TABLE_LAYOUT.topY, layout.tvScale);
+      television.position.z = scaleCoordinateAroundPivot(desktopZ, TABLE_LAYOUT.centerZ, layout.tvScale);
       television.scale.setScalar(desktopScale * layout.tvScale);
     });
     if (realisticTelevisions) {
@@ -721,17 +720,22 @@ function updateBasketballPhysics(body: BasketballBody, colliders: Box3[], delta:
 }
 
 function createBasketballColliders() {
-  const tableMinZ = TABLE_COLLIDER.centerZ - TABLE_COLLIDER.halfDepth;
-  const tableMaxZ = TABLE_COLLIDER.centerZ + TABLE_COLLIDER.halfDepth;
+  const tableMinZ = TABLE_LAYOUT.centerZ - TABLE_LAYOUT.halfDepth;
+  const tableMaxZ = TABLE_LAYOUT.centerZ + TABLE_LAYOUT.halfDepth;
   return [
     new Box3(
-      new Vector3(-TABLE_COLLIDER.halfWidth, -0.05, tableMinZ),
-      new Vector3(TABLE_COLLIDER.halfWidth, TABLE_COLLIDER.topY, tableMaxZ),
+      new Vector3(-TABLE_LAYOUT.halfWidth, TABLE_LAYOUT.topY - TABLE_LAYOUT.topThickness, tableMinZ),
+      new Vector3(TABLE_LAYOUT.halfWidth, TABLE_LAYOUT.topY, tableMaxZ),
     ),
-    ...[-2.55, 2.55].flatMap((x) => [-1.25, -0.05].map((z) => new Box3(
-      new Vector3(x - 0.12, -1.14, z - 0.12),
-      new Vector3(x + 0.12, -0.05, z + 0.12),
-    ))),
+    ...[-TABLE_LAYOUT.legX, TABLE_LAYOUT.legX].flatMap((x) => (
+      [-TABLE_LAYOUT.legZ, TABLE_LAYOUT.legZ].map((offsetZ) => {
+        const z = TABLE_LAYOUT.centerZ + offsetZ;
+        return new Box3(
+          new Vector3(x - TABLE_LAYOUT.legHalfWidth, TABLE_LAYOUT.floorY, z - TABLE_LAYOUT.legHalfDepth),
+          new Vector3(x + TABLE_LAYOUT.legHalfWidth, TABLE_LAYOUT.topY - TABLE_LAYOUT.topThickness, z + TABLE_LAYOUT.legHalfDepth),
+        );
+      })
+    )),
   ];
 }
 
@@ -866,7 +870,7 @@ async function loadBasketballModel() {
     const sourceDiameter = Math.max(modelSize.x, modelSize.y, modelSize.z);
     const displayDiameter = 0.82;
     group.scale.setScalar(displayDiameter / Math.max(sourceDiameter, 0.001));
-    group.position.set(-2.88, -0.68, 0.42);
+    group.position.set(-2.88, -0.68, 1.4);
     group.rotation.set(0.12, -0.45, -0.18);
     group.traverse((object) => {
       if (!(object instanceof Mesh)) return;
@@ -882,25 +886,25 @@ async function loadBasketballModel() {
   }
 }
 
-async function loadIndustrialTable() {
+async function loadWoodenTable() {
   try {
     const result = await new GLTFLoader().loadAsync(
-      `${import.meta.env.BASE_URL}models/industrial-coffee-table-cc0/industrial_coffee_table_1k.gltf`,
+      `${import.meta.env.BASE_URL}models/wooden-table-cc0/wooden_table_02_1k.gltf`,
     );
     const group = result.scene;
-    group.name = "IndustrialCoffeeTable-PolyHaven-CC0";
+    group.name = "WoodenTable-PolyHaven-CC0";
     group.updateMatrixWorld(true);
     const sourceBounds = new Box3().setFromObject(group);
     const sourceSize = sourceBounds.getSize(new Vector3());
     group.scale.set(
-      5.9 / Math.max(sourceSize.x, 0.001),
-      1.25 / Math.max(sourceSize.y, 0.001),
-      1.85 / Math.max(sourceSize.z, 0.001),
+      TABLE_LAYOUT.halfWidth * 2 / Math.max(sourceSize.x, 0.001),
+      (TABLE_LAYOUT.topY - TABLE_LAYOUT.floorY) / Math.max(sourceSize.y, 0.001),
+      TABLE_LAYOUT.halfDepth * 2 / Math.max(sourceSize.z, 0.001),
     );
     group.updateMatrixWorld(true);
     const scaledBounds = new Box3().setFromObject(group);
     const scaledCenter = scaledBounds.getCenter(new Vector3());
-    group.position.set(-scaledCenter.x, -1.14 - scaledBounds.min.y, TABLE_COLLIDER.centerZ - scaledCenter.z);
+    group.position.set(-scaledCenter.x, TABLE_LAYOUT.floorY - scaledBounds.min.y, TABLE_LAYOUT.centerZ - scaledCenter.z);
     group.traverse((object) => {
       if (!(object instanceof Mesh)) return;
       object.castShadow = true;
@@ -923,14 +927,14 @@ async function loadPlayStation2Model() {
     const sourceBounds = new Box3().setFromObject(group);
     const sourceSize = sourceBounds.getSize(new Vector3());
     // Fit the console in the clear tabletop strip in front of the center TV.
-    group.scale.setScalar(0.48 / Math.max(sourceSize.x, 0.001));
+    group.scale.setScalar(1.08 / Math.max(sourceSize.x, 0.001));
     group.updateMatrixWorld(true);
     const scaledBounds = new Box3().setFromObject(group);
     const scaledCenter = scaledBounds.getCenter(new Vector3());
     group.position.set(
       -scaledCenter.x,
-      TABLE_COLLIDER.topY + 0.01 - scaledBounds.min.y,
-      TABLE_COLLIDER.centerZ + TABLE_COLLIDER.halfDepth - 0.02 - scaledBounds.max.z,
+      TABLE_LAYOUT.topY + 0.01 - scaledBounds.min.y,
+      TABLE_LAYOUT.centerZ + TABLE_LAYOUT.halfDepth - 0.07 - scaledBounds.max.z,
     );
     group.traverse((object) => {
       if (!(object instanceof Mesh)) return;

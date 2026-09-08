@@ -1,6 +1,6 @@
 {
   "asset": {
-    "generator": "Khronos glTF Blender I/O v4.5.48",
+    "generator": "Khronos glTF Blender I/O v1.6.16",
     "version": "2.0"
   },
   "scene": 0,
@@ -15,19 +15,13 @@
   "nodes": [
     {
       "mesh": 0,
-      "name": "industrial_coffee_table",
-      "rotation": [
-        0.7071068286895752,
-        0,
-        0,
-        0.7071068286895752
-      ]
+      "name": "wooden_table_02"
     }
   ],
   "materials": [
     {
       "doubleSided": true,
-      "name": "industrial_coffee_table",
+      "name": "wooden_table_02",
       "normalTexture": {
         "index": 0
       },
@@ -43,7 +37,7 @@
   ],
   "meshes": [
     {
-      "name": "Cylinder.001",
+      "name": "Cube.003",
       "primitives": [
         {
           "attributes": {
@@ -74,80 +68,76 @@
   "images": [
     {
       "mimeType": "image/jpeg",
-      "name": "industrial_coffee_table_nor_gl",
-      "uri": "textures/industrial_coffee_table_nor_gl_1k.jpg"
+      "name": "wooden_table_02_nor_gl",
+      "uri": "textures/wooden_table_02_nor_gl_1k.jpg"
     },
     {
       "mimeType": "image/jpeg",
-      "name": "industrial_coffee_table_diff",
-      "uri": "textures/industrial_coffee_table_diff_1k.jpg"
+      "name": "wooden_table_02_diff",
+      "uri": "textures/wooden_table_02_diff_1k.jpg"
     },
     {
       "mimeType": "image/jpeg",
-      "name": "industrial_coffee_table_metal-industrial_coffee_table_rough",
-      "uri": "textures/industrial_coffee_table_arm_1k.jpg"
+      "name": "wooden_table_02_metal-wooden_table_02_rough",
+      "uri": "textures/wooden_table_02_arm_1k.jpg"
     }
   ],
   "accessors": [
     {
       "bufferView": 0,
       "componentType": 5126,
-      "count": 33975,
+      "count": 200,
       "max": [
-        0.3925403654575348,
-        0.3789639472961426,
-        1.668930025289228e-7
+        0.5672084093093872,
+        0.7994177341461182,
+        0.35301241278648376
       ],
       "min": [
-        -0.38572409749031067,
-        -0.37896424531936646,
-        -0.638421893119812
+        -0.5672082304954529,
+        -0.00012515290291048586,
+        -0.35301241278648376
       ],
       "type": "VEC3"
     },
     {
       "bufferView": 1,
       "componentType": 5126,
-      "count": 33975,
+      "count": 200,
       "type": "VEC3"
     },
     {
       "bufferView": 2,
       "componentType": 5126,
-      "count": 33975,
+      "count": 200,
       "type": "VEC2"
     },
     {
       "bufferView": 3,
       "componentType": 5123,
-      "count": 123900,
+      "count": 588,
       "type": "SCALAR"
     }
   ],
   "bufferViews": [
     {
       "buffer": 0,
-      "byteLength": 407700,
-      "byteOffset": 0,
-      "target": 34962
+      "byteLength": 2400,
+      "byteOffset": 0
     },
     {
       "buffer": 0,
-      "byteLength": 407700,
-      "byteOffset": 407700,
-      "target": 34962
+      "byteLength": 2400,
+      "byteOffset": 2400
     },
     {
       "buffer": 0,
-      "byteLength": 271800,
-      "byteOffset": 815400,
-      "target": 34962
+      "byteLength": 1600,
+      "byteOffset": 4800
     },
     {
       "buffer": 0,
-      "byteLength": 247800,
-      "byteOffset": 1087200,
-      "target": 34963
+      "byteLength": 1176,
+      "byteOffset": 6400
     }
   ],
   "samplers": [
@@ -158,8 +148,8 @@
   ],
   "buffers": [
     {
-      "byteLength": 1335000,
-      "uri": "industrial_coffee_table.bin"
+      "byteLength": 7576,
+      "uri": "wooden_table_02.bin"
     }
   ]
 }

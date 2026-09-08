@@ -7,6 +7,7 @@ Use imported assets selectively. The authored CRT layout and camera anchors rema
 | Asset | Creator | Source | License | Modified | Notes |
 | --- | --- | --- | --- | --- | --- |
 | Basketball | DigitalN8m4r3 / Miodrag Sejic | [OpenGameArt](https://opengameart.org/content/basketballs) | CC0 | Yes | Smooth mesh with classic leather textures; 512px JPEG maps embedded in GLB, loaded asynchronously |
+| Wooden Table 02 | Serhii Khromov | [Poly Haven](https://polyhaven.com/a/wooden_table_02) | CC0 | Yes | Downloaded 2026-09-08; 1K glTF, scaled into a low wooden media table; 196 triangles and about 485 KB |
 
 ## Recommended sources
 

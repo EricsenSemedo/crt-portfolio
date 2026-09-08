@@ -7,6 +7,12 @@ import {
   type Material,
 } from "three";
 
+// Shared by the fallback, imported model placement, and basketball collisions.
+export const TABLE_LAYOUT = {
+  centerZ: -0.3, halfWidth: 2.95, halfDepth: 1.275, topY: 0.11, floorY: -1.14,
+  topThickness: 0.11, legX: 2.53, legZ: 0.98, legHalfWidth: 0.16, legHalfDepth: 0.11,
+};
+
 export interface TableAsset {
   group: Group;
   dispose: () => void;
@@ -15,7 +21,6 @@ export interface TableAsset {
 interface TableMaterials {
   wood: MeshStandardMaterial;
   darkWood: MeshStandardMaterial;
-  edge: MeshStandardMaterial;
 }
 
 export function createTable(): TableAsset {
@@ -46,19 +51,15 @@ export function createTable(): TableAsset {
     return mesh;
   }
 
-  box("TableTop", [5.8, 0.24, 1.72], [0, 0, 0], materials.wood);
-  box("TableFrontEdge", [5.96, 0.18, 0.14], [0, -0.06, 0.93], materials.edge);
-  box("TableBackEdge", [5.96, 0.18, 0.14], [0, -0.06, -0.93], materials.edge);
-  box("TableLeftEdge", [0.14, 0.18, 1.78], [-3.02, -0.06, 0], materials.edge);
-  box("TableRightEdge", [0.14, 0.18, 1.78], [3.02, -0.06, 0], materials.edge);
-
-  box("TableLegFrontLeft", [0.24, 1.42, 0.24], [-2.55, -0.83, 0.64], materials.darkWood);
-  box("TableLegFrontRight", [0.24, 1.42, 0.24], [2.55, -0.83, 0.64], materials.darkWood);
-  box("TableLegBackLeft", [0.24, 1.42, 0.24], [-2.55, -0.83, -0.64], materials.darkWood);
-  box("TableLegBackRight", [0.24, 1.42, 0.24], [2.55, -0.83, -0.64], materials.darkWood);
-
-  box("TableLowerBraceFront", [5.1, 0.12, 0.12], [0, -1.24, 0.64], materials.edge);
-  box("TableLowerBraceBack", [5.1, 0.12, 0.12], [0, -1.24, -0.64], materials.edge);
+  const { halfWidth, halfDepth, topY, floorY, topThickness, legX, legZ, legHalfWidth, legHalfDepth } = TABLE_LAYOUT;
+  box("TableTop", [halfWidth * 2, topThickness, halfDepth * 2], [0, -topThickness / 2, 0], materials.wood);
+  const legHeight = topY - floorY - topThickness;
+  for (const [side, x] of [["Left", -legX], ["Right", legX]] as const) {
+    for (const [end, z] of [["Front", legZ], ["Back", -legZ]] as const) {
+      box(`TableLeg${end}${side}`, [legHalfWidth * 2, legHeight, legHalfDepth * 2],
+        [x, -topThickness - legHeight / 2, z], materials.darkWood);
+    }
+  }
 
   return {
     group,
@@ -79,11 +80,6 @@ function createTableMaterials(): TableMaterials {
     darkWood: new MeshStandardMaterial({
       color: "#33281d",
       roughness: 0.82,
-      metalness: 0.02,
-    }),
-    edge: new MeshStandardMaterial({
-      color: "#4a3927",
-      roughness: 0.8,
       metalness: 0.02,
     }),
   };
