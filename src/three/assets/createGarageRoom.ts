@@ -45,14 +45,14 @@ export function createGarageRoom() {
   box([halfWidth * 2, 0.1, frontZ - doorwayZ], [0, floorY - 0.05, (frontZ + doorwayZ) / 2], concrete);
   box([0.18, 5.6, frontZ - doorwayZ], [-halfWidth, 1.64, (frontZ + doorwayZ) / 2], plaster);
   box([0.18, 5.6, frontZ - doorwayZ], [halfWidth, 1.64, (frontZ + doorwayZ) / 2], plaster);
-  box([9.6, 0.16, frontZ - doorwayZ], [0, 4.4, (frontZ + doorwayZ) / 2], metal);
+  box([9.6, 0.16, frontZ - doorwayZ], [0, GARAGE_BOUNDS.ceilingY + 0.08, (frontZ + doorwayZ) / 2], metal);
   // Raised sectional door and jambs frame the exterior without a back wall.
   box([9.6, 0.55, 0.25], [0, 4.15, doorwayZ], wood);
   for (const x of [-4.45, 4.45]) {
     box([0.28, 5.1, 0.35], [x, 1.39, doorwayZ], wood);
     box([0.06, 0.08, 5], [x, 3.8, -1.2], metal);
   }
-  for (let z = -3.2; z < 1; z += 0.65) box([8.8, 0.08, 0.61], [0, 3.94, z], metal);
+  for (let z = -3.2; z < 1; z += 0.65) box([GARAGE_BOUNDS.raisedDoorHalfWidth * 2, 0.08, 0.61], [0, GARAGE_BOUNDS.raisedDoorY + 0.04, z], metal);
   // Large concrete slabs, with the floor extending beneath the viewer.
   for (const x of [-2.4, 0, 2.4]) box([0.012, 0.002, 13.6], [x, floorY + 0.002, 3.2], seams);
   for (const z of [-1, 2.4, 5.8, 9.2]) box([9.6, 0.002, 0.012], [0, floorY + 0.003, z], seams);

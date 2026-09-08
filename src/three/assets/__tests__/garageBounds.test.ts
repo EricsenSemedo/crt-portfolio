@@ -18,4 +18,19 @@ describe("garage basketball boundary", () => {
     containBasketball(position, velocity, 0.41);
     expect(velocity.z).toBe(3);
   });
+  it("bounces a fast upward throw below the raised garage door", () => {
+    const position = new Vector3(0, 6, 0);
+    const velocity = new Vector3(1, 18, 0);
+    containBasketball(position, velocity, 0.41);
+    expect(position.y + 0.41).toBeCloseTo(3.9);
+    expect(velocity.y).toBeLessThan(0);
+  });
+  it("bounces below the roof behind the raised door without reversing a falling ball", () => {
+    const position = new Vector3(0, 6, 2);
+    const velocity = new Vector3(0, -2, 0);
+    containBasketball(position, velocity, 0.41);
+    expect(position.y + 0.41).toBeCloseTo(4.32);
+    expect(velocity.y).toBe(-2);
+  });
+
 });

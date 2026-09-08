@@ -5,6 +5,7 @@ import {
   CanvasTexture,
   Color,
   DirectionalLight,
+  EquirectangularReflectionMapping,
   Group,
   MathUtils,
   Mesh,
@@ -19,6 +20,7 @@ import {
   Sprite,
   SpriteMaterial,
   SRGBColorSpace,
+  TextureLoader,
   Vector2,
   Vector3,
   WebGLRenderer,
@@ -150,11 +152,12 @@ export function createPortfolioScene(): PortfolioSceneController {
   const ceiling = new PointLight("#ffdbb1", 10, 12, 1.8);
   ceiling.position.set(-1.2, 4.2, 2.2);
   const sunlight = new DirectionalLight("#ffc379", 2.6);
-  sunlight.position.set(-6.6, 3.6, -10);
+  // Same low sun direction as the rotated Industrial Sunset 02 panorama.
+  sunlight.position.set(-13.204, 0.435, -34.724);
   sunlight.target.position.set(0, -1.16, 3);
   sunlight.castShadow = true;
   sunlight.shadow.mapSize.set(1024, 1024);
-  Object.assign(sunlight.shadow.camera, { left: -8, right: 8, top: 6, bottom: -6, near: 0.5, far: 35 });
+  Object.assign(sunlight.shadow.camera, { left: -8, right: 8, top: 6, bottom: -6, near: 0.5, far: 80 });
   sunlight.shadow.bias = -0.001;
   sunlight.shadow.normalBias = 0.025;
   const fill = new DirectionalLight("#2457ff", 0.28);
@@ -230,7 +233,7 @@ export function createPortfolioScene(): PortfolioSceneController {
   let basketballBody: BasketballBody | null = null;
   let realisticTelevisions: Group | null = null;
   let isDisposed = false;
-  void loadGarageEnvironment(renderer, scene, () => isDisposed).then((environment) => {
+  void loadSunsetEnvironment(renderer, scene, () => isDisposed).then((environment) => {
     if (!environment) return;
     if (isDisposed) environment.dispose();
     else importedResources.push(environment);
@@ -839,31 +842,47 @@ function createInteractionPrompt() {
   };
 }
 
-async function loadGarageEnvironment(renderer: WebGLRenderer, scene: Scene, disposed: () => boolean) {
-  try {
-    const source = await new HDRLoader().loadAsync(`${import.meta.env.BASE_URL}environments/garage-1k.hdr`);
-    try {
-      if (disposed()) return null;
-      const generator = new PMREMGenerator(renderer);
-      try {
-        const environment = generator.fromEquirectangular(source);
-        scene.environment = environment.texture;
-        scene.environmentIntensity = 0.18;
-        return {
-          dispose: () => {
-            if (scene.environment === environment.texture) scene.environment = null;
-            environment.dispose();
-          },
-        };
-      } finally {
-        generator.dispose();
-      }
-    } finally {
-      source.dispose();
-    }
-  } catch {
+async function loadSunsetEnvironment(renderer: WebGLRenderer, scene: Scene, disposed: () => boolean) {
+  const root = `${import.meta.env.BASE_URL}environments/`;
+  const [hdrResult, skyResult] = await Promise.allSettled([
+    new HDRLoader().loadAsync(root + "sunset-1k.hdr"),
+    new TextureLoader().loadAsync(root + "sunset-4k.jpg"),
+  ]);
+  const source = hdrResult.status === "fulfilled" ? hdrResult.value : null;
+  const sky = skyResult.status === "fulfilled" ? skyResult.value : null;
+  if (disposed()) {
+    source?.dispose();
+    sky?.dispose();
     return null;
   }
+  // Native environment backgrounds stay at infinity as the camera moves.
+  scene.backgroundRotation.y = scene.environmentRotation.y = 2.5364;
+  if (sky) {
+    sky.mapping = EquirectangularReflectionMapping;
+    sky.colorSpace = SRGBColorSpace;
+    scene.background = sky;
+  }
+  let environment: ReturnType<PMREMGenerator["fromEquirectangular"]> | null = null;
+  if (source) {
+    const generator = new PMREMGenerator(renderer);
+    try {
+      environment = generator.fromEquirectangular(source);
+      scene.environment = environment.texture;
+      scene.environmentIntensity = 0.3;
+      if (!sky) scene.background = environment.texture;
+    } catch {
+      // The high-resolution background can still work without reflections.
+    } finally {
+      generator.dispose();
+      source.dispose();
+    }
+  }
+  return { dispose() {
+    if (scene.background === sky || scene.background === environment?.texture) scene.background = null;
+    if (scene.environment === environment?.texture) scene.environment = null;
+    sky?.dispose();
+    environment?.dispose();
+  } };
 }
 
 async function loadBasketballModel() {

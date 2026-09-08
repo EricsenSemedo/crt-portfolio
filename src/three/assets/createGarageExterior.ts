@@ -1,10 +1,8 @@
 import {
-  BackSide, Box3, BoxGeometry, BufferGeometry, Color, DoubleSide, Group, Mesh, MeshBasicMaterial, SphereGeometry,
+  BoxGeometry, BufferGeometry, DoubleSide, Group, Mesh,
   MeshStandardMaterial, PlaneGeometry, RepeatWrapping, SRGBColorSpace,
-  TextureLoader, Vector3, type Texture,
+  TextureLoader, type Texture,
 } from "three";
-import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
-import { MeshoptDecoder } from "three/examples/jsm/libs/meshopt_decoder.module.js";
 import { mergeGeometries } from "three/examples/jsm/utils/BufferGeometryUtils.js";
 
 export async function createGarageExterior() {
@@ -12,18 +10,12 @@ export async function createGarageExterior() {
   const group = new Group();
   group.name = "GarageExterior";
   const textures: Texture[] = [];
-  const skyMaterial = new MeshBasicMaterial({ side: BackSide, toneMapped: false });
   const materials: MeshStandardMaterial[] = [];
   const geometries: BufferGeometry[] = [];
-  const treeGeometries = new Set<BufferGeometry>();
-  const treeMaterials = new Set<MeshStandardMaterial>();
   const batches = new Map<MeshStandardMaterial, BufferGeometry[]>();
   function dispose() {
-    skyMaterial.dispose();
     geometries.forEach(g => g.dispose());
     materials.forEach(m => m.dispose());
-    treeGeometries.forEach(g => g.dispose());
-    treeMaterials.forEach(m => { m.map?.dispose(); m.dispose(); });
     textures.forEach(t => t.dispose());
   }
   function material(color: string) {
@@ -75,14 +67,6 @@ export async function createGarageExterior() {
       textured("leafy_grass", [24, 24]), textured("roof_slates_02", [4, 2]),
       textured("garage_floor", [3, 4]),
     ]);
-    const panorama = await texture("sunset", true, [1, 1]).catch(() => null);
-    skyMaterial.map = panorama;
-    const skyGeometry = new SphereGeometry(65, 32, 16);
-    geometries.push(skyGeometry);
-    const sky = new Mesh(skyGeometry, skyMaterial);
-    sky.rotation.y = 1;
-    sky.position.y = -1.16;
-    if (panorama) group.add(sky);
     ground(9.55, 13.6, 0, 3.2, concrete, -1.151);
     ground(100, 80, 0, -44, grass, -1.19);
     ground(9.1, 10.4, 0, -8.8, drive);
@@ -131,29 +115,9 @@ export async function createGarageExterior() {
       parts.forEach(g => g.dispose());
       mesh(merged, m).castShadow = true;
     }
-    const tree = (await new GLTFLoader().setMeshoptDecoder(MeshoptDecoder).loadAsync(root + "jacaranda.glb")).scene;
-    tree.traverse(object => {
-      if (!(object instanceof Mesh)) return;
-      treeGeometries.add(object.geometry);
-      for (const m of Array.isArray(object.material) ? object.material : [object.material]) {
-        treeMaterials.add(m);
-        m.color.multiply(new Color("#b7ba94"));
-      }
-    });
-    const bounds = new Box3().setFromObject(tree);
-    const size = bounds.getSize(new Vector3());
-    const center = bounds.getCenter(new Vector3());
-    for (const [x, z, height, rotation] of [[-7,-22,7,0],[11,-29,9,1.8],[-13,-31,9,-0.8]]) {
-      const instance = tree.clone(true);
-      const scale = height / size.y;
-      instance.scale.setScalar(scale);
-      instance.rotation.y = rotation;
-      instance.position.set(x - center.x * scale, -1.16 - bounds.min.y * scale, z - center.z * scale);
-      group.add(instance);
-    }
     return { group, dispose };
   } catch {
-    // Keep the textured architecture if only the optional tree fails.
+    // Keep any completed architecture if an optional resource fails.
     return { group, dispose };
   }
 }

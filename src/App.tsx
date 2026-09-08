@@ -110,7 +110,7 @@ function PortfolioApp() {
         {selectedId ? byId[selectedId] ?? null : null}
       </TVZoomOverlay>
 
-      <div className="global-crt-overlay" aria-hidden="true">
+      <div className="global-crt-overlay" aria-hidden="true" hidden={!selectedId}>
         <div className="global-crt-overlay__gloom" />
         <div className="global-crt-overlay__scan-beam" />
         <img className="global-crt-overlay__vignette" src={crtLensMatte} alt="" />
