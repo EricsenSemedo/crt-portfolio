@@ -4,6 +4,7 @@ import {
   TextureLoader, type Texture,
 } from "three";
 import { mergeGeometries } from "three/examples/jsm/utils/BufferGeometryUtils.js";
+import { createGarageTrees } from "./createGarageTrees";
 
 export async function createGarageExterior() {
   const root = `${import.meta.env.BASE_URL}models/garage-sunset/`;
@@ -13,7 +14,9 @@ export async function createGarageExterior() {
   const materials: MeshStandardMaterial[] = [];
   const geometries: BufferGeometry[] = [];
   const batches = new Map<MeshStandardMaterial, BufferGeometry[]>();
+  let trees: Awaited<ReturnType<typeof createGarageTrees>> | undefined;
   function dispose() {
+    trees?.dispose();
     geometries.forEach(g => g.dispose());
     materials.forEach(m => m.dispose());
     textures.forEach(t => t.dispose());
@@ -67,6 +70,7 @@ export async function createGarageExterior() {
       textured("leafy_grass", [24, 24]), textured("roof_slates_02", [4, 2]),
       textured("garage_floor", [3, 4]),
     ]);
+    grass.color.set("#4b9b38");
     ground(9.55, 13.6, 0, 3.2, concrete, -1.151);
     ground(100, 80, 0, -44, grass, -1.19);
     ground(9.1, 10.4, 0, -8.8, drive);
@@ -115,6 +119,8 @@ export async function createGarageExterior() {
       parts.forEach(g => g.dispose());
       mesh(merged, m).castShadow = true;
     }
+    trees = await createGarageTrees(root + "jacaranda.glb", -1.19);
+    group.add(trees.group);
     return { group, dispose };
   } catch {
     // Keep any completed architecture if an optional resource fails.
