@@ -26,9 +26,11 @@ import {
   WebGLRenderer,
 } from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
+import { MeshoptDecoder } from "three/examples/jsm/libs/meshopt_decoder.module.js";
 import { HDRLoader } from "three/examples/jsm/loaders/HDRLoader.js";
 import { PORTFOLIO_CHANNELS, type PortfolioChannelId } from "../data/channels";
 import { createGarageExterior } from "./assets/createGarageExterior";
+import { loadGarageStructure } from "./assets/loadGarageStructure";
 import { containBasketball } from "./assets/garageBounds";
 import { createGarageRoom } from "./assets/createGarageRoom";
 import { createTelevisionPreview } from "./assets/createTelevisionPreview";
@@ -232,6 +234,15 @@ export function createPortfolioScene(): PortfolioSceneController {
   let basketballBody: BasketballBody | null = null;
   let realisticTelevisions: Group | null = null;
   let isDisposed = false;
+  void loadGarageStructure().then(garage => {
+    if (!garage) return;
+    if (isDisposed) garage.dispose();
+    else {
+      room.group.visible = false;
+      scene.add(garage.group);
+      importedResources.push(garage);
+    }
+  });
   void loadSunsetEnvironment(renderer, scene, () => isDisposed).then((environment) => {
     if (!environment) return;
     if (isDisposed) environment.dispose();
@@ -922,11 +933,11 @@ async function loadBasketballModel() {
 
 async function loadWoodenTable() {
   try {
-    const result = await new GLTFLoader().loadAsync(
-      `${import.meta.env.BASE_URL}models/wooden-table-cc0/wooden_table_02_1k.gltf`,
+    const result = await new GLTFLoader().setMeshoptDecoder(MeshoptDecoder).loadAsync(
+      `${import.meta.env.BASE_URL}models/workbench/workbench.glb`,
     );
     const group = result.scene;
-    group.name = "WoodenTable-PolyHaven-CC0";
+    group.name = "WoodenWorkbench-PolyHaven-CC0";
     group.updateMatrixWorld(true);
     const sourceBounds = new Box3().setFromObject(group);
     const sourceSize = sourceBounds.getSize(new Vector3());

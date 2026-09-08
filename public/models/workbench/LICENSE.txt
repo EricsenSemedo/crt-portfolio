@@ -1,0 +1,5 @@
+Wooden Table 01 — Ethan Place / Poly Haven
+Source: https://polyhaven.com/a/WoodenTable_01
+Downloaded 2026-09-08. CC0 1.0 Universal.
+https://creativecommons.org/publicdomain/zero/1.0/
+Modifications: Meshopt-compressed GLB with the original 1K PBR textures.
