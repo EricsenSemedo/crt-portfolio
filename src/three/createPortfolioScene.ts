@@ -5,7 +5,6 @@ import {
   CanvasTexture,
   Color,
   DirectionalLight,
-  Fog,
   Group,
   MathUtils,
   Mesh,
@@ -29,7 +28,9 @@ import {
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { HDRLoader } from "three/examples/jsm/loaders/HDRLoader.js";
 import { PORTFOLIO_CHANNELS, type PortfolioChannelId } from "../data/channels";
-import { createBasementRoom } from "./assets/createBasementRoom";
+import { createGarageExterior } from "./assets/createGarageExterior";
+import { containBasketball } from "./assets/garageBounds";
+import { createGarageRoom } from "./assets/createGarageRoom";
 import { createTelevisionPreview } from "./assets/createTelevisionPreview";
 import { createTable, TABLE_LAYOUT } from "./assets/createTable";
 import {
@@ -128,9 +129,8 @@ export function createPortfolioScene(): PortfolioSceneController {
   const motionPreference = window.matchMedia("(prefers-reduced-motion: reduce)");
   const scene = new Scene();
   scene.background = new Color("#111111");
-  scene.fog = new Fog("#111111", 8, 17);
 
-  const camera = new PerspectiveCamera(38, 1, 0.1, 40);
+  const camera = new PerspectiveCamera(38, 1, 0.1, 120);
   camera.position.copy(OVERVIEW_POSITION);
   camera.lookAt(OVERVIEW_TARGET);
   const overviewPosition = OVERVIEW_POSITION.clone();
@@ -146,17 +146,22 @@ export function createPortfolioScene(): PortfolioSceneController {
   renderer.toneMappingExposure = 0.92;
   renderer.shadowMap.enabled = true;
 
-  const ambient = new AmbientLight("#d3dcdf", 0.42);
-  const ceiling = new PointLight("#f8fafa", 20, 12, 1.8);
+  const ambient = new AmbientLight("#d5c1aa", 0.32);
+  const ceiling = new PointLight("#ffdbb1", 10, 12, 1.8);
   ceiling.position.set(-1.2, 4.2, 2.2);
-  ceiling.castShadow = true;
-  ceiling.shadow.mapSize.set(1024, 1024);
+  const sunlight = new DirectionalLight("#ffc379", 2.6);
+  sunlight.position.set(-6.6, 3.6, -10);
+  sunlight.target.position.set(0, -1.16, 3);
+  sunlight.castShadow = true;
+  sunlight.shadow.mapSize.set(1024, 1024);
+  Object.assign(sunlight.shadow.camera, { left: -8, right: 8, top: 6, bottom: -6, near: 0.5, far: 35 });
+  sunlight.shadow.bias = -0.001;
+  sunlight.shadow.normalBias = 0.025;
   const fill = new DirectionalLight("#2457ff", 0.28);
   fill.position.set(4, 2.4, 5);
-  scene.add(ambient, ceiling, fill);
+  scene.add(ambient, ceiling, fill, sunlight, sunlight.target);
 
-  const room = createBasementRoom();
-  room.group.position.set(0, 0, -0.4);
+  const room = createGarageRoom();
   const table = createTable();
   table.group.position.set(0, TABLE_LAYOUT.topY, TABLE_LAYOUT.centerZ);
   scene.add(room.group, table.group);
@@ -167,7 +172,7 @@ export function createPortfolioScene(): PortfolioSceneController {
       label: PORTFOLIO_CHANNELS.home.title.toUpperCase(),
       subtitle: `CH ${PORTFOLIO_CHANNELS.home.number}`,
       asset: createTelevisionPreview("#aaa38e"),
-      position: [-1.82, 0.2, -0.46],
+      position: [-2.06, 0.11, -0.46],
       rotationY: 0.11,
       scale: 3.25,
       tint: "#aaa38e",
@@ -177,7 +182,7 @@ export function createPortfolioScene(): PortfolioSceneController {
       label: PORTFOLIO_CHANNELS.portfolio.title.toUpperCase(),
       subtitle: `CH ${PORTFOLIO_CHANNELS.portfolio.number}`,
       asset: createTelevisionPreview("#8d958b"),
-      position: [0, 0.2, -0.72],
+      position: [0, 0.11, -0.72],
       rotationY: 0,
       scale: 3.15,
       tint: "#8d958b",
@@ -187,7 +192,7 @@ export function createPortfolioScene(): PortfolioSceneController {
       label: PORTFOLIO_CHANNELS.contact.title.toUpperCase(),
       subtitle: `CH ${PORTFOLIO_CHANNELS.contact.number}`,
       asset: createTelevisionPreview("#777d82"),
-      position: [1.84, 0.2, -0.48],
+      position: [2.1, 0.11, -0.48],
       rotationY: -0.11,
       scale: 3.45,
       tint: "#777d82",
@@ -229,6 +234,13 @@ export function createPortfolioScene(): PortfolioSceneController {
     if (!environment) return;
     if (isDisposed) environment.dispose();
     else importedResources.push(environment);
+  });
+  void createGarageExterior().then((exterior) => {
+    if (isDisposed) exterior.dispose();
+    else {
+      scene.add(exterior.group);
+      importedResources.push(exterior);
+    }
   });
   void loadWoodenTable().then((importedTable) => {
     if (!importedTable) return;
@@ -663,7 +675,7 @@ export function createPortfolioScene(): PortfolioSceneController {
     allAssets.forEach((asset) => asset.dispose());
     importedResources.forEach((resource) => resource.dispose());
     interactionPrompt.dispose();
-    ceiling.shadow.dispose();
+    sunlight.shadow.dispose();
     renderer.dispose();
     renderer.domElement.remove();
   }
@@ -706,12 +718,7 @@ function updateBasketballPhysics(body: BasketballBody, colliders: Box3[], delta:
     body.group.position.x = MathUtils.clamp(body.group.position.x, xMin, xMax);
     body.velocity.x *= -0.66;
   }
-  const zMin = -3.6 + body.radius;
-  const zMax = 3.2 - body.radius;
-  if (body.group.position.z < zMin || body.group.position.z > zMax) {
-    body.group.position.z = MathUtils.clamp(body.group.position.z, zMin, zMax);
-    body.velocity.z *= -0.66;
-  }
+  containBasketball(body.group.position, body.velocity, body.radius);
 
   if (body.velocity.lengthSq() < 0.0025 && body.group.position.y === body.floorY) {
     body.velocity.set(0, 0, 0);
@@ -841,7 +848,7 @@ async function loadGarageEnvironment(renderer: WebGLRenderer, scene: Scene, disp
       try {
         const environment = generator.fromEquirectangular(source);
         scene.environment = environment.texture;
-        scene.environmentIntensity = 0.42;
+        scene.environmentIntensity = 0.18;
         return {
           dispose: () => {
             if (scene.environment === environment.texture) scene.environment = null;
@@ -1050,7 +1057,7 @@ function drawScreen(canvas: HTMLCanvasElement, label: string, subtitle: string, 
   context.shadowColor = "#2457ff";
   context.shadowBlur = 6;
   context.fillStyle = "#f8fafa";
-  context.font = "700 64px monospace";
+  context.font = "700 88px monospace";
   const visibleLabel = time > 0 && time < 260 ? scrambleScreenLabel(label, time) : label;
   context.fillText(visibleLabel, width / 2, height / 2 + 12);
   context.shadowBlur = 3;

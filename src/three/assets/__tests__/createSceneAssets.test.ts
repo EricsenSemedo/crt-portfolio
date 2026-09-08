@@ -1,28 +1,23 @@
 import { describe, expect, it } from "vitest";
 import { Object3D } from "three";
-import { createBasementRoom } from "../createBasementRoom";
+import { createGarageRoom } from "../createGarageRoom";
 import { createTable } from "../createTable";
 
-describe("createBasementRoom", () => {
+describe("createGarageRoom", () => {
   it("creates a scene group with stable metadata", () => {
-    const asset = createBasementRoom();
+    const asset = createGarageRoom();
 
-    expect(asset.group.name).toBe("BasementRoom");
+    expect(asset.group.name).toBe("GarageRoom");
     expect(asset.group.userData.assetKind).toBe("scene");
-    expect(asset.group.userData.assetVariant).toBe("basement-room");
+    expect(asset.group.userData.assetVariant).toBe("sunset-garage");
 
     asset.dispose();
   });
 
   it("includes visible room planes and subtle detail parts", () => {
-    const asset = createBasementRoom();
+    const asset = createGarageRoom();
     const requiredParts = [
-      "FloorPlane",
-      "BackWall",
-      "LeftWall",
-      "RightWall",
-      "FloorGrid",
-      "WallPanel1",
+      "GarageStructure",
     ];
 
     requiredParts.forEach((partName) => {

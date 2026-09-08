@@ -1,0 +1,30 @@
+Garage sunset assets — downloaded 2026-09-08
+All source assets: CC0 1.0 Universal
+https://creativecommons.org/publicdomain/zero/1.0/
+
+jacaranda_tree — Rob Tuytel, Rico Cilliers
+https://polyhaven.com/a/jacaranda_tree
+
+garage_floor — Jenelle van Heerden
+https://polyhaven.com/a/garage_floor
+
+grooved_concrete_driveway — Dimitrios Savva
+https://polyhaven.com/a/grooved_concrete_driveway
+
+asphalt_02 — Rob Tuytel
+https://polyhaven.com/a/asphalt_02
+
+roof_slates_02 — Rob Tuytel
+https://polyhaven.com/a/roof_slates_02
+
+leafy_grass — Charlotte Baglioni
+https://polyhaven.com/a/leafy_grass
+
+kloppenheim_06 — Greg Zaal
+https://polyhaven.com/a/kloppenheim_06
+
+Modifications: texture maps resized to 512px JPEG; panorama to 2048px JPEG.
+Jacaranda: removed normal/ARM maps, welded, simplified (ratio 0.012, error 0.05),
+deduplicated, and Meshopt compressed with glTF Transform 4.5.0.
+Tree geometry and materials shared between three distant instances.
+The house and garage architecture are authored in code.

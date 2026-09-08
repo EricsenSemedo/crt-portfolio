@@ -77,3 +77,11 @@ Do not download a complete photoreal garage scene. It will make the portfolio ge
 ### Immediate TV preview
 
 `python3 scripts/build-tv-preview.py` (Pillow required) derives embedded geometry and baked vertex colors from the shipped CC0 Television_01. The first frame uses the same shape, glass, and transforms as the detailed TVs without waiting for model or texture downloads. Regenerate the preview after changing the source model or diffuse texture.
+
+### Sunset garage
+
+`createGarageRoom.ts` owns the immediate garage shell and shelf. `createGarageExterior.ts` asynchronously adds a textured driveway, asphalt road, lawn, and a ranch house with pitched roof, eaves, siding, recessed windows, and porch. The exterior uses a simplified Poly Haven Jacaranda model and a photographed Kloppenheim 06 sky, rather than illustrated trees or a flat house facade. Sources and CC0 licenses are recorded in `public/models/garage-sunset/LICENSE.txt`.
+
+Texture maps are 512px JPEG; the panorama is 2048px. The tree was welded and simplified with glTF Transform 4.5.0 (ratio 0.012, error 0.05), then Meshopt compressed. Its geometry, textures, and materials are shared between three instances. Static architectural boxes are merged by material. One directional shadow light creates the evening shadows without postprocessing.
+
+`garageBounds.ts` shares the doorway boundary with basketball containment. The floor extends beneath the viewer while the ball stays within reach. Exterior downloads do not block TV navigation, and late results dispose themselves after the scene closes.

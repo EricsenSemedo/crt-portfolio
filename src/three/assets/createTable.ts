@@ -9,8 +9,8 @@ import {
 
 // Shared by the fallback, imported model placement, and basketball collisions.
 export const TABLE_LAYOUT = {
-  centerZ: -0.3, halfWidth: 2.95, halfDepth: 1.275, topY: 0.11, floorY: -1.14,
-  topThickness: 0.11, legX: 2.53, legZ: 0.98, legHalfWidth: 0.16, legHalfDepth: 0.11,
+  centerZ: -0.3, halfWidth: 3.35, halfDepth: 1.275, topY: 0.11, floorY: -1.14,
+  topThickness: 0.11, legX: 2.87, legZ: 0.98, legHalfWidth: 0.18, legHalfDepth: 0.11,
 };
 
 export interface TableAsset {

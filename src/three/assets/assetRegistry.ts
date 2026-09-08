@@ -1,4 +1,4 @@
-import { createBasementRoom } from "./createBasementRoom";
+import { createGarageRoom } from "./createGarageRoom";
 import { createBasketball } from "./createBasketball";
 import { createController } from "./createController";
 import { createDiscTV } from "./createDiscTV";
@@ -42,11 +42,11 @@ export const viewableAssets: ViewableAsset[] = [
     create: createGameTV,
   },
   {
-    id: "basement-room",
-    label: "Basement Room",
+    id: "sunset-garage",
+    label: "Sunset Garage",
     category: "Scene",
     accent: "#84cc16",
-    create: createBasementRoom,
+    create: createGarageRoom,
   },
   {
     id: "table",

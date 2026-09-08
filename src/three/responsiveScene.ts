@@ -1,4 +1,5 @@
 import { MathUtils } from "three";
+import { GARAGE_BOUNDS } from "./assets/garageBounds";
 
 export interface SceneLayout {
   portrait: boolean;
@@ -56,9 +57,9 @@ export function getSceneLayout(width: number, height: number): SceneLayout {
   if (portrait) {
     return {
       portrait: true,
-      camera: [0, 1.9, 8.8],
-      target: [0, 0.18, -0.4],
-      channelX: [-1.38, 0, 1.38],
+      camera: [0, 4.2, 10.5],
+      target: [0, 0.35, -2],
+      channelX: [-1.68, 0, 1.68],
       tvScale: 0.8,
       fov: 60,
       promptY: 2.7,
@@ -69,11 +70,11 @@ export function getSceneLayout(width: number, height: number): SceneLayout {
 
   return {
     portrait: false,
-    camera: [0, 1.82, 7.55],
-    target: [0, 0.05, -0.4],
-    channelX: [-1.82, 0, 1.84],
+    camera: [0, 3.8, 9.5],
+    target: [0, 0.25, -1.5],
+    channelX: [-2.06, 0, 2.1],
     tvScale: 1,
-    fov: 38,
+    fov: 42,
     promptY: 2.3,
     ballStartX: -2.88,
     pixelRatioCap: 1.75,
@@ -88,7 +89,7 @@ export function getBasketballHorizontalBounds(
 ): HorizontalBounds {
   const depth = Math.max(layout.camera[2] - ballZ, 0.1);
   const visibleHalfWidth = Math.tan(MathUtils.degToRad(layout.fov / 2)) * depth * aspect;
-  const worldLimit = 4.8 - radius;
+  const worldLimit = GARAGE_BOUNDS.halfWidth - radius;
   const viewportLimit = Math.max(radius, visibleHalfWidth - radius * 1.65 - 0.18);
   const limit = Math.min(worldLimit, viewportLimit);
   return { min: -limit, max: limit };
