@@ -30,10 +30,8 @@ import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { HDRLoader } from "three/examples/jsm/loaders/HDRLoader.js";
 import { PORTFOLIO_CHANNELS, type PortfolioChannelId } from "../data/channels";
 import { createBasementRoom } from "./assets/createBasementRoom";
-import { createDiscTV } from "./assets/createDiscTV";
-import { createGameTV } from "./assets/createGameTV";
+import { createTelevisionPreview } from "./assets/createTelevisionPreview";
 import { createTable } from "./assets/createTable";
-import { createVhsTV } from "./assets/createVhsTV";
 import {
   getScreenTransitionDuration,
   getRandomScreenTransitionKind,
@@ -70,6 +68,7 @@ interface ChannelConfig {
   position: [number, number, number];
   rotationY: number;
   scale: number;
+  tint: string;
 }
 
 interface ScreenDisplay {
@@ -168,28 +167,31 @@ export function createPortfolioScene(): PortfolioSceneController {
       id: "home",
       label: PORTFOLIO_CHANNELS.home.title.toUpperCase(),
       subtitle: `CH ${PORTFOLIO_CHANNELS.home.number}`,
-      asset: createVhsTV(),
-      position: [-1.82, 1.08, -0.48],
+      asset: createTelevisionPreview("#aaa38e"),
+      position: [-1.82, 0.2, -0.46],
       rotationY: 0.11,
-      scale: 0.72,
+      scale: 3.25,
+      tint: "#aaa38e",
     },
     {
       id: "portfolio",
       label: PORTFOLIO_CHANNELS.portfolio.title.toUpperCase(),
       subtitle: `CH ${PORTFOLIO_CHANNELS.portfolio.number}`,
-      asset: createDiscTV(),
-      position: [0, 1.04, -0.76],
+      asset: createTelevisionPreview("#8d958b"),
+      position: [0, 0.2, -0.72],
       rotationY: 0,
-      scale: 0.78,
+      scale: 3.15,
+      tint: "#8d958b",
     },
     {
       id: "contact",
       label: PORTFOLIO_CHANNELS.contact.title.toUpperCase(),
       subtitle: `CH ${PORTFOLIO_CHANNELS.contact.number}`,
-      asset: createGameTV(),
-      position: [1.84, 1.02, -0.5],
+      asset: createTelevisionPreview("#777d82"),
+      position: [1.84, 0.2, -0.48],
       rotationY: -0.11,
-      scale: 0.67,
+      scale: 3.45,
+      tint: "#777d82",
     },
   ];
 
@@ -954,20 +956,13 @@ async function loadRealisticTelevisions(channels: ChannelConfig[], disposed: () 
     }
     const group = new Group();
     group.name = "RealisticTelevisionLineup";
-    const variants = [
-      { scale: 3.25, tint: "#aaa38e", y: 0.2, z: -0.46 },
-      { scale: 3.15, tint: "#8d958b", y: 0.2, z: -0.72 },
-      { scale: 3.45, tint: "#777d82", y: 0.2, z: -0.48 },
-    ];
-
     loadedModels.forEach((result, index) => {
       const channel = channels[index];
-      const variant = variants[index];
       const television = result.scene;
       television.name = `RealisticTelevision-${channel.id}`;
-      television.position.set(channel.position[0], variant.y, variant.z);
+      television.position.set(...channel.position);
       television.rotation.y = channel.rotationY;
-      television.scale.setScalar(variant.scale);
+      television.scale.setScalar(channel.scale);
       television.traverse((object) => {
         if (!(object instanceof Mesh)) return;
         object.castShadow = true;
@@ -975,7 +970,7 @@ async function loadRealisticTelevisions(channels: ChannelConfig[], disposed: () 
         const sourceMaterials = Array.isArray(object.material) ? object.material : [object.material];
         const clonedMaterials = sourceMaterials.map((sourceMaterial) => {
           const cloned = sourceMaterial.clone();
-          if ("color" in cloned && cloned.color instanceof Color) cloned.color.multiply(new Color(variant.tint));
+          if ("color" in cloned && cloned.color instanceof Color) cloned.color.multiply(new Color(channel.tint));
           return cloned;
         });
         object.material = Array.isArray(object.material) ? clonedMaterials : clonedMaterials[0];

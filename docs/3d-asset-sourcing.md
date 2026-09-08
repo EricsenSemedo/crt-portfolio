@@ -6,7 +6,7 @@ Use imported assets selectively. The authored CRT layout and camera anchors rema
 
 | Asset | Creator | Source | License | Modified | Notes |
 | --- | --- | --- | --- | --- | --- |
-| Basketball lowpoly | NephthysGameDev | [OpenGameArt](https://opengameart.org/content/basketball-lowpoly) | CC0 | Yes | Blender source exported locally to binary glTF |
+| Basketball | DigitalN8m4r3 / Miodrag Sejic | [OpenGameArt](https://opengameart.org/content/basketballs) | CC0 | Yes | Smooth mesh with classic leather textures; 512px JPEG maps embedded in GLB, loaded asynchronously |
 
 ## Recommended sources
 
@@ -72,3 +72,7 @@ Do not download a complete photoreal garage scene. It will make the portfolio ge
 | Example CRT | Artist name | Direct model URL | CC BY 4.0 | Yes | Decimated, textures resized |
 | Television 01 | Gabriel Radić | https://polyhaven.com/a/Television_01 | CC0 | Yes | 1K glTF art-directed into three distinct CRT variants |
 | Garage HDRI | Greg Zaal | https://polyhaven.com/a/garage | CC0 | Yes | 1K HDR used for scene reflections only |
+
+### Immediate TV preview
+
+`python3 scripts/build-tv-preview.py` (Pillow required) derives embedded geometry and baked vertex colors from the shipped CC0 Television_01. The first frame uses the same shape, glass, and transforms as the detailed TVs without waiting for model or texture downloads. Regenerate the preview after changing the source model or diffuse texture.
