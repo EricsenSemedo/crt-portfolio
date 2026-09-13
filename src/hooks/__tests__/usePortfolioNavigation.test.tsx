@@ -62,7 +62,9 @@ describe("usePortfolioNavigation", () => {
 
   function click(label: string) {
     act(() => {
-      [...host.querySelectorAll("button")].find((button) => button.textContent === label)?.click();
+      const button = [...host.querySelectorAll("button")].find((candidate) => candidate.textContent === label);
+      if (!button) throw new Error(`Button not found: ${label}`);
+      button.click();
     });
   }
 
