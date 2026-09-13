@@ -125,7 +125,10 @@ export default function ThreeCRTStage({
         });
       return;
     }
-    if (focusedRef.current === requestedChannel) return;
+    if (focusedRef.current === requestedChannel) {
+      onRequestedFocusComplete?.(requestedChannel);
+      return;
+    }
     selectingRef.current = true;
     focusedRef.current = null;
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;

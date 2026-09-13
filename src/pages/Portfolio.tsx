@@ -32,26 +32,24 @@ function projectsById(ids: string[]) {
 
 interface PortfolioProps {
   onNavigate?: NavigateFunction;
-  onProjectDetailOpenChange?: (isOpen: boolean) => void;
+  selectedProject: Project | null;
+  onOpenProject: (project: Project) => void;
+  onCloseProject: () => void;
 }
 
-export default function Portfolio({ onNavigate, onProjectDetailOpenChange }: PortfolioProps) {
-  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+export default function Portfolio({ onNavigate, selectedProject, onOpenProject, onCloseProject }: PortfolioProps) {
   const [currentChannel, setCurrentChannel] = useState<ChannelType>('demo');
   const backgroundRef = useRef<HTMLDivElement>(null);
   const softwareProjects = projectsById(softwareProjectIds);
   const gameDevelopmentProjects = projectsById(gameDevelopmentProjectIds);
   const additionalProjects = projects.filter((project) => !featuredProjectIds.includes(project.id));
 
-  function openProject(project: Project) {
-    setSelectedProject(project);
-    onProjectDetailOpenChange?.(true);
-  }
-
-  function closeProject() {
-    setSelectedProject(null);
+  // Reset the local demo tab for a new route, including browser Back/Forward.
+  const projectId = selectedProject?.id ?? null;
+  const [previousProjectId, setPreviousProjectId] = useState(projectId);
+  if (previousProjectId !== projectId) {
+    setPreviousProjectId(projectId);
     setCurrentChannel('demo');
-    onProjectDetailOpenChange?.(false);
   }
 
   return (
@@ -76,7 +74,7 @@ export default function Portfolio({ onNavigate, onProjectDetailOpenChange }: Por
             <ProjectTV
               key={project.id}
               project={project}
-              onClick={() => openProject(project)}
+              onClick={() => onOpenProject(project)}
             />
           ))}
         </section>
@@ -93,7 +91,7 @@ export default function Portfolio({ onNavigate, onProjectDetailOpenChange }: Por
             <ProjectTV
               key={project.id}
               project={project}
-              onClick={() => openProject(project)}
+              onClick={() => onOpenProject(project)}
             />
           ))}
         </section>
@@ -111,7 +109,7 @@ export default function Portfolio({ onNavigate, onProjectDetailOpenChange }: Por
               <AdditionalProjectRow
                 key={project.id}
                 project={project}
-                onClick={() => openProject(project)}
+                onClick={() => onOpenProject(project)}
               />
             ))}
           </div>
@@ -143,7 +141,7 @@ export default function Portfolio({ onNavigate, onProjectDetailOpenChange }: Por
             project={selectedProject}
             currentChannel={currentChannel}
             onChannelChange={setCurrentChannel}
-            onClose={closeProject}
+            onClose={onCloseProject}
             backgroundRef={backgroundRef}
           />
         )}
