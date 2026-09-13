@@ -16,6 +16,7 @@ function NavigationProbe() {
       <button onClick={() => navigation.navigateToTV("home")}>Open profile</button>
       <button onClick={() => navigation.navigateToTV("portfolio")}>Open portfolio</button>
       <button onClick={() => navigation.navigateToTV("contact")}>Open contact</button>
+      <button onClick={() => navigation.navigateToTV("constructor")}>Invalid target</button>
       <button onClick={() => navigation.openProject(projects[0])}>Open project</button>
       <button onClick={navigation.closeProject}>Close project</button>
       <button onClick={navigation.closeTV}>Close TV</button>
@@ -84,6 +85,14 @@ describe("usePortfolioNavigation", () => {
     expect(read("channel")).toBe("portfolio");
     expect(read("project")).toBe(projects[0].id);
     expect(read("redirect")).toBe("none");
+  });
+
+  it("rejects inherited object properties as navigation targets", () => {
+    mount();
+    const historyLength = window.history.length;
+    click("Invalid target");
+    expect(window.location.hash).toBe("#/");
+    expect(window.history.length).toBe(historyLength);
   });
 
   it("requests canonical redirects for aliases, unknown paths, and unknown projects", () => {

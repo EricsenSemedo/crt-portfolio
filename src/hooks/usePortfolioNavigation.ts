@@ -58,7 +58,7 @@ export default function usePortfolioNavigation(): PortfolioNavigation {
   }
 
   const navigateToTV = useCallback((targetId: string) => {
-    if (!(targetId in channelPaths)) return;
+    if (!Object.prototype.hasOwnProperty.call(channelPaths, targetId)) return;
     const targetPath = channelPaths[targetId as PortfolioChannelId];
     if (location.pathname === targetPath) return;
     navigate(targetPath, {
