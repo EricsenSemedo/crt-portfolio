@@ -3,6 +3,7 @@ import { createRoot, type Root } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { PortfolioChannelId } from "../data/channels";
 import App from "../App";
+import { navigateHistory } from "../testUtils/history";
 
 type StageProps = {
   onSelect: (id: PortfolioChannelId) => void;
@@ -101,10 +102,7 @@ describe("App hash navigation", () => {
   }
 
   async function traverse(direction: "back" | "forward") {
-    await act(async () => {
-      window.history[direction]();
-      await new Promise((resolve) => window.setTimeout(resolve, 25));
-    });
+    await navigateHistory(() => window.history[direction]());
   }
 
   function completeOverlayExit() {
@@ -194,9 +192,8 @@ describe("App hash navigation", () => {
     completeFocus("home");
     const profileStage = host.querySelector("[data-testid=stage]");
 
-    await act(async () => {
+    await navigateHistory(() => {
       window.location.hash = "#/missing";
-      await new Promise((resolve) => window.setTimeout(resolve, 25));
     });
 
     expect(window.location.hash).toBe("#/");

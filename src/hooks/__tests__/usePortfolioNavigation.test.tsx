@@ -3,6 +3,7 @@ import { createRoot, type Root } from "react-dom/client";
 import { HashRouter } from "react-router";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import projects from "../../data/projects";
+import { navigateHistory } from "../../testUtils/history";
 import usePortfolioNavigation from "../usePortfolioNavigation";
 
 function NavigationProbe() {
@@ -66,16 +67,7 @@ describe("usePortfolioNavigation", () => {
   }
 
   async function traverse(direction: "back" | "forward") {
-    await act(async () => {
-      window.history[direction]();
-      await new Promise((resolve) => window.setTimeout(resolve, 10));
-    });
-  }
-
-  async function waitForHistory() {
-    await act(async () => {
-      await new Promise((resolve) => window.setTimeout(resolve, 10));
-    });
+    await navigateHistory(() => window.history[direction]());
   }
 
   it("derives the selected channel and project from hash URLs", () => {
@@ -128,8 +120,7 @@ describe("usePortfolioNavigation", () => {
     expect(window.location.hash).toBe("#/profile");
     expect(read("channel")).toBe("home");
 
-    click("Close TV");
-    await waitForHistory();
+    await navigateHistory(() => click("Close TV"));
     expect(window.location.hash).toBe("#/");
   });
 
@@ -141,8 +132,7 @@ describe("usePortfolioNavigation", () => {
     expect(window.location.hash).toBe(`#/portfolio/${projects[0].id}`);
     expect(read("project")).toBe(projects[0].id);
 
-    click("Close project");
-    await waitForHistory();
+    await navigateHistory(() => click("Close project"));
     expect(window.location.hash).toBe("#/portfolio");
     expect(read("project")).toBe("none");
   });
