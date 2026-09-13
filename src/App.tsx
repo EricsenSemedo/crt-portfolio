@@ -1,4 +1,6 @@
 import { lazy, Suspense, useCallback, useEffect, useRef, useState } from "react";
+import { HashRouter, Navigate } from "react-router";
+import usePortfolioNavigation from "./hooks/usePortfolioNavigation";
 import crtLensMatte from "./assets/crt-lens-matte.svg";
 import TVZoomOverlay from "./components/TVZoomOverlay";
 import type { PortfolioChannelId } from "./data/channels";
@@ -22,75 +24,64 @@ export default function App() {
     );
   }
 
-  return <PortfolioApp />;
+  return <HashRouter><PortfolioApp /></HashRouter>;
 }
 
 function PortfolioApp() {
+  const { channel, project, redirectTo, navigateToTV, openProject, closeProject, closeTV } = usePortfolioNavigation();
   const [selectedId, setSelectedId] = useState<PortfolioChannelId | null>(null);
-  const [sceneChannel, setSceneChannel] = useState<PortfolioChannelId | null>(null);
-  const [pendingId, setPendingId] = useState<PortfolioChannelId | null>(null);
-  const [overlayExited, setOverlayExited] = useState(false);
-  const [overviewReady, setOverviewReady] = useState(false);
-  const [screenEffectActive, setScreenEffectActive] = useState(false);
-  const [projectDetailOpen, setProjectDetailOpen] = useState(false);
+  const [sceneChannel, setSceneChannel] = useState<PortfolioChannelId | null>(channel);
+  const [phase, setPhase] = useState<"overview" | "ready" | "focusing" | "open" | "exiting">(channel ? "focusing" : "overview");
+  const [screenEffectActive, setScreenEffectActive] = useState(Boolean(channel));
   const backgroundRef = useRef<HTMLDivElement>(null);
-  const navigateToTV = (targetId: string) => {
-    const target = targetId as PortfolioChannelId;
-    if (target === selectedId) return;
-    setPendingId(target);
-    setOverlayExited(false);
-    setOverviewReady(false);
-    setScreenEffectActive(true);
-    setProjectDetailOpen(false);
-    setSelectedId(null);
-  };
 
+  // The URL chooses the destination; animation callbacks only advance its presentation.
   useEffect(() => {
-    if (!pendingId || !overlayExited || !overviewReady) return;
-    setSceneChannel(pendingId);
-  }, [overlayExited, overviewReady, pendingId]);
+    if (phase === "open" && selectedId !== channel) {
+      setScreenEffectActive(true);
+      setSelectedId(null);
+      setPhase("exiting");
+    } else if (phase === "ready" && channel) {
+      setScreenEffectActive(true);
+      setSceneChannel(channel);
+      setPhase("focusing");
+    } else if (phase === "focusing" && sceneChannel !== channel) {
+      setSceneChannel(channel);
+      if (!channel) setPhase("overview");
+    }
+  }, [channel, phase, sceneChannel, selectedId]);
 
-  function closeTV() {
-    setScreenEffectActive(true);
-    setPendingId(null);
-    setSelectedId(null);
-    setOverlayExited(false);
-    setOverviewReady(false);
-    setProjectDetailOpen(false);
-  }
-
-  const handleOverviewComplete = useCallback(() => setOverviewReady(true), []);
+  const handleOverviewComplete = useCallback(() => {
+    setPhase("ready");
+    setScreenEffectActive(false);
+  }, []);
   const handleOverlayExitComplete = useCallback(() => {
-    setOverlayExited(true);
     setSceneChannel(null);
+    setPhase("overview");
   }, []);
   const handleOverlayEnterComplete = useCallback(() => setScreenEffectActive(false), []);
   const handleRequestedFocusComplete = useCallback((id: PortfolioChannelId) => {
-    if (id !== pendingId) return;
+    if (id !== channel) return;
     setScreenEffectActive(true);
     setSelectedId(id);
-    setPendingId(null);
-  }, [pendingId]);
+    setPhase("open");
+  }, [channel]);
 
   const byId: Record<string, React.ReactNode> = {
     home: <Home onNavigate={navigateToTV} />,
-    portfolio: <Portfolio onNavigate={navigateToTV} onProjectDetailOpenChange={setProjectDetailOpen} />,
+    portfolio: <Portfolio onNavigate={navigateToTV} selectedProject={project} onOpenProject={openProject} onCloseProject={closeProject} />,
     contact: <Contact onNavigate={navigateToTV} />,
   };
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-[#111111]">
+      {redirectTo && <Navigate to={redirectTo} replace />}
       <div ref={backgroundRef}>
         <Suspense fallback={<div className="min-h-screen bg-[#111111]" />}>
           <ThreeCRTStage
-            onSelect={(id) => {
-              setScreenEffectActive(true);
-              setProjectDetailOpen(false);
-              setSceneChannel(id);
-              setSelectedId(id);
-            }}
+            onSelect={navigateToTV}
             requestedChannel={sceneChannel}
-            quickTransition={Boolean(pendingId)}
+            quickTransition={phase === "overview" || phase === "focusing"}
             screenEffectActive={screenEffectActive}
             paused={Boolean(selectedId) && !screenEffectActive}
             onOverviewComplete={handleOverviewComplete}
@@ -104,7 +95,7 @@ function PortfolioApp() {
         onClose={closeTV}
         onExitComplete={handleOverlayExitComplete}
         onEnterComplete={handleOverlayEnterComplete}
-        hideHeader={projectDetailOpen}
+        hideHeader={Boolean(project)}
         backgroundRef={backgroundRef}
       >
         {selectedId ? byId[selectedId] ?? null : null}

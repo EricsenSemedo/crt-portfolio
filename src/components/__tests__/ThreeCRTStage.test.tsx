@@ -110,3 +110,14 @@ it("allows local selections after a superseded channel-button request", async ()
   await act(async () => host.querySelectorAll("button")[0].click());
   expect(select.mock.calls).toEqual([["contact"], ["home"]]);
 });
+
+it("acknowledges a routed channel that was already focused by a local selection", async () => {
+  const select = vi.fn();
+  const complete = vi.fn();
+  await act(async () => root.render(<ThreeCRTStage onSelect={select} onRequestedFocusComplete={complete} />));
+  await act(async () => host.querySelectorAll("button")[0].click());
+  expect(select).toHaveBeenCalledExactlyOnceWith("home");
+  await act(async () => root.render(<ThreeCRTStage onSelect={select} requestedChannel="home" onRequestedFocusComplete={complete} />));
+  expect(complete).toHaveBeenCalledExactlyOnceWith("home");
+  expect(controller.focus).toHaveBeenCalledOnce();
+});
