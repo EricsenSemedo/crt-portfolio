@@ -4,6 +4,7 @@ import {
   createPortfolioScene,
   type PortfolioSceneController,
 } from "../three/createPortfolioScene";
+import CRTLoadingScreen from "./CRTLoadingScreen";
 import "./ThreeCRTStage.css";
 
 interface ThreeCRTStageProps {
@@ -36,14 +37,20 @@ export default function ThreeCRTStage({
   const syncLoopRef = useRef<(() => void) | null>(null);
   const [unavailable, setUnavailable] = useState(false);
   const [ready, setReady] = useState(false);
-  const [hovered, setHovered] = useState<PortfolioChannelId | null>(null);
+  const [loading, setLoading] = useState({ settled: 0, total: 0 });
+  const [slowLoading, setSlowLoading] = useState(false);
+  const showFallbackRef = useRef<(() => void) | null>(null);
+  const [hovered, setHovered] = useState<PortfolioChannelId | "basketball" | null>(null);
 
   useEffect(() => {
     const mount = mountRef.current;
     if (!mount) return;
+    let active = true;
     let controller: PortfolioSceneController;
     try {
-      controller = createPortfolioScene();
+      controller = createPortfolioScene({
+        onLoadingProgress: (progress) => { if (active) setLoading(progress); },
+      });
     } catch {
       setUnavailable(true);
       setReady(true);
@@ -59,6 +66,7 @@ export default function ThreeCRTStage({
     controller.resize(mount.clientWidth, mount.clientHeight);
 
     let frame = 0;
+    let sceneReady = false;
     function draw(time: number) {
       controller.render(time);
       frame = requestAnimationFrame(draw);
@@ -66,25 +74,47 @@ export default function ThreeCRTStage({
 
     function handleVisibilityChange() {
       cancelAnimationFrame(frame);
-      if (!document.hidden && !pausedRef.current && sceneRef.current === controller) frame = requestAnimationFrame(draw);
+      if (sceneReady && !document.hidden && !pausedRef.current && sceneRef.current === controller) frame = requestAnimationFrame(draw);
     }
 
-    function handleContextLost(event: Event) {
-      event.preventDefault();
+    function showFallback() {
+      if (sceneRef.current !== controller) return;
       cancelAnimationFrame(frame);
+      window.clearTimeout(slowTimer);
       sceneRef.current = null;
       resizeObserver.disconnect();
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+      controller.canvas.removeEventListener("webglcontextlost", handleContextLost);
+      syncLoopRef.current = null;
+      showFallbackRef.current = null;
       controller.dispose();
       selectingRef.current = false;
       setUnavailable(true);
+      setReady(true);
     }
+    function handleContextLost(event: Event) {
+      event.preventDefault();
+      showFallback();
+    }
+    showFallbackRef.current = showFallback;
     controller.canvas.addEventListener("webglcontextlost", handleContextLost);
     syncLoopRef.current = handleVisibilityChange;
     document.addEventListener("visibilitychange", handleVisibilityChange);
     handleVisibilityChange();
-    setReady(true);
+    const slowTimer = window.setTimeout(() => { if (active) setSlowLoading(true); }, 10_000);
+    void controller.ready.then(() => {
+      if (active && sceneRef.current === controller) {
+        window.clearTimeout(slowTimer);
+        sceneReady = true;
+        handleVisibilityChange();
+        setReady(true);
+      }
+    }).catch(() => { if (active) showFallback(); });
 
     return () => {
+      active = false;
+      window.clearTimeout(slowTimer);
+      showFallbackRef.current = null;
       cancelAnimationFrame(frame);
       document.removeEventListener("visibilitychange", handleVisibilityChange);
       resizeObserver.disconnect();
@@ -105,6 +135,7 @@ export default function ThreeCRTStage({
   }, [screenEffectActive]);
 
   useEffect(() => {
+    if (!ready) return;
     const controller = sceneRef.current;
     const request = ++focusRequestRef.current;
     const isCurrent = () => sceneRef.current === controller && focusRequestRef.current === request;
@@ -145,7 +176,7 @@ export default function ThreeCRTStage({
         selectingRef.current = false;
         onRequestedFocusComplete?.(requestedChannel);
       });
-  }, [onOverviewComplete, onRequestedFocusComplete, quickTransition, requestedChannel, unavailable]);
+  }, [onOverviewComplete, onRequestedFocusComplete, quickTransition, ready, requestedChannel, unavailable]);
 
   async function selectChannel(id: PortfolioChannelId) {
     const controller = sceneRef.current;
@@ -153,7 +184,7 @@ export default function ThreeCRTStage({
       onSelect(id);
       return;
     }
-    if (!controller || selectingRef.current) return;
+    if (!ready || !controller || selectingRef.current) return;
     const request = ++focusRequestRef.current;
     const isCurrent = () => sceneRef.current === controller && focusRequestRef.current === request;
     selectingRef.current = true;
@@ -189,7 +220,7 @@ export default function ThreeCRTStage({
     const next = sceneRef.current?.pick(event.clientX, event.clientY) ?? null;
     if (next !== hovered) {
       setHovered(next);
-      sceneRef.current?.setHovered(next);
+      sceneRef.current?.setHovered(next === "basketball" ? null : next);
     }
   }
 
@@ -228,7 +259,7 @@ export default function ThreeCRTStage({
       />
 
       {unavailable && <p className="three-stage__fallback" role="status">3D view unavailable. Choose a section below.</p>}
-      <nav id="channels" className="three-stage__channels" aria-label="Portfolio sections">
+      <nav id="channels" className="three-stage__channels" aria-label="Portfolio sections" inert={!ready}>
         {PORTFOLIO_CHANNEL_LIST.map((channel) => (
           <button
             key={channel.id}
@@ -250,7 +281,7 @@ export default function ThreeCRTStage({
         ))}
       </nav>
 
-      <div className={"three-stage__loader " + (ready ? "is-ready" : "")}>WARMING UP</div>
+      {!ready && <CRTLoadingScreen {...loading} onSkip={slowLoading ? () => showFallbackRef.current?.() : undefined} />}
     </main>
   );
 }

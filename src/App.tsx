@@ -2,6 +2,7 @@ import { lazy, Suspense, useCallback, useEffect, useRef, useState } from "react"
 import { HashRouter, Navigate } from "react-router";
 import usePortfolioNavigation from "./hooks/usePortfolioNavigation";
 import crtLensMatte from "./assets/crt-lens-matte.svg";
+import CRTLoadingScreen from "./components/CRTLoadingScreen";
 import TVZoomOverlay from "./components/TVZoomOverlay";
 import type { PortfolioChannelId } from "./data/channels";
 import Contact from "./pages/Contact";
@@ -77,7 +78,7 @@ function PortfolioApp() {
     <div className="relative min-h-screen overflow-hidden bg-[#111111]">
       {redirectTo && <Navigate to={redirectTo} replace />}
       <div ref={backgroundRef}>
-        <Suspense fallback={<div className="min-h-screen bg-[#111111]" />}>
+        <Suspense fallback={<CRTLoadingScreen />}>
           <ThreeCRTStage
             onSelect={navigateToTV}
             requestedChannel={sceneChannel}

@@ -17,6 +17,7 @@ beforeEach(() => {
   document.body.append(host);
   root = createRoot(host);
   controller = {
+    ready: Promise.resolve(),
     canvas: document.createElement("canvas"), resize: vi.fn(), render: vi.fn(),
     pick: vi.fn(), activateAt: vi.fn(), setParallax: vi.fn(), setHovered: vi.fn(),
     focus: vi.fn().mockResolvedValue(undefined), reset: vi.fn().mockResolvedValue(undefined),
@@ -120,4 +121,42 @@ it("acknowledges a routed channel that was already focused by a local selection"
   await act(async () => root.render(<ThreeCRTStage onSelect={select} requestedChannel="home" onRequestedFocusComplete={complete} />));
   expect(complete).toHaveBeenCalledExactlyOnceWith("home");
   expect(controller.focus).toHaveBeenCalledOnce();
+});
+
+
+it("keeps the loader and routed transition waiting for actual scene readiness", async () => {
+  let finish!: () => void;
+  controller.ready = new Promise<void>((resolve) => { finish = resolve; });
+  await act(async () => root.render(<ThreeCRTStage onSelect={vi.fn()} requestedChannel="home" />));
+  expect(host.querySelector('[role="progressbar"]')).not.toBeNull();
+  expect(controller.focus).not.toHaveBeenCalled();
+  await act(async () => {
+    vi.mocked(createPortfolioScene).mock.calls[0][0]?.onLoadingProgress?.({ settled: 3, total: 7 });
+  });
+  expect(host.querySelector('[role="progressbar"]')?.getAttribute("aria-valuenow")).toBe("3");
+  await act(async () => finish());
+  expect(host.querySelector('[role="progressbar"]')).toBeNull();
+  expect(controller.focus).toHaveBeenCalledWith("home", false, false);
+});
+
+it("lets visitors continue through section navigation when loading stalls", async () => {
+  controller.ready = new Promise<void>(() => {});
+  const select = vi.fn();
+  await act(async () => root.render(<ThreeCRTStage onSelect={select} />));
+  expect(host.textContent).not.toContain("Continue without 3D");
+  await act(async () => vi.advanceTimersByTime(10_000));
+  const skip = [...host.querySelectorAll("button")].find(button => button.textContent === "Continue without 3D")!;
+  await act(async () => skip.click());
+  expect(host.querySelector('[role="progressbar"]')).toBeNull();
+  expect(host.textContent).toContain("3D view unavailable");
+  expect(controller.dispose).toHaveBeenCalledOnce();
+  await act(async () => host.querySelector<HTMLButtonElement>("nav button")!.click());
+  expect(select).toHaveBeenCalledWith("home");
+});
+
+it("falls back to section navigation if preparing the first frame fails", async () => {
+  controller.ready = Promise.reject(new Error("Render failed"));
+  await act(async () => root.render(<ThreeCRTStage onSelect={vi.fn()} />));
+  expect(host.querySelector('[role="progressbar"]')).toBeNull();
+  expect(host.querySelector(".is-unavailable")).not.toBeNull();
 });

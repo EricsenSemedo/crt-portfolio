@@ -1,0 +1,89 @@
+.crt-loading-screen {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  display: grid;
+  min-height: 100svh;
+  place-items: center;
+  padding: 2rem;
+  background: rgb(var(--crt-bg-overlay));
+  color: rgb(var(--crt-text-primary));
+  font-family: var(--font-mono);
+}
+
+.crt-loading-screen__content {
+  width: min(100%, 25rem);
+  text-align: center;
+}
+
+.crt-loading-screen__title {
+  margin: 0 0 1rem;
+  font-family: var(--font-display);
+  font-size: clamp(1.4rem, 5vw, 2rem);
+  font-weight: 700;
+  letter-spacing: .08em;
+}
+
+.crt-loading-screen__message {
+  margin: 0 0 2rem;
+  color: rgb(var(--crt-text-secondary));
+  font-size: .875rem;
+  line-height: 1.6;
+}
+
+.crt-loading-screen__bar {
+  display: grid;
+  grid-template-columns: repeat(20, minmax(0, 1fr));
+  gap: 3px;
+  height: 1.75rem;
+  padding: 4px;
+  border: 1px solid rgb(var(--crt-border-secondary));
+}
+
+.crt-loading-screen__bar span {
+  background: rgb(var(--crt-surface-secondary));
+}
+
+.crt-loading-screen__bar .is-filled {
+  background: rgb(var(--crt-accent-primary));
+}
+
+.crt-loading-screen__bar .is-active,
+.crt-loading-screen__bar.is-starting span:nth-child(-n + 3) {
+  background: rgb(var(--crt-accent-primary));
+  animation: crt-loading-pulse 1s ease-in-out infinite alternate;
+}
+
+.crt-loading-screen__count {
+  margin: .75rem 0 0;
+  color: rgb(var(--crt-text-accent));
+  font-size: .75rem;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: .1em;
+}
+
+.crt-loading-screen__skip {
+  min-height: 44px;
+  margin-top: 1.5rem;
+  padding: .5rem 1rem;
+  border: 1px solid rgb(var(--crt-border-secondary));
+  color: rgb(var(--crt-text-primary));
+  cursor: pointer;
+}
+
+.crt-loading-screen__skip:hover,
+.crt-loading-screen__skip:focus-visible {
+  background: rgb(var(--crt-accent-primary));
+  outline: 2px solid rgb(var(--crt-text-accent));
+  outline-offset: 3px;
+}
+
+@keyframes crt-loading-pulse {
+  from { opacity: .35; }
+  to { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .crt-loading-screen__bar.is-starting span,
+  .crt-loading-screen__bar .is-active { animation: none; }
+}

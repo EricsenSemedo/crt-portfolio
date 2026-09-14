@@ -41,6 +41,7 @@ import {
   type ScreenTransitionKind,
 } from "./screenTransition";
 import { disposeObjectTree } from "./disposeObjectTree";
+import { SceneLoadingTracker, type SceneLoadingProgress } from "./sceneLoading";
 import { attachTelevisionScreen } from "./televisionScreen";
 import {
   getBasketballHorizontalBounds,
@@ -112,9 +113,10 @@ interface HeldScreenEffect {
 
 export interface PortfolioSceneController {
   canvas: HTMLCanvasElement;
+  ready: Promise<void>;
   resize: (width: number, height: number) => void;
   render: (time: number) => void;
-  pick: (clientX: number, clientY: number) => PortfolioChannelId | null;
+  pick: (clientX: number, clientY: number) => PortfolioChannelId | "basketball" | null;
   activateAt: (clientX: number, clientY: number) => PortfolioChannelId | "basketball" | null;
   setParallax: (x: number, y: number) => void;
   setHovered: (id: PortfolioChannelId | null) => void;
@@ -125,10 +127,14 @@ export interface PortfolioSceneController {
   dispose: () => void;
 }
 
+export interface CreatePortfolioSceneOptions {
+  onLoadingProgress?: (progress: SceneLoadingProgress) => void;
+}
+
 const OVERVIEW_POSITION = new Vector3(0, 1.82, 7.55);
 const OVERVIEW_TARGET = new Vector3(0, 0.05, -0.4);
 
-export function createPortfolioScene(): PortfolioSceneController {
+export function createPortfolioScene(options: CreatePortfolioSceneOptions = {}): PortfolioSceneController {
   const motionPreference = window.matchMedia("(prefers-reduced-motion: reduce)");
   const scene = new Scene();
   scene.background = new Color("#111111");
@@ -234,7 +240,8 @@ export function createPortfolioScene(): PortfolioSceneController {
   let basketballBody: BasketballBody | null = null;
   let realisticTelevisions: Group | null = null;
   let isDisposed = false;
-  void loadGarageStructure().then(garage => {
+  const loading = new SceneLoadingTracker(7, options.onLoadingProgress);
+  loading.track(loadGarageStructure().then(garage => {
     if (!garage) return;
     if (isDisposed) garage.dispose();
     else {
@@ -242,20 +249,20 @@ export function createPortfolioScene(): PortfolioSceneController {
       scene.add(garage.group);
       importedResources.push(garage);
     }
-  });
-  void loadSunsetEnvironment(renderer, scene, () => isDisposed).then((environment) => {
+  }));
+  loading.track(loadSunsetEnvironment(renderer, scene, () => isDisposed).then((environment) => {
     if (!environment) return;
     if (isDisposed) environment.dispose();
     else importedResources.push(environment);
-  });
-  void createGarageExterior().then((exterior) => {
+  }));
+  loading.track(createGarageExterior().then((exterior) => {
     if (isDisposed) exterior.dispose();
     else {
       scene.add(exterior.group);
       importedResources.push(exterior);
     }
-  });
-  void loadWoodenTable().then((importedTable) => {
+  }));
+  loading.track(loadWoodenTable().then((importedTable) => {
     if (!importedTable) return;
     if (isDisposed) importedTable.dispose();
     else {
@@ -263,16 +270,16 @@ export function createPortfolioScene(): PortfolioSceneController {
       scene.add(importedTable.group);
       importedResources.push(importedTable);
     }
-  });
-  void loadPlayStation2Model().then((playStation) => {
+  }));
+  loading.track(loadPlayStation2Model().then((playStation) => {
     if (!playStation) return;
     if (isDisposed) playStation.dispose();
     else {
       scene.add(playStation.group);
       importedResources.push(playStation);
     }
-  });
-  void loadRealisticTelevisions(channels, () => isDisposed).then((televisions) => {
+  }));
+  loading.track(loadRealisticTelevisions(channels, () => isDisposed).then((televisions) => {
     if (!televisions) return;
     if (isDisposed) televisions.dispose();
     else {
@@ -282,9 +289,9 @@ export function createPortfolioScene(): PortfolioSceneController {
       updateCameraFraming();
       importedResources.push(televisions);
     }
-  });
+  }));
 
-  void loadBasketballModel().then((basketball) => {
+  loading.track(loadBasketballModel().then((basketball) => {
     if (!basketball) return;
     if (isDisposed) basketball.dispose();
     else {
@@ -303,7 +310,7 @@ export function createPortfolioScene(): PortfolioSceneController {
       };
       basketball.group.position.x = sceneLayout.ballStartX;
     }
-  });
+  }));
 
   const allAssets: SceneAsset[] = [
     room,
@@ -468,20 +475,26 @@ export function createPortfolioScene(): PortfolioSceneController {
     renderer.render(scene, camera);
   }
 
-  function pick(clientX: number, clientY: number) {
-    setRaycasterFromClient(clientX, clientY);
-    const hit = raycaster.intersectObjects(hitTargets, false)[0];
-    return (hit?.object.userData.channelId as PortfolioChannelId | undefined) ?? null;
-  }
-
-  function activateAt(clientX: number, clientY: number) {
+  function pickHit(clientX: number, clientY: number) {
     setRaycasterFromClient(clientX, clientY);
     const televisionHit = raycaster.intersectObjects(hitTargets, false)[0];
     const basketballHit = raycaster.intersectObjects(basketballHitTargets, true)[0];
     if (basketballBody && basketballHit && (!televisionHit || basketballHit.distance < televisionHit.distance)) {
+      return { id: "basketball" as const, hit: basketballHit };
+    }
+    return { id: (televisionHit?.object.userData.channelId as PortfolioChannelId | undefined) ?? null, hit: televisionHit };
+  }
+
+  function pick(clientX: number, clientY: number) {
+    return pickHit(clientX, clientY).id;
+  }
+
+  function activateAt(clientX: number, clientY: number) {
+    const { id, hit } = pickHit(clientX, clientY);
+    if (id === "basketball" && basketballBody) {
       const ballCenter = basketballBody.group.getWorldPosition(new Vector3());
       const horizontalTap = MathUtils.clamp(
-        (basketballHit.point.x - ballCenter.x) / basketballBody.radius,
+        (hit.point.x - ballCenter.x) / basketballBody.radius,
         -1,
         1,
       );
@@ -489,7 +502,7 @@ export function createPortfolioScene(): PortfolioSceneController {
       basketballBody.active = true;
       return "basketball";
     }
-    return (televisionHit?.object.userData.channelId as PortfolioChannelId | undefined) ?? null;
+    return id;
   }
 
   function setRaycasterFromClient(clientX: number, clientY: number) {
@@ -688,6 +701,7 @@ export function createPortfolioScene(): PortfolioSceneController {
   function dispose() {
     if (isDisposed) return;
     isDisposed = true;
+    loading.dispose();
     if (animation) animation.resolve();
     if (screenTransition) screenTransition.resolve("cancelled");
     displays.forEach((display) => {
@@ -704,6 +718,9 @@ export function createPortfolioScene(): PortfolioSceneController {
 
   return {
     canvas: renderer.domElement,
+    ready: loading.ready.then(() => {
+      if (!isDisposed) render(performance.now());
+    }),
     resize,
     render,
     pick,
