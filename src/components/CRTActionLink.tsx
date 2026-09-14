@@ -29,10 +29,9 @@ export default function CRTActionLink({ href, label, description, icon, primary 
       className="crt-scroll-reveal crt-action-shell group relative block overflow-hidden rounded-none border border-crt-border-secondary bg-transparent p-5 font-mono focus:outline-none focus:ring-2 focus:ring-inset focus:ring-crt-accent/50">
       <span className={"absolute inset-0 bg-white transition-transform duration-200 ease-out " + (fill.fillOrigin === "top" ? "origin-top " : "origin-bottom ") + (fill.fillVisible ? "scale-y-100" : "scale-y-0")} aria-hidden="true" />
       <span className="crt-action-content relative z-10 flex w-full items-center gap-4">
-        <span className={"shrink-0 transition-colors " + (fill.fillVisible ? "text-[#111]" : "text-crt-text")}>{icon}</span>
+        <span className={"shrink-0 transition-colors " + (fill.fillVisible ? "text-[#111]" : primary ? "text-crt-accent-text" : "text-crt-text")}>{icon}</span>
         <span className="min-w-0 flex-1">
           <span className={"flex items-center gap-2 text-lg font-semibold transition-colors " + (fill.fillVisible ? "text-[#111]" : "text-crt-text")}>
-            {primary && <span className="h-2 w-2 rounded-full bg-[#00ff66] shadow-[0_0_10px_#00ff66]" aria-hidden="true" />}
             {visibleLabel}
           </span>
           <span className={"block text-sm transition-colors " + (fill.fillVisible ? "text-[#333]" : "text-crt-text-tertiary")}>{description}</span>

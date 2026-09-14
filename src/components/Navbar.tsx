@@ -9,8 +9,8 @@ interface NavbarProps {
 }
 
 /**
- * Navbar - Top bar overlay inside TVZoomOverlay with title and close button.
- * Uses theme tokens for gradient background and text colors.
+ * Navbar - Top bar overlay inside TVZoomOverlay with title and Home button.
+ * Uses a restrained accent treatment to keep return navigation discoverable.
  */
 export default function Navbar({ title, onClose }: NavbarProps) {
   const headerRef = useRef<HTMLDivElement>(null);
@@ -111,21 +111,23 @@ export default function Navbar({ title, onClose }: NavbarProps) {
 
   return (
     <div ref={headerRef} className="smart-header pointer-events-none absolute left-0 right-0 top-0 flex h-16 items-center border-b border-white/30 bg-[#1a1a1a]/95">
-      <div id="tv-overlay-title" className="channel-marquee pointer-events-auto h-full flex-1 overflow-hidden font-display text-3xl font-bold uppercase leading-none tracking-[.08em] text-crt-text md:text-4xl" role="heading" aria-level={2} aria-label={title}>
-        <div className="channel-marquee__track h-full items-center" aria-hidden="true">
-          <div className="channel-marquee__group h-full items-center">{marqueeItems}</div>
-          <div className="channel-marquee__group h-full items-center">{marqueeItems}</div>
-        </div>
-      </div>
       <CRTIconButton
         onClick={onClose}
-        className="pointer-events-auto h-full border-l border-white/30 px-5"
-        label="Return to TV room"
+        variant="accent"
+        className="pointer-events-auto h-full shrink-0 px-4 sm:px-5"
+        label="Home — Return to TV room"
+        text="Home"
       >
         <svg className="h-5 w-5 fill-current" viewBox="0 0 24 24">
           <path d="M12 2.7 2.5 10.5l1.3 1.6 1.2-1v9.4h5.5v-5.7h3v5.7H19v-9.4l1.2 1 1.3-1.6L12 2.7Z" />
         </svg>
       </CRTIconButton>
+      <div id="tv-overlay-title" className="channel-marquee pointer-events-auto h-full min-w-0 flex-1 overflow-hidden pl-4 font-display text-3xl font-bold uppercase leading-none tracking-[.08em] text-crt-text md:text-4xl" role="heading" aria-level={2} aria-label={title}>
+        <div className="channel-marquee__track h-full items-center" aria-hidden="true">
+          <div className="channel-marquee__group h-full items-center">{marqueeItems}</div>
+          <div className="channel-marquee__group h-full items-center">{marqueeItems}</div>
+        </div>
+      </div>
     </div>
   );
 }

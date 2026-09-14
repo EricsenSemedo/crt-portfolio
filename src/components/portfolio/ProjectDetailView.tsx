@@ -74,9 +74,20 @@ export default function ProjectDetailView({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.1, duration: 0.2 }}
-            className="absolute top-2 left-2 right-2 z-10 flex justify-between items-center gap-1"
+            className="absolute top-0 left-0 right-0 z-10 flex h-16 items-center gap-1 sm:gap-2 border-b border-white/30 bg-crt-base"
           >
-            <div className="flex gap-1">
+            <CRTIconButton
+              onClick={onClose}
+              variant="accent"
+              text="Back"
+              className="h-full shrink-0 px-2 sm:px-5"
+              label="Back to project gallery"
+            >
+              <svg className="block h-5 w-5 fill-none stroke-current" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="m15 18-6-6 6-6" strokeWidth="2.4" strokeLinecap="square" strokeLinejoin="miter" />
+              </svg>
+            </CRTIconButton>
+            <div className="flex flex-1 justify-center gap-0 px-1 sm:absolute sm:left-1/2 sm:-translate-x-1/2 sm:gap-1 sm:px-0">
               <CRTButton
                 onClick={() => onChannelChange('demo')}
                 aria-pressed={currentChannel === 'demo'}
@@ -94,16 +105,6 @@ export default function ProjectDetailView({
                 Description
               </CRTButton>
             </div>
-
-            <CRTIconButton
-              onClick={onClose}
-              className="h-10 w-10 shrink-0 p-0"
-              label="Back to project gallery"
-            >
-              <svg className="block h-5 w-5 fill-none stroke-current" viewBox="0 0 24 24" aria-hidden="true">
-                <path d="m15 18-6-6 6-6" strokeWidth="2.4" strokeLinecap="square" strokeLinejoin="miter" />
-              </svg>
-            </CRTIconButton>
           </motion.div>
 
           {/* Channel Content */}

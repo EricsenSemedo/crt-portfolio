@@ -1,14 +1,19 @@
 import type { ButtonHTMLAttributes, ReactNode } from "react";
+import useScrambleText from "../hooks/useScrambleText";
 import useDirectionalFill from "../hooks/useDirectionalFill";
 
 interface CRTIconButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   children: ReactNode;
   label: string;
+  text?: string;
+  variant?: "neutral" | "accent";
 }
 
 export default function CRTIconButton({
   children,
   label,
+  text,
+  variant = "neutral",
   className = "",
   onPointerEnter,
   onPointerLeave,
@@ -16,15 +21,20 @@ export default function CRTIconButton({
   onBlur,
   ...props
 }: CRTIconButtonProps) {
+  const textLabel = useScrambleText(text ?? "", !text, { autoPlay: "touch", delay: 300 });
   const fill = useDirectionalFill<HTMLButtonElement>();
+
+  const accent = variant === "accent";
 
   return (
     <button
       type="button"
       {...props}
-      className={"min-h-11 min-w-11 crt-action-shell crt-action-shell--close group relative inline-flex cursor-pointer items-center justify-center overflow-hidden align-middle text-white focus:outline-none focus:ring-2 focus:ring-inset focus:ring-crt-accent " + className}
+      className={"min-h-11 min-w-11 crt-action-shell crt-action-shell--close group relative inline-flex cursor-pointer items-center justify-center overflow-hidden align-middle text-white focus:outline-none focus:ring-2 focus:ring-inset "
+        + (accent ? "border-r border-white/30 bg-crt-accent focus:ring-crt-overlay " : "focus:ring-crt-accent ") + className}
       onPointerEnter={(event) => {
         onPointerEnter?.(event);
+        if (event.pointerType === "mouse") textLabel.scramble();
         fill.handlePointerEnter(event);
       }}
       onPointerLeave={(event) => {
@@ -33,7 +43,10 @@ export default function CRTIconButton({
       }}
       onFocus={(event) => {
         onFocus?.(event);
-        if (event.currentTarget.matches(":focus-visible")) fill.handleFocus();
+        if (event.currentTarget.matches(":focus-visible")) {
+          textLabel.scramble();
+          fill.handleFocus();
+        }
       }}
       onBlur={(event) => {
         onBlur?.(event);
@@ -54,6 +67,7 @@ export default function CRTIconButton({
         aria-hidden="true"
       >
         {children}
+        {text && <span className="ml-2 font-mono text-sm font-semibold">{textLabel.visibleLabel}</span>}
       </span>
     </button>
   );

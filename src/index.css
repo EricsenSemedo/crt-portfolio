@@ -66,7 +66,9 @@
 /*
  * CRT Portfolio Design Tokens
  *
- * One CRT palette: phosphor glow and deep blacks in a dim room.
+ * 60/30/10 visual balance (approximate, not literal pixel quotas):
+ * 60% charcoal canvas; 30% neutral surfaces and silver content;
+ * 10% electric blue for actions, focus, and selection.
  *
  * Token naming follows the pattern:
  *   --crt-{category}-{role}

@@ -31,7 +31,7 @@ export default function Contact({ onNavigate }: ContactProps) {
         </section>
 
         <footer className="flex justify-center" aria-label="Contact navigation">
-          <CRTButton onClick={() => onNavigate?.("home")} variant="secondary">Back to Home</CRTButton>
+          <CRTButton onClick={() => onNavigate?.("home")} variant="secondary">Back to Profile</CRTButton>
         </footer>
       </div>
     </div>

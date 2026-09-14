@@ -121,7 +121,7 @@ export default function Portfolio({ onNavigate, selectedProject, onOpenProject, 
               onClick={() => onNavigate?.('home')}
               variant="secondary"
             >
-              Back to Home
+              Back to Profile
             </CRTButton>
             <CRTButton
               onClick={() => onNavigate?.('contact')}

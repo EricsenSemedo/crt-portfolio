@@ -66,7 +66,6 @@ export default function CRTButton({
       {...props}
     >
       <span className="crt-action-content relative z-10 inline-flex items-center gap-2">
-        {variant === "primary" && <span className="h-2 w-2 rounded-full bg-[#00ff66] shadow-[0_0_10px_#00ff66]" aria-hidden="true" />}
         {label ? visibleLabel : children}
       </span>
     </button>
