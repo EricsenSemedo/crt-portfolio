@@ -16,6 +16,7 @@ const softwareProjectIds = [
 ];
 
 const gameDevelopmentProjectIds = [
+  "heros-quest",
   "physics-grab",
   "dont-get-caught",
   "grow-your-plant",
@@ -82,7 +83,7 @@ export default function Portfolio({ onNavigate, selectedProject, onOpenProject, 
         <section id="game-development" className="border-t border-crt-border-subtle px-2 pt-10 sm:px-6">
           <p className="font-mono text-xs uppercase tracking-[0.24em] text-crt-accent-text">Game Development</p>
           <p className="mt-2 max-w-2xl text-sm text-crt-text-tertiary">
-            Roblox games and gameplay systems built around multiplayer loops, progression, and responsive cross-platform controls.
+            Roblox games and gameplay systems built around arcade and multiplayer loops, progression, and responsive cross-platform controls.
           </p>
         </section>
 

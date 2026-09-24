@@ -29,6 +29,50 @@ export const projects: Project[] = [
     },
   },
   {
+    id: "heros-quest",
+    title: "Hero's Quest",
+    category: "Roblox / Arcade Game",
+    description: "Grow a train of heroes, weave through enemies, and collect upgrades in a solo arcade adventure inspired by classic Roblox.",
+    status: "Playable Alpha",
+    tech: ["Luau", "Roblox", "React Lua", "Rojo"],
+    image: "/crt-portfolio/projects/heros-quest/hero-selection.webp",
+    demo: {
+      type: "video",
+      src: "/crt-portfolio/projects/heros-quest/gameplay.mp4",
+      alt: "Hero's Quest alpha gameplay captured in PC Roblox Studio",
+    },
+    media: [
+      {
+        type: "video",
+        src: "/crt-portfolio/projects/heros-quest/gameplay.mp4",
+        alt: "Hero's Quest alpha gameplay captured in PC Roblox Studio",
+      },
+      {
+        type: "image",
+        src: "/crt-portfolio/projects/heros-quest/gameplay.webp",
+        alt: "Hero's Quest Astral Wizard fighting enemies in Crossroads",
+      },
+      {
+        type: "image",
+        src: "/crt-portfolio/projects/heros-quest/hero-selection.webp",
+        alt: "Hero's Quest leader selection and Campaign menu",
+      },
+    ],
+    detailLayout: "game",
+    detailedDescription: {
+      contribution: "Built the gameplay simulation, hero and enemy behaviors, progression, persistence, responsive React UI, and runtime presentation; integrated and adapted community and Roblox art assets.",
+      problem: "Combine the readable movement of a snake game with a growing party of heroes, automatic combat, and progression that survives between runs.",
+      solution: "Built a server-owned simulation for continuous movement, hero recruitment, combat, pickups, and rewards, with resumable Campaign checkpoints and data-driven arenas and encounters.",
+      impact: "Integrated a playable development alpha with eight hero roles and a 25-level chapter across five arenas. Public release and full-chapter and device validation remain in progress.",
+      highlights: [
+        "Growing hero train with role-based automatic attacks and enemy formations",
+        "Server-owned run state, combat, rewards, and Campaign checkpoints",
+        "Data-driven arenas, guardian encounters, pickups, and permanent upgrades",
+        "React Lua menus with keyboard, gamepad, and configurable touch input",
+      ],
+    },
+  },
+  {
     id: "physics-grab",
     title: "Physics Grab & Fling",
     category: "Roblox / Physics Systems",

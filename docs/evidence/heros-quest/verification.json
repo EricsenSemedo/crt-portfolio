@@ -1,0 +1,22 @@
+[
+  {
+    "viewport": "desktop",
+    "video": {
+      "width": 1280,
+      "height": 764,
+      "duration": 24,
+      "paused": false
+    },
+    "errors": []
+  },
+  {
+    "viewport": "mobile",
+    "video": {
+      "width": 1280,
+      "height": 764,
+      "duration": 24,
+      "paused": false
+    },
+    "errors": []
+  }
+]
