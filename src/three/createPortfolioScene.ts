@@ -895,11 +895,12 @@ async function loadSunsetEnvironment(renderer: WebGLRenderer, scene: Scene, disp
   }
   // Native environment backgrounds stay at infinity as the camera moves.
   scene.backgroundRotation.y = scene.environmentRotation.y = 2.5364;
+  // Dim whichever sky loads to dusk, including the HDR fallback below.
+  scene.backgroundIntensity = 0.32;
   if (sky) {
     sky.mapping = EquirectangularReflectionMapping;
     sky.colorSpace = SRGBColorSpace;
     scene.background = sky;
-    scene.backgroundIntensity = 0.32;
   }
   let environment: ReturnType<PMREMGenerator["fromEquirectangular"]> | null = null;
   if (source) {
