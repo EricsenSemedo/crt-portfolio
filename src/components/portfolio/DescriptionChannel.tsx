@@ -122,7 +122,7 @@ export default function DescriptionChannel({ project }: DescriptionChannelProps)
                   href={source.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="crt-action-shell border border-crt-border px-4 py-3 font-mono text-crt-text hover:bg-white hover:text-[#111] transition-colors"
+                  className="crt-action-shell border border-crt-border px-4 py-3 font-mono text-crt-text hover:bg-crt-text hover:text-[#111] transition-colors"
                 >
                   <span className="crt-scroll-reveal inline-block">{source.label} ↗</span>
                 </a>

@@ -75,7 +75,7 @@ function PortfolioApp() {
   };
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-[#111111]">
+    <div className="relative min-h-screen overflow-hidden bg-crt-overlay">
       {redirectTo && <Navigate to={redirectTo} replace />}
       <div ref={backgroundRef}>
         <Suspense fallback={<CRTLoadingScreen />}>

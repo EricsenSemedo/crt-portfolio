@@ -40,7 +40,7 @@ export default function AdditionalProjectRow({ project, onClick }: AdditionalPro
       aria-label={"View " + project.title}
     >
       <span
-        className={"absolute inset-0 bg-white transition-transform duration-200 ease-out "
+        className={"absolute inset-0 bg-crt-text transition-transform duration-200 ease-out "
           + (fill.fillOrigin === "top" ? "origin-top " : "origin-bottom ")
           + (fill.fillVisible ? "scale-y-100" : "scale-y-0")}
         aria-hidden="true"

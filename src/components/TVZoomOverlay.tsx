@@ -73,7 +73,7 @@ export default function TVZoomOverlay({
         >
           {/* Full-screen content container with CRT effects */}
           <motion.div
-            className="crt-screen-frame relative h-full w-full overflow-hidden bg-[#1a1a1a]"
+            className="crt-screen-frame relative h-full w-full overflow-hidden bg-crt-base"
             onClick={(e) => e.stopPropagation()}
             style={{ transformOrigin: "center" }}
             initial={reduceMotion

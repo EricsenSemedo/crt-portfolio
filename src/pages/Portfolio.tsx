@@ -58,7 +58,7 @@ export default function Portfolio({ onNavigate, selectedProject, onOpenProject, 
       <div ref={backgroundRef} className="crt-content-container min-h-full">
         {/* Header */}
         <section className="space-y-4 px-2 pt-20 text-center sm:px-6">
-          <ScrambleHeading className="pb-2 text-4xl font-display font-bold leading-tight tracking-wide text-white md:text-5xl">
+          <ScrambleHeading className="pb-2 text-4xl font-display font-bold leading-tight tracking-wide text-crt-text md:text-5xl">
             Project Gallery
           </ScrambleHeading>
         </section>
