@@ -27,7 +27,7 @@ export default function CRTActionLink({ href, label, description, icon, primary 
         scramble();
       }} onBlur={fill.handleBlur}
       className="crt-scroll-reveal crt-action-shell group relative block overflow-hidden rounded-none border border-crt-border-secondary bg-transparent p-5 font-mono focus:outline-none focus:ring-2 focus:ring-inset focus:ring-crt-accent/50">
-      <span className={"absolute inset-0 bg-white transition-transform duration-200 ease-out " + (fill.fillOrigin === "top" ? "origin-top " : "origin-bottom ") + (fill.fillVisible ? "scale-y-100" : "scale-y-0")} aria-hidden="true" />
+      <span className={"absolute inset-0 bg-crt-text transition-transform duration-200 ease-out " + (fill.fillOrigin === "top" ? "origin-top " : "origin-bottom ") + (fill.fillVisible ? "scale-y-100" : "scale-y-0")} aria-hidden="true" />
       <span className="crt-action-content relative z-10 flex w-full items-center gap-4">
         <span className={"shrink-0 transition-colors " + (fill.fillVisible ? "text-[#111]" : primary ? "text-crt-accent-text" : "text-crt-text")}>{icon}</span>
         <span className="min-w-0 flex-1">

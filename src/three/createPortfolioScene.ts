@@ -133,11 +133,14 @@ export interface CreatePortfolioSceneOptions {
 
 const OVERVIEW_POSITION = new Vector3(0, 1.82, 7.55);
 const OVERVIEW_TARGET = new Vector3(0, 0.05, -0.4);
+// Each screen lights the room around it; hovering turns the set up.
+const SCREEN_GLOW = 5;
+const SCREEN_GLOW_HOVERED = 9;
 
 export function createPortfolioScene(options: CreatePortfolioSceneOptions = {}): PortfolioSceneController {
   const motionPreference = window.matchMedia("(prefers-reduced-motion: reduce)");
   const scene = new Scene();
-  scene.background = new Color("#111111");
+  scene.background = new Color("#0b0907");
 
   const camera = new PerspectiveCamera(38, 1, 0.1, 120);
   camera.position.copy(OVERVIEW_POSITION);
@@ -155,10 +158,11 @@ export function createPortfolioScene(options: CreatePortfolioSceneOptions = {}):
   renderer.toneMappingExposure = 0.92;
   renderer.shadowMap.enabled = true;
 
-  const ambient = new AmbientLight("#d5c1aa", 0.32);
-  const ceiling = new PointLight("#ffdbb1", 10, 12, 1.8);
-  ceiling.position.set(-1.2, 4.2, 2.2);
-  const sunlight = new DirectionalLight("#ffc379", 2.6);
+  // Late-night den: a dim warm room, one tungsten lamp, the last of the dusk, and the TVs.
+  const ambient = new AmbientLight("#7d6a58", 0.14);
+  const lamp = new PointLight("#ffb46b", 5, 9, 1.8);
+  lamp.position.set(-3.4, 1.6, 2.2);
+  const sunlight = new DirectionalLight("#ff9152", 0.45);
   // Same low sun direction as the rotated Industrial Sunset 02 panorama.
   sunlight.position.set(-13.204, 0.435, -34.724);
   sunlight.target.position.set(0, -1.16, 3);
@@ -167,9 +171,7 @@ export function createPortfolioScene(options: CreatePortfolioSceneOptions = {}):
   Object.assign(sunlight.shadow.camera, { left: -8, right: 8, top: 6, bottom: -6, near: 0.5, far: 80 });
   sunlight.shadow.bias = -0.001;
   sunlight.shadow.normalBias = 0.025;
-  const fill = new DirectionalLight("#2457ff", 0.28);
-  fill.position.set(4, 2.4, 5);
-  scene.add(ambient, ceiling, fill, sunlight, sunlight.target);
+  scene.add(ambient, lamp, sunlight, sunlight.target);
 
   const room = createGarageRoom();
   const table = createTable();
@@ -219,7 +221,7 @@ export function createPortfolioScene(options: CreatePortfolioSceneOptions = {}):
     group.scale.setScalar(channel.scale);
     screenPlane.userData.channelId = channel.id;
     hitTargets.push(screenPlane);
-    hoverLight.intensity = 0.08;
+    hoverLight.intensity = SCREEN_GLOW;
     scene.add(group);
 
     const display = createScreenDisplay(channel.label, channel.subtitle);
@@ -519,7 +521,7 @@ export function createPortfolioScene(options: CreatePortfolioSceneOptions = {}):
   function setHovered(next: PortfolioChannelId | null) {
     if (hovered === next) return;
     channels.forEach((channel) => {
-      channel.asset.hoverLight.intensity = channel.id === next ? 1.2 : 0.08;
+      channel.asset.hoverLight.intensity = channel.id === next ? SCREEN_GLOW_HOVERED : SCREEN_GLOW;
       const display = displays.get(channel.id);
       if (display && channel.id !== next) {
         drawScreen(display.canvas, channel.label, channel.subtitle, 0);
@@ -827,9 +829,9 @@ function createInteractionPrompt() {
     context.clearRect(0, 0, canvas.width, canvas.height);
     context.textAlign = "center";
     context.textBaseline = "middle";
-    context.shadowColor = "#2457ff";
+    context.shadowColor = "#ffb347";
     context.shadowBlur = 18;
-    context.fillStyle = "#f8fafa";
+    context.fillStyle = "#f3ebdd";
     context.font = "600 46px monospace";
     context.fillText(label, canvas.width / 2, 72);
 
@@ -839,7 +841,7 @@ function createInteractionPrompt() {
     context.lineTo(pointerX + 34, 130);
     context.lineTo(pointerX, 196);
     context.closePath();
-    context.fillStyle = "#d3dcdf";
+    context.fillStyle = "#ffc478";
     context.shadowBlur = 26;
     context.fill();
   }
@@ -893,6 +895,8 @@ async function loadSunsetEnvironment(renderer: WebGLRenderer, scene: Scene, disp
   }
   // Native environment backgrounds stay at infinity as the camera moves.
   scene.backgroundRotation.y = scene.environmentRotation.y = 2.5364;
+  // Dim whichever sky loads to dusk, including the HDR fallback below.
+  scene.backgroundIntensity = 0.32;
   if (sky) {
     sky.mapping = EquirectangularReflectionMapping;
     sky.colorSpace = SRGBColorSpace;
@@ -904,7 +908,7 @@ async function loadSunsetEnvironment(renderer: WebGLRenderer, scene: Scene, disp
     try {
       environment = generator.fromEquirectangular(source);
       scene.environment = environment.texture;
-      scene.environmentIntensity = 0.3;
+      scene.environmentIntensity = 0.12;
       if (!sky) scene.background = environment.texture;
     } catch {
       // The high-resolution background can still work without reflections.
