@@ -305,6 +305,10 @@ body {
   transform-origin: center;
 }
 
+.crt-page:focus {
+  outline: none;
+}
+
 .crt-page {
   scrollbar-color: rgb(var(--crt-accent-secondary) / .22) transparent;
   scrollbar-width: thin;

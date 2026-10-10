@@ -49,7 +49,7 @@ const experience = [
 
 export default function Home({ onNavigate }: HomeProps) {
   return (
-    <div className="crt-page bg-page-tint w-full h-full overflow-y-auto text-crt-text">
+    <div tabIndex={-1} className="crt-page bg-page-tint w-full h-full overflow-y-auto text-crt-text">
       <div className="crt-content-container min-h-full py-8">
         {/* Hero Section */}
         <section className="space-y-5 pb-12 pt-16 text-center md:pt-20">

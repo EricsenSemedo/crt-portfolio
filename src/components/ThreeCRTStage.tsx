@@ -29,6 +29,10 @@ export default function ThreeCRTStage({
   const mountRef = useRef<HTMLDivElement>(null);
   const sceneRef = useRef<PortfolioSceneController | null>(null);
   const selectingRef = useRef(false);
+  // A TV picked while the camera is still returning to the room runs once it arrives.
+  const resettingRef = useRef(false);
+  const pendingSelectRef = useRef<PortfolioChannelId | null>(null);
+  const selectChannelRef = useRef<(id: PortfolioChannelId) => void>(() => {});
   const focusRequestRef = useRef(0);
   const focusedRef = useRef<PortfolioChannelId | null>(null);
   const pointerGestureRef = useRef<{ id: number; x: number; y: number; moved: boolean } | null>(null);
@@ -89,6 +93,7 @@ export default function ThreeCRTStage({
       showFallbackRef.current = null;
       controller.dispose();
       selectingRef.current = false;
+      resettingRef.current = false;
       setUnavailable(true);
       setReady(true);
     }
@@ -146,13 +151,18 @@ export default function ThreeCRTStage({
     }
     if (!requestedChannel) {
       selectingRef.current = true;
+      resettingRef.current = true;
       focusedRef.current = null;
       void controller
         ?.reset(window.matchMedia("(prefers-reduced-motion: reduce)").matches, quickTransition)
         .then(() => {
           if (!isCurrent()) return;
           selectingRef.current = false;
+          resettingRef.current = false;
           onOverviewComplete?.();
+          const pending = pendingSelectRef.current;
+          pendingSelectRef.current = null;
+          if (pending) selectChannelRef.current(pending);
         });
       return;
     }
@@ -161,6 +171,8 @@ export default function ThreeCRTStage({
       return;
     }
     selectingRef.current = true;
+    resettingRef.current = false;
+    pendingSelectRef.current = null;
     focusedRef.current = null;
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     void controller
@@ -184,6 +196,10 @@ export default function ThreeCRTStage({
       onSelect(id);
       return;
     }
+    if (resettingRef.current) {
+      pendingSelectRef.current = id;
+      return;
+    }
     if (!ready || !controller || selectingRef.current) return;
     const request = ++focusRequestRef.current;
     const isCurrent = () => sceneRef.current === controller && focusRequestRef.current === request;
@@ -205,6 +221,8 @@ export default function ThreeCRTStage({
     onSelect(id);
   }
 
+  selectChannelRef.current = (id) => void selectChannel(id);
+
   function handlePointerMove(event: React.PointerEvent<HTMLDivElement>) {
     const gesture = pointerGestureRef.current;
     if (gesture?.id === event.pointerId && Math.hypot(event.clientX - gesture.x, event.clientY - gesture.y) > 10) {
@@ -225,7 +243,7 @@ export default function ThreeCRTStage({
   }
 
   return (
-    <main className={"three-stage" + (unavailable ? " is-unavailable" : "")} aria-label="Eric Semedo portfolio channels">
+    <main className={"three-stage" + (unavailable ? " is-unavailable" : "")} aria-label="Ericsen Semedo portfolio channels">
       <div
         ref={mountRef}
         className={"three-stage__canvas " + (hovered ? "is-hovering" : "")}
