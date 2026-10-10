@@ -96,12 +96,20 @@ export default function Navbar({ title, onClose }: NavbarProps) {
       settle();
     }
 
+    function handleFocusIn() {
+      stopSnap();
+      setPosition(0, true);
+    }
+
+    const headerElement = headerRef.current;
+    headerElement?.addEventListener("focusin", handleFocusIn);
     scrollContainer.addEventListener("scroll", handleScroll, { passive: true });
     scrollContainer.addEventListener("touchstart", handleTouchStart, { passive: true });
     scrollContainer.addEventListener("touchend", handleTouchEnd, { passive: true });
     scrollContainer.addEventListener("touchcancel", handleTouchEnd, { passive: true });
     return () => {
       window.clearTimeout(snapTimer);
+      headerElement?.removeEventListener("focusin", handleFocusIn);
       scrollContainer.removeEventListener("scroll", handleScroll);
       scrollContainer.removeEventListener("touchstart", handleTouchStart);
       scrollContainer.removeEventListener("touchend", handleTouchEnd);

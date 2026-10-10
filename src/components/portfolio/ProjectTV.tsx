@@ -6,6 +6,7 @@ import CRTScanlines from "../CRTScanlines";
 
 interface ProjectTVProps {
   project: Project;
+  channel: number;
   onClick?: () => void;
 }
 
@@ -13,7 +14,7 @@ interface ProjectTVProps {
  * ProjectTV - Individual project card styled as a mini CRT TV.
  * Uses theme tokens for bezel, screen, and accent colors.
  */
-export default function ProjectTV({ project, onClick }: ProjectTVProps) {
+export default function ProjectTV({ project, channel, onClick }: ProjectTVProps) {
   const fill = useDirectionalFill<HTMLDivElement>("all");
   const title = useScrambleText(project.title);
   const previewSrc = project.image ?? project.media?.[0]?.src ?? project.demo?.src;
@@ -123,7 +124,7 @@ export default function ProjectTV({ project, onClick }: ProjectTVProps) {
           
           {/* Channel Number */}
           <span className={"text-xs font-mono transition-colors " + (fill.fillVisible ? "text-[#333]" : "text-crt-text-muted")}>
-            CH {project.id.slice(-2).toUpperCase()}
+            CH {String(channel).padStart(2, "0")}
           </span>
         </div>
         </div>

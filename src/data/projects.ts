@@ -482,7 +482,7 @@ export const projects: Project[] = [
     status: "Learning Experience",
     tech: ["SQL", "PHP", "HTML", "CSS"],
     image: "/api/placeholder/300/200",
-    github: "https://github.com/EricsenSemedo/project_manager_pro",
+    sources: [{ label: "GitHub Repository", href: "https://github.com/EricsenSemedo/project_manager_pro" }],
     demo: {
       type: "video",
       src: "/crt-portfolio/videos/project-manager-pro-demo.mp4",
