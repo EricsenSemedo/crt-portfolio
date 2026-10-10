@@ -94,7 +94,7 @@ export default function DemoChannel({ project }: DemoChannelProps) {
         />
         
         {/* Demo Media */}
-        <div className="relative mb-7 aspect-video overflow-hidden border border-crt-border bg-crt-surface-primary">
+        <div data-carry-target className="relative mb-7 aspect-video overflow-hidden border border-crt-border bg-crt-surface-primary">
           {!activeMedia || failedSource === activeMedia.src ? (
             <div className="absolute inset-0 flex items-center justify-center bg-crt-surface-secondary">
               <div className="text-center px-6">

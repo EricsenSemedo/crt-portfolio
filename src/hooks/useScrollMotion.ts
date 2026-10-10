@@ -35,6 +35,47 @@ function updateSurfaceRows(surface: HTMLElement, reducedMotion: boolean) {
   }
 }
 
+const ENTER_LINE = 0.9;
+const MAX_STAGGER_STEPS = 6;
+
+/**
+ * Entrances replay in both directions: anything that drops fully below the screen
+ * re-arms, so it plays again on the way back down. Nothing above the fold re-hides.
+ */
+function updateSurfaceEntrances(surface: HTMLElement, reducedMotion: boolean) {
+  const surfaceRect = surface.getBoundingClientRect();
+  const viewportHeight = surface.clientHeight;
+  const entering: HTMLElement[] = [];
+
+  for (const element of surface.querySelectorAll<HTMLElement>("[data-enter]")) {
+    if (element.closest(SCROLL_SURFACE_SELECTOR) !== surface) continue;
+    const rect = element.getBoundingClientRect();
+    const top = rect.top - surfaceRect.top;
+    const entered = element.classList.contains("is-entered");
+    if (reducedMotion) {
+      element.classList.add("is-entered");
+    } else if (!entered && top < viewportHeight * ENTER_LINE && rect.bottom > surfaceRect.top) {
+      entering.push(element);
+    } else if (entered && top > viewportHeight) {
+      element.classList.remove("is-entered");
+    }
+  }
+
+  entering.forEach((element, index) => {
+    element.style.setProperty("--crt-enter-delay", `${Math.min(index, MAX_STAGGER_STEPS) * 70}ms`);
+    element.classList.add("is-entered");
+  });
+
+  // Screens drift slightly inside their bezels, scrubbed by scroll in both directions.
+  for (const image of surface.querySelectorAll<HTMLElement>(".crt-parallax")) {
+    if (image.closest(SCROLL_SURFACE_SELECTOR) !== surface) continue;
+    const rect = image.getBoundingClientRect();
+    const center = (rect.top + rect.height / 2 - surfaceRect.top) / viewportHeight;
+    const offset = reducedMotion ? 0 : Math.max(-1.2, Math.min(1.2, (center - 0.5) * 2));
+    image.style.setProperty("--crt-parallax", offset.toFixed(3));
+  }
+}
+
 export default function useScrollMotion(
   rootRef: RefObject<HTMLElement | null>,
   lifecycleKey: string | undefined,
@@ -52,10 +93,16 @@ export default function useScrollMotion(
     let surfaceSyncFrame: number | undefined;
     let isDesktopSmooth = false;
     let reducedMotion = false;
+    let started = false;
+
+    // Arm entrances now so content waits for the screen to finish powering on.
+    if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) root.classList.add("crt-enter-ready");
 
     function updateAllRows() {
-      root.querySelectorAll<HTMLElement>(SCROLL_SURFACE_SELECTOR)
-        .forEach((surface) => updateSurfaceRows(surface, reducedMotion));
+      root.querySelectorAll<HTMLElement>(SCROLL_SURFACE_SELECTOR).forEach((surface) => {
+        updateSurfaceRows(surface, reducedMotion);
+        if (started) updateSurfaceEntrances(surface, reducedMotion);
+      });
     }
 
     function requestRowUpdate() {
@@ -178,6 +225,7 @@ export default function useScrollMotion(
     ];
 
     function start() {
+      started = true;
       configureInputMode();
       mutationObserver.observe(root, { childList: true, subtree: true });
       window.addEventListener("resize", configureInputMode, { passive: true });
@@ -191,6 +239,7 @@ export default function useScrollMotion(
 
     return () => {
       if (startTimer !== undefined) window.clearTimeout(startTimer);
+      root.classList.remove("crt-enter-ready");
       mutationObserver.disconnect();
       resizeObserver.disconnect();
       window.removeEventListener("resize", configureInputMode);

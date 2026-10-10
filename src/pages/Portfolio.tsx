@@ -1,8 +1,10 @@
-import { AnimatePresence } from "framer-motion";
-import { useRef, useState } from "react";
+import { AnimatePresence, useReducedMotion } from "framer-motion";
+import { useCallback, useRef, useState } from "react";
 import CRTButton from "../components/CRTButton";
 import ScrambleHeading from "../components/ScrambleHeading";
 import { AdditionalProjectRow, ProjectDetailView, ProjectTV } from "../components/portfolio";
+import NowShowing from "../components/portfolio/NowShowing";
+import ScreenCarry, { type ScreenCarryFlight } from "../components/portfolio/ScreenCarry";
 import projects from "../data/projects";
 import type { NavigateFunction, Project } from "../types";
 
@@ -29,6 +31,21 @@ const projectGroups = [
 ];
 
 const featuredProjectIds = [...softwareProjectIds, ...gameDevelopmentProjectIds];
+
+// Prototype 2.0: one software and one game project per track lead the channel.
+const headlineProjectIds = ["pullworth", "heros-quest", "toonsync", "physics-grab"];
+
+function cardScreen(id: string) {
+  return document.querySelector(`[data-crt-screen="${id}"]`);
+}
+
+function demoRect() {
+  return document.querySelector("[data-carry-target]")?.getBoundingClientRect() ?? null;
+}
+
+function carryImage(project: Project) {
+  return project.image && !/\.(webm|mp4)$/.test(project.image) ? project.image : null;
+}
 
 function projectsById(ids: string[]) {
   return ids.flatMap((id) => {
@@ -59,6 +76,33 @@ export default function Portfolio({ onNavigate, selectedProject, onOpenProject, 
     setCurrentChannel('demo');
   }
 
+  const reduceMotion = useReducedMotion();
+  const [flight, setFlight] = useState<ScreenCarryFlight | null>(null);
+  const flightKey = useRef(0);
+  const carrySource = useRef<Element | null>(null);
+  const endFlight = useCallback(() => setFlight(null), []);
+
+  // The clicked screen carries into the project page, and back into its card on close.
+  function openWithCarry(project: Project, source?: Element | null) {
+    const src = carryImage(project);
+    const screen = source ?? cardScreen(project.id);
+    carrySource.current = screen;
+    if (src && !reduceMotion && screen) {
+      setFlight({ key: ++flightKey.current, src, from: () => screen.getBoundingClientRect(), to: demoRect, direction: "open" });
+    }
+    onOpenProject(project);
+  }
+
+  function closeWithCarry() {
+    const src = selectedProject ? carryImage(selectedProject) : null;
+    const from = demoRect();
+    if (selectedProject && src && from && !reduceMotion && currentChannel === "demo") {
+      const screen = carrySource.current?.isConnected ? carrySource.current : cardScreen(selectedProject.id);
+      setFlight({ key: ++flightKey.current, src, from: () => from, to: () => screen?.getBoundingClientRect() ?? null, direction: "close" });
+    }
+    onCloseProject();
+  }
+
   return (
     <div tabIndex={-1} className="crt-page bg-page-tint w-full h-full overflow-y-auto text-crt-text">
       <div ref={backgroundRef} className="crt-content-container min-h-full">
@@ -67,7 +111,7 @@ export default function Portfolio({ onNavigate, selectedProject, onOpenProject, 
           <ScrambleHeading className="pb-2 text-4xl font-display font-bold leading-tight tracking-wide text-crt-text md:text-5xl">
             Project Gallery
           </ScrambleHeading>
-          <nav className="flex flex-wrap justify-center gap-3" aria-label="Jump to project group">
+          <nav data-enter="copy" className="flex flex-wrap justify-center gap-3" aria-label="Jump to project group">
             {projectGroups.map((group) => (
               <CRTButton
                 key={group.id}
@@ -81,9 +125,12 @@ export default function Portfolio({ onNavigate, selectedProject, onOpenProject, 
           </nav>
         </section>
 
-        <section id="software-and-ai" className="border-t border-crt-border-subtle px-2 pt-10 sm:px-6">
-          <h2 className="font-display text-2xl font-bold tracking-wide text-crt-text">Software &amp; AI</h2>
-          <p className="mt-2 max-w-2xl text-sm text-crt-text-tertiary">
+        {!reduceMotion && <NowShowing projects={projectsById(headlineProjectIds)} onWatch={openWithCarry} />}
+
+        <section id="software-and-ai" className="relative px-2 pt-10 sm:px-6">
+          <span data-enter="rule" className="crt-rule" aria-hidden="true" />
+          <h2 data-enter="heading" className="font-display text-2xl font-bold tracking-wide text-crt-text">Software &amp; AI</h2>
+          <p data-enter="copy" className="mt-2 max-w-2xl text-sm text-crt-text-tertiary">
             Product, client, and hackathon work spanning field tools, social platforms, and applied AI systems.
           </p>
         </section>
@@ -94,14 +141,15 @@ export default function Portfolio({ onNavigate, selectedProject, onOpenProject, 
               key={project.id}
               project={project}
               channel={featuredProjectIds.indexOf(project.id) + 1}
-              onClick={() => onOpenProject(project)}
+              onClick={() => openWithCarry(project)}
             />
           ))}
         </section>
 
-        <section id="game-development" className="border-t border-crt-border-subtle px-2 pt-10 sm:px-6">
-          <h2 className="font-display text-2xl font-bold tracking-wide text-crt-text">Game Development</h2>
-          <p className="mt-2 max-w-2xl text-sm text-crt-text-tertiary">
+        <section id="game-development" className="relative px-2 pt-10 sm:px-6">
+          <span data-enter="rule" className="crt-rule" aria-hidden="true" />
+          <h2 data-enter="heading" className="font-display text-2xl font-bold tracking-wide text-crt-text">Game Development</h2>
+          <p data-enter="copy" className="mt-2 max-w-2xl text-sm text-crt-text-tertiary">
             Roblox games and gameplay systems built around arcade and multiplayer loops, progression, and responsive cross-platform controls.
           </p>
         </section>
@@ -112,14 +160,15 @@ export default function Portfolio({ onNavigate, selectedProject, onOpenProject, 
               key={project.id}
               project={project}
               channel={featuredProjectIds.indexOf(project.id) + 1}
-              onClick={() => onOpenProject(project)}
+              onClick={() => openWithCarry(project)}
             />
           ))}
         </section>
 
-        <section className="border-t border-crt-border-subtle px-2 pt-10 sm:px-6">
-          <h2 className="font-display text-2xl font-bold tracking-wide text-crt-text">Additional Projects</h2>
-          <p className="mt-2 max-w-2xl text-sm text-crt-text-tertiary">
+        <section className="relative px-2 pt-10 sm:px-6">
+          <span data-enter="rule" className="crt-rule" aria-hidden="true" />
+          <h2 data-enter="heading" className="font-display text-2xl font-bold tracking-wide text-crt-text">Additional Projects</h2>
+          <p data-enter="copy" className="mt-2 max-w-2xl text-sm text-crt-text-tertiary">
             Experiments, coursework, client systems, and earlier builds that shaped the featured work above.
           </p>
         </section>
@@ -130,13 +179,13 @@ export default function Portfolio({ onNavigate, selectedProject, onOpenProject, 
               <AdditionalProjectRow
                 key={project.id}
                 project={project}
-                onClick={() => onOpenProject(project)}
+                onClick={() => openWithCarry(project)}
               />
             ))}
           </div>
         </section>
 
-        <footer className="px-2 py-10 text-center sm:px-6" aria-label="Project gallery navigation">
+        <footer data-enter="copy" className="px-2 py-10 text-center sm:px-6" aria-label="Project gallery navigation">
           <div className="flex flex-wrap justify-center gap-4">
             <CRTButton
               onClick={() => onNavigate?.('home')}
@@ -162,11 +211,12 @@ export default function Portfolio({ onNavigate, selectedProject, onOpenProject, 
             project={selectedProject}
             currentChannel={currentChannel}
             onChannelChange={setCurrentChannel}
-            onClose={onCloseProject}
+            onClose={closeWithCarry}
             backgroundRef={backgroundRef}
           />
         )}
       </AnimatePresence>
+      {flight && <ScreenCarry key={flight.key} flight={flight} onDone={endFlight} />}
     </div>
   );
 }

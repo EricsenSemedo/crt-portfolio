@@ -464,3 +464,112 @@ body {
   outline: 2px solid rgb(var(--crt-text-accent));
   outline-offset: 4px;
 }
+
+/* Prototype 2.0: on-screen channel number, the green OSD of an old set. */
+.channel-osd {
+  color: #7dff9a;
+  text-shadow: 0 0 6px rgb(125 255 154 / .7), 2px 0 0 rgb(255 60 60 / .35), -2px 0 0 rgb(60 120 255 / .35);
+  letter-spacing: .08em;
+}
+
+.screen-carry__lines {
+  background: repeating-linear-gradient(180deg, rgb(0 0 0 / .22) 0 1px, transparent 1px 3px);
+}
+
+/* Prototype 2.0: each kind of element tunes in its own way. */
+@property --crt-enter-opacity {
+  syntax: "<number>";
+  inherits: false;
+  initial-value: 1;
+}
+
+[data-enter] {
+  opacity: calc(var(--crt-reveal-opacity, 1) * var(--crt-enter-opacity));
+}
+
+.crt-enter-ready [data-enter] {
+  transition:
+    --crt-enter-opacity .6s cubic-bezier(.16, 1, .3, 1) var(--crt-enter-delay, 0ms),
+    translate .75s cubic-bezier(.16, 1, .3, 1) var(--crt-enter-delay, 0ms),
+    clip-path .8s cubic-bezier(.16, 1, .3, 1) var(--crt-enter-delay, 0ms),
+    scale 1s cubic-bezier(.65, 0, .35, 1) var(--crt-enter-delay, 0ms);
+}
+
+/* Copy and cards: a quiet fade up. */
+.crt-enter-ready [data-enter="copy"]:not(.is-entered) {
+  --crt-enter-opacity: 0;
+  translate: 0 18px;
+}
+
+/* Headings: drawn top to bottom behind a bright scan line. */
+.crt-enter-ready [data-enter="heading"] { position: relative; }
+.crt-enter-ready [data-enter="heading"]:not(.is-entered) {
+  clip-path: inset(0 0 100% 0);
+  translate: 0 .25em;
+}
+.crt-enter-ready [data-enter="heading"].is-entered::after {
+  content: "";
+  position: absolute;
+  inset-inline: -4px;
+  top: 0;
+  height: 2px;
+  background: rgb(var(--crt-text-accent));
+  box-shadow: 0 0 12px rgb(var(--crt-text-accent));
+  animation: crt-scan-line .8s cubic-bezier(.16, 1, .3, 1) var(--crt-enter-delay, 0ms) both;
+  pointer-events: none;
+}
+@keyframes crt-scan-line {
+  from { top: 0; opacity: 1; }
+  70% { opacity: .8; }
+  to { top: 100%; opacity: 0; }
+}
+
+/* Screens: power on from a bright line, like the set itself. */
+.crt-enter-ready [data-enter="media"]:not(.is-entered) { --crt-enter-opacity: 0; }
+.crt-enter-ready [data-enter="media"].is-entered {
+  animation: crt-power-on .62s cubic-bezier(.22, 1, .36, 1) calc(var(--crt-enter-delay, 0ms) + 120ms) both;
+}
+@keyframes crt-power-on {
+  0% { transform: scale(.7, .012); filter: brightness(3); opacity: 0; }
+  35% { transform: scale(1, .02); filter: brightness(2.6); opacity: 1; }
+  100% { transform: none; filter: none; opacity: 1; }
+}
+
+/* Dividers: drawn outward from the center like a horizontal sync line. */
+.crt-rule {
+  position: absolute;
+  inset-inline: 0;
+  top: 0;
+  height: 1px;
+  background: rgb(var(--crt-border-subtle));
+}
+.crt-enter-ready .crt-rule:not(.is-entered) { scale: 0 1; }
+
+.crt-parallax {
+  translate: 0 calc(var(--crt-parallax, 0) * -5%);
+  scale: 1.12;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .crt-parallax { translate: none; scale: none; }
+  [data-enter] { animation: none !important; }
+}
+
+.now-showing__image {
+  scale: calc(1 + var(--now-showing-push, 0) * .06);
+}
+.now-showing__static {
+  pointer-events: none;
+  animation: now-showing-static .24s steps(4) both;
+}
+@keyframes now-showing-static {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+.now-showing__copy {
+  animation: now-showing-copy .45s cubic-bezier(.16, 1, .3, 1) .1s both;
+}
+@keyframes now-showing-copy {
+  from { opacity: 0; translate: 0 14px; }
+  to { opacity: 1; translate: 0 0; }
+}

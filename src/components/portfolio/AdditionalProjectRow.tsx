@@ -24,6 +24,7 @@ export default function AdditionalProjectRow({ project, onClick }: AdditionalPro
 
   return (
     <div
+      data-enter="copy"
       className="additional-project-row group relative cursor-pointer overflow-hidden border-b border-crt-border"
       onClick={onClick}
       onPointerEnter={handlePointerEnter}

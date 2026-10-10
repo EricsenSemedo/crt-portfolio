@@ -1,9 +1,10 @@
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { useEffect, useRef, type ReactNode, type RefObject } from "react";
+import { useEffect, useRef, useState, type ReactNode, type RefObject } from "react";
 import { PORTFOLIO_CHANNELS, type PortfolioChannelId } from "../data/channels";
 import { useModalAccessibility } from "../hooks/useModalAccessibility";
 import useScrollMotion from "../hooks/useScrollMotion";
 import Navbar from "./Navbar";
+import StaticNoise from "./StaticNoise";
 
 interface SelectedItem {
   id: PortfolioChannelId;
@@ -114,11 +115,59 @@ export default function TVZoomOverlay({
               transition={{ duration: reduceMotion ? 0.01 : 0.2 }}
             >
                 <div className="absolute inset-0">
-                  {!hideHeader && <Navbar title={PORTFOLIO_CHANNELS[selectedItem.id].title} onClose={onClose} />}
-                  <div className="absolute inset-0">{children}</div>
+                  <AnimatePresence initial={false}>
+                    <motion.div
+                      key={selectedItem.id}
+                      className="absolute inset-0"
+                      initial={reduceMotion ? { opacity: 0 } : { opacity: 0, y: "-7%", filter: "brightness(2.2)" }}
+                      animate={{ opacity: 1, y: "0%", filter: "brightness(1)" }}
+                      exit={{ opacity: 0, transition: { duration: reduceMotion ? 0.01 : 0.12 } }}
+                      transition={reduceMotion
+                        ? { duration: 0.01 }
+                        : { delay: 0.16, duration: 0.34, ease: [0.16, 1, 0.3, 1] }}
+                    >
+                      {!hideHeader && <Navbar title={PORTFOLIO_CHANNELS[selectedItem.id].title} onClose={onClose} />}
+                      <div className="absolute inset-0">{children}</div>
+                    </motion.div>
+                  </AnimatePresence>
+                  {!reduceMotion && <ChannelFlip id={selectedItem.id} />}
                 </div>
               </motion.div>
             </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+}
+
+/** Static burst and on-screen channel number when the channel changes inside the TV. */
+function ChannelFlip({ id }: { id: PortfolioChannelId }) {
+  const [flip, setFlip] = useState<{ id: PortfolioChannelId; count: number }>({ id, count: 0 });
+  if (flip.id !== id) setFlip({ id, count: flip.count + 1 });
+  const channel = PORTFOLIO_CHANNELS[id];
+
+  return (
+    <AnimatePresence>
+      {flip.count > 0 && (
+        <motion.div key={flip.count} className="pointer-events-none absolute inset-0 z-50" aria-hidden="true">
+          <motion.div
+            className="absolute inset-0 bg-black"
+            initial={{ opacity: 1 }}
+            animate={{ opacity: 0 }}
+            transition={{ delay: 0.14, duration: 0.2 }}
+          >
+            <StaticNoise intensity={8} />
+            <div className="demo-carousel__static absolute inset-0" />
+          </motion.div>
+          <motion.p
+            className="channel-osd absolute right-6 top-20 font-mono text-3xl font-bold md:right-10 md:text-4xl"
+            initial={{ opacity: 1 }}
+            animate={{ opacity: 0 }}
+            transition={{ delay: 1.1, duration: 0.25 }}
+          >
+            CH {channel.number}
+            <span className="block text-right text-lg">{channel.title.toUpperCase()}</span>
+          </motion.p>
         </motion.div>
       )}
     </AnimatePresence>

@@ -29,6 +29,7 @@ import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { MeshoptDecoder } from "three/examples/jsm/libs/meshopt_decoder.module.js";
 import { HDRLoader } from "three/examples/jsm/loaders/HDRLoader.js";
 import { PORTFOLIO_CHANNELS, type PortfolioChannelId } from "../data/channels";
+import projects from "../data/projects";
 import { createGarageExterior } from "./assets/createGarageExterior";
 import { loadGarageStructure } from "./assets/loadGarageStructure";
 import { containBasketball } from "./assets/garageBounds";
@@ -327,6 +328,11 @@ export function createPortfolioScene(options: CreatePortfolioSceneOptions = {}):
   let lastFrameTime = performance.now();
   let hovered: PortfolioChannelId | null = null;
   let isOverview = true;
+  // Prototype 2.0: the Projects set channel-surfs through real project screens while you look around.
+  const reelImages = loadReelImages();
+  let reelLastFrame = 0;
+  const reelFor = (id: PortfolioChannelId, time: number) =>
+    id === "portfolio" && isOverview && !motionPreference.matches ? reelFrame(reelImages, time) : null;
   let focusedChannel: PortfolioChannelId | null = null;
   let animation: {
     startedAt: number;
@@ -469,9 +475,18 @@ export function createPortfolioScene(options: CreatePortfolioSceneOptions = {}):
       const display = displays.get(hovered);
       const channel = channels.find((item) => item.id === hovered);
       if (display && channel && time - display.lastFrame > 70) {
-        drawScreen(display.canvas, channel.label, channel.subtitle, time - display.hoverStartedAt);
+        drawScreen(display.canvas, channel.label, channel.subtitle, time - display.hoverStartedAt, reelFor(hovered, time));
         display.texture.needsUpdate = true;
         display.lastFrame = time;
+      }
+    }
+    if (!screenTransition && hovered !== "portfolio" && time - reelLastFrame > 70) {
+      const reel = reelFor("portfolio", time);
+      const display = displays.get("portfolio");
+      if (reel && display) {
+        drawScreen(display.canvas, PORTFOLIO_CHANNELS.portfolio.title.toUpperCase(), `CH ${PORTFOLIO_CHANNELS.portfolio.number}`, 0, reel);
+        display.texture.needsUpdate = true;
+        reelLastFrame = time;
       }
     }
     renderer.render(scene, camera);
@@ -1092,7 +1107,54 @@ function createScreenDisplay(label: string, subtitle: string): ScreenDisplay {
   return { canvas, texture, material, lastFrame: 0, hoverStartedAt: 0 };
 }
 
-function drawScreen(canvas: HTMLCanvasElement, label: string, subtitle: string, time: number) {
+interface ReelFrame {
+  image: HTMLImageElement;
+  staticAmount: number;
+}
+
+const REEL_SLOT_MS = 2600;
+const REEL_STATIC_MS = 160;
+
+function loadReelImages() {
+  const featured = ["pullworth", "heros-quest", "toonsync", "physics-grab", "derma", "dont-get-caught", "shadi", "grow-your-plant"];
+  return featured.flatMap((id) => {
+    const src = projects.find((project) => project.id === id)?.image;
+    if (!src || /\.(webm|mp4)$/.test(src)) return [];
+    const image = new Image();
+    image.src = src;
+    return [image];
+  });
+}
+
+function reelFrame(images: HTMLImageElement[], time: number): ReelFrame | null {
+  const ready = images.filter((image) => image.complete && image.naturalWidth > 0);
+  if (ready.length === 0) return null;
+  const slot = Math.floor(time / REEL_SLOT_MS);
+  const intoSlot = time % REEL_SLOT_MS;
+  return { image: ready[slot % ready.length], staticAmount: intoSlot < REEL_STATIC_MS ? 1 - intoSlot / REEL_STATIC_MS : 0 };
+}
+
+function drawReel(context: CanvasRenderingContext2D, width: number, height: number, reel: ReelFrame) {
+  const { image } = reel;
+  const scale = Math.max(width / image.naturalWidth, height / image.naturalHeight);
+  const drawWidth = image.naturalWidth * scale;
+  const drawHeight = image.naturalHeight * scale;
+  context.drawImage(image, (width - drawWidth) / 2, (height - drawHeight) / 2, drawWidth, drawHeight);
+  // Keep the picture in the set's blue signal so the label stays readable.
+  context.fillStyle = "rgba(8, 28, 96, .5)";
+  context.fillRect(0, 0, width, height);
+  if (reel.staticAmount > 0) {
+    context.fillStyle = `rgba(20, 20, 24, ${reel.staticAmount})`;
+    context.fillRect(0, 0, width, height);
+    for (let index = 0; index < 1400 * reel.staticAmount; index++) {
+      const shade = Math.floor(Math.random() * 255);
+      context.fillStyle = `rgb(${shade}, ${shade}, ${shade})`;
+      context.fillRect(Math.random() * width, Math.random() * height, 4, 2);
+    }
+  }
+}
+
+function drawScreen(canvas: HTMLCanvasElement, label: string, subtitle: string, time: number, reel: ReelFrame | null = null) {
   const context = canvas.getContext("2d");
   if (!context) return;
   const { width, height } = canvas;
@@ -1102,6 +1164,7 @@ function drawScreen(canvas: HTMLCanvasElement, label: string, subtitle: string, 
   gradient.addColorStop(1, "#050b22");
   context.fillStyle = gradient;
   context.fillRect(0, 0, width, height);
+  if (reel) drawReel(context, width, height, reel);
 
   if (time > 0) {
     const rollY = (time * 0.19) % height;

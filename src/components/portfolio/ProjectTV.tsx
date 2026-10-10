@@ -33,6 +33,7 @@ export default function ProjectTV({ project, channel, onClick }: ProjectTVProps)
   
   return (
     <div
+      data-enter="copy"
       className="crt-scroll-reveal project-tv group relative cursor-pointer"
       data-crt-reveal-size="large-card"
       onClick={onClick}
@@ -62,14 +63,14 @@ export default function ProjectTV({ project, channel, onClick }: ProjectTVProps)
         <div className="relative z-10">
         
         {/* TV Screen */}
-        <div className="relative bg-crt-shell-screen rounded border border-crt-border-secondary overflow-hidden aspect-[4/3]">
+        <div data-crt-screen={project.id} data-enter="media" className="relative bg-crt-shell-screen rounded border border-crt-border-secondary overflow-hidden aspect-[4/3]">
           
           {/* Project preview media */}
           {previewSrc ? (
             <img
               src={previewSrc}
               alt={previewAlt}
-              className="absolute inset-0 h-full w-full object-cover"
+              className="crt-parallax absolute inset-0 h-full w-full object-cover"
               loading="lazy"
             />
           ) : (

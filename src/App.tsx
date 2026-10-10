@@ -38,7 +38,11 @@ function PortfolioApp() {
 
   // The URL chooses the destination; animation callbacks only advance its presentation.
   useEffect(() => {
-    if (phase === "open" && selectedId !== channel) {
+    if (phase === "open" && channel && selectedId && selectedId !== channel) {
+      // Already inside a TV: flip channels on this screen; the room catches up behind it.
+      setSelectedId(channel);
+      setSceneChannel(channel);
+    } else if (phase === "open" && selectedId !== channel) {
       setScreenEffectActive(true);
       setSelectedId(null);
       setPhase("exiting");
@@ -62,11 +66,11 @@ function PortfolioApp() {
   }, []);
   const handleOverlayEnterComplete = useCallback(() => setScreenEffectActive(false), []);
   const handleRequestedFocusComplete = useCallback((id: PortfolioChannelId) => {
-    if (id !== channel) return;
+    if (id !== channel || selectedId === id) return;
     setScreenEffectActive(true);
     setSelectedId(id);
     setPhase("open");
-  }, [channel]);
+  }, [channel, selectedId]);
 
   const byId: Record<string, React.ReactNode> = {
     home: <Home onNavigate={navigateToTV} />,
