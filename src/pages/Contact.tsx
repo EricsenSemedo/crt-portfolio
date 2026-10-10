@@ -13,6 +13,7 @@ export default function Contact({ onNavigate }: ContactProps) {
       <div className="crt-content-container flex min-h-full flex-col items-center justify-center gap-12 py-16">
         <section className="text-center">
           <ScrambleHeading className="font-display text-4xl font-bold tracking-wide text-crt-text md:text-5xl">Connect With Me</ScrambleHeading>
+          <p className="mt-4 text-lg text-crt-text-secondary">Open to entry-level software and game development roles. Message me on LinkedIn.</p>
         </section>
 
         <section className="mx-auto w-full max-w-2xl">
