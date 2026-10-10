@@ -15,6 +15,7 @@ interface ScreenCarryProps {
 
 const FLIGHT_MS = 620;
 const FADE_MS = 160;
+const MAX_HOLD_MS = 600;
 
 function ease(t: number) {
   return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
@@ -30,17 +31,25 @@ export default function ScreenCarry({ flight, onDone }: ScreenCarryProps) {
   useEffect(() => {
     const element = ref.current;
     if (!element) return;
-    const start = performance.now();
+    const mountedAt = performance.now();
+    let start: number | null = null;
     const first = flight.from();
     let frame = 0;
 
     function tick(now: number) {
       const from = first ?? flight.from();
       const to = flight.to();
+      // The destination page renders a frame or two after the click; hold the screen until it exists.
+      if (element && from && !to && now - mountedAt < MAX_HOLD_MS) {
+        Object.assign(element.style, { left: `${from.left}px`, top: `${from.top}px`, width: `${from.width}px`, height: `${from.height}px` });
+        frame = requestAnimationFrame(tick);
+        return;
+      }
       if (!element || !from || !to) {
         onDone();
         return;
       }
+      start ??= now;
       const elapsed = now - start;
       const t = ease(Math.min(elapsed / FLIGHT_MS, 1));
       element.style.left = `${from.left + (to.left - from.left) * t}px`;
