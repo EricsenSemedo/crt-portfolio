@@ -64,7 +64,7 @@ export default function Portfolio({ onNavigate, selectedProject, onOpenProject, 
         </section>
 
         <section id="software-and-ai" className="border-t border-crt-border-subtle px-2 pt-10 sm:px-6">
-          <p className="font-mono text-xs uppercase tracking-[0.24em] text-crt-accent-text">Software &amp; AI</p>
+          <h2 className="font-display text-2xl font-bold tracking-wide text-crt-text">Software &amp; AI</h2>
           <p className="mt-2 max-w-2xl text-sm text-crt-text-tertiary">
             Product, client, and hackathon work spanning field tools, social platforms, and applied AI systems.
           </p>
@@ -81,7 +81,7 @@ export default function Portfolio({ onNavigate, selectedProject, onOpenProject, 
         </section>
 
         <section id="game-development" className="border-t border-crt-border-subtle px-2 pt-10 sm:px-6">
-          <p className="font-mono text-xs uppercase tracking-[0.24em] text-crt-accent-text">Game Development</p>
+          <h2 className="font-display text-2xl font-bold tracking-wide text-crt-text">Game Development</h2>
           <p className="mt-2 max-w-2xl text-sm text-crt-text-tertiary">
             Roblox games and gameplay systems built around arcade and multiplayer loops, progression, and responsive cross-platform controls.
           </p>
@@ -98,7 +98,7 @@ export default function Portfolio({ onNavigate, selectedProject, onOpenProject, 
         </section>
 
         <section className="border-t border-crt-border-subtle px-2 pt-10 sm:px-6">
-          <p className="font-mono text-xs uppercase tracking-[0.24em] text-crt-accent-text">Additional Projects</p>
+          <h2 className="font-display text-2xl font-bold tracking-wide text-crt-text">Additional Projects</h2>
           <p className="mt-2 max-w-2xl text-sm text-crt-text-tertiary">
             Experiments, coursework, client systems, and earlier builds that shaped the featured work above.
           </p>

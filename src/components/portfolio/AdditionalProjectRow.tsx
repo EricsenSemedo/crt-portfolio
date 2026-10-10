@@ -47,8 +47,7 @@ export default function AdditionalProjectRow({ project, onClick }: AdditionalPro
       />
       <div className="additional-project-row__content relative z-10 grid gap-5 px-1 py-6 md:grid-cols-[minmax(0,0.8fr)_minmax(18rem,1.2fr)] md:items-center md:px-4">
         <div className="crt-scroll-reveal">
-          <p className={"font-mono text-xs uppercase tracking-[0.2em] transition-colors " + (fill.fillVisible ? "text-[#444]" : "text-crt-text-tertiary")}>{project.category}</p>
-          <h3 className={"mt-2 font-display text-2xl font-bold tracking-wide transition-colors md:text-3xl " + (fill.fillVisible ? "text-[#111]" : "text-crt-text")}>{title.visibleLabel}</h3>
+          <h3 className={"font-display text-2xl font-bold tracking-wide transition-colors md:text-3xl " + (fill.fillVisible ? "text-[#111]" : "text-crt-text")}>{title.visibleLabel}</h3>
         </div>
         <p className={"crt-scroll-reveal leading-relaxed transition-colors md:text-right " + (fill.fillVisible ? "text-[#222]" : "text-crt-text-secondary")}>{project.description}</p>
       </div>

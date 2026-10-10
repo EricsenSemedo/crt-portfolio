@@ -50,7 +50,6 @@ export default function DescriptionChannel({ project }: DescriptionChannelProps)
         <div className="space-y-8">
           {isHackathon && (
             <div className="border border-crt-accent p-6">
-              <p className="crt-scroll-reveal font-mono text-xs uppercase tracking-[.2em] text-crt-accent-text mb-2">Competition Result</p>
               <p className="crt-scroll-reveal font-display text-3xl font-bold text-crt-text">{project.status}</p>
             </div>
           )}
@@ -59,11 +58,10 @@ export default function DescriptionChannel({ project }: DescriptionChannelProps)
             <div>
               <p className="crt-scroll-reveal mb-10 max-w-3xl font-display text-2xl leading-relaxed text-crt-text">{project.description}</p>
               <div className="ml-2 border-l border-crt-accent pl-7">
-                {hackathonSteps.map((step, index) => (
+                {hackathonSteps.map((step) => (
                   <div key={step.label} className="relative pb-8 last:pb-0">
-                    <span className="absolute -left-[2rem] top-1 block h-2.5 w-2.5 bg-crt-accent" aria-hidden="true" />
-                    <p className="crt-scroll-reveal font-mono text-xs uppercase tracking-[.2em] text-crt-accent-text">{String(index + 1).padStart(2, "0")} / {step.label}</p>
-                    <h3 className="crt-scroll-reveal mt-2 text-xl font-display font-bold text-crt-text">{step.title}</h3>
+                    <span className="absolute -left-[2rem] top-2 block h-2.5 w-2.5 bg-crt-accent" aria-hidden="true" />
+                    <h3 className="crt-scroll-reveal text-xl font-display font-bold text-crt-text">{step.title}</h3>
                     <p className="crt-scroll-reveal mt-2 max-w-3xl leading-relaxed text-crt-text-secondary">{step.description}</p>
                   </div>
                 ))}
@@ -73,13 +71,10 @@ export default function DescriptionChannel({ project }: DescriptionChannelProps)
             <div>
               <p className="crt-scroll-reveal mb-10 font-display text-lg leading-relaxed text-crt-text sm:text-2xl">{project.description}</p>
               <div className="ml-2 border-l border-crt-accent pl-7 text-left">
-                {overviewSteps.map((step, index) => (
+                {overviewSteps.map((step) => (
                   <div key={step.label} className="relative pb-8 last:pb-0">
-                    <span className="absolute -left-[2rem] top-1 block h-2.5 w-2.5 bg-crt-accent" aria-hidden="true" />
-                    <p className="crt-scroll-reveal font-mono text-xs uppercase tracking-[.2em] text-crt-accent-text">
-                      {String(index + 1).padStart(2, "0")} / {step.label}
-                    </p>
-                    <h3 className="crt-scroll-reveal mt-2 font-display text-xl font-bold text-crt-text">{step.title}</h3>
+                    <span className="absolute -left-[2rem] top-2 block h-2.5 w-2.5 bg-crt-accent" aria-hidden="true" />
+                    <h3 className="crt-scroll-reveal font-display text-xl font-bold text-crt-text">{step.title}</h3>
                     <p className="crt-scroll-reveal mt-2 max-w-3xl leading-relaxed text-crt-text-secondary">{step.description}</p>
                   </div>
                 ))}

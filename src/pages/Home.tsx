@@ -90,9 +90,9 @@ export default function Home({ onNavigate }: HomeProps) {
             {experience.map((item) => (
               <article key={item.title} className="grid gap-5 py-8 md:grid-cols-[minmax(12rem,0.7fr)_minmax(0,1.3fr)] md:gap-10">
                 <div className="crt-scroll-reveal">
-                  <p className="font-mono text-xs uppercase tracking-[0.2em] text-crt-text-tertiary">{item.dates}</p>
-                  <h4 className="mt-3 text-xl font-semibold text-crt-text">{item.title}</h4>
+                  <h4 className="text-xl font-semibold text-crt-text">{item.title}</h4>
                   <p className="mt-1 text-crt-text-secondary">{item.company}</p>
+                  <p className="mt-1 text-sm text-crt-text-tertiary">{item.dates}</p>
                 </div>
                 <div className="space-y-4 md:pt-1">
                   <p className="crt-scroll-reveal font-mono text-sm text-crt-text">{item.role}</p>
