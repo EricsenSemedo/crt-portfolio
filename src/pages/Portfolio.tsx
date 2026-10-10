@@ -22,6 +22,12 @@ const gameDevelopmentProjectIds = [
   "grow-your-plant",
 ];
 
+// Hiring managers for either track can skip straight to their group.
+const projectGroups = [
+  { id: "software-and-ai", label: "Software & AI" },
+  { id: "game-development", label: "Game Development" },
+];
+
 const featuredProjectIds = [...softwareProjectIds, ...gameDevelopmentProjectIds];
 
 function projectsById(ids: string[]) {
@@ -61,6 +67,18 @@ export default function Portfolio({ onNavigate, selectedProject, onOpenProject, 
           <ScrambleHeading className="pb-2 text-4xl font-display font-bold leading-tight tracking-wide text-crt-text md:text-5xl">
             Project Gallery
           </ScrambleHeading>
+          <nav className="flex flex-wrap justify-center gap-3" aria-label="Jump to project group">
+            {projectGroups.map((group) => (
+              <CRTButton
+                key={group.id}
+                variant="secondary"
+                className="min-h-11"
+                onClick={() => document.getElementById(group.id)?.scrollIntoView({ behavior: "smooth", block: "start" })}
+              >
+                {group.label}
+              </CRTButton>
+            ))}
+          </nav>
         </section>
 
         <section id="software-and-ai" className="border-t border-crt-border-subtle px-2 pt-10 sm:px-6">

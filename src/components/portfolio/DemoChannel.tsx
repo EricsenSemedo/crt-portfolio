@@ -201,6 +201,17 @@ export default function DemoChannel({ project }: DemoChannelProps) {
           </div>
         )}
         
+        {/* Show, then tell: what Ericsen owned, without opening Description */}
+        <div className="mx-auto mb-7 max-w-3xl text-center">
+          {project.detailLayout === "hackathon" && (
+            <p className="mb-2 font-display text-xl font-bold text-crt-accent-text">{project.status}</p>
+          )}
+          <p className="leading-relaxed text-crt-text-secondary">
+            <span className="font-semibold text-crt-text">What I owned: </span>
+            {project.detailedDescription.contribution}
+          </p>
+        </div>
+
         {/* Tech Stack */}
         <div className="mx-auto flex w-fit max-w-full flex-wrap justify-center gap-2 text-center">
           {project.tech.map((tech) => (
