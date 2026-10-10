@@ -53,6 +53,15 @@ export default function TVZoomOverlay({
     initialFocus: "dialog",
   });
 
+  // Hand focus to the page scroller so arrow keys and Page Down read the channel.
+  useEffect(() => {
+    if (!selectedId) return;
+    const frame = window.requestAnimationFrame(() => {
+      dialogRef.current?.querySelector<HTMLElement>(".crt-page")?.focus({ preventScroll: true });
+    });
+    return () => window.cancelAnimationFrame(frame);
+  }, [selectedId]);
+
   return (
     <AnimatePresence onExitComplete={onExitComplete}>
       {selectedItem && (

@@ -60,7 +60,7 @@ export default function ProjectDetailView({
     >
       {/* Fast center-expansion transition without spring or bounce motion. */}
       <motion.div
-        className="absolute inset-4 bg-crt-surface-secondary rounded-lg p-4 border-2 border-crt-accent/50 shadow-lg shadow-crt-accent/20 overflow-hidden"
+        className="absolute inset-2 bg-crt-surface-secondary rounded-lg p-2 sm:inset-4 sm:p-4 border-2 border-crt-accent/50 shadow-lg shadow-crt-accent/20 overflow-hidden"
         initial={{ opacity: 0, scaleX: reduceMotion ? 1 : 0.18 }}
         animate={{ opacity: 1, scaleX: 1 }}
         exit={{ opacity: 0, scaleX: reduceMotion ? 1 : 0.18 }}
