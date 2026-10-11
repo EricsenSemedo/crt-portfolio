@@ -328,11 +328,12 @@ export function createPortfolioScene(options: CreatePortfolioSceneOptions = {}):
   let lastFrameTime = performance.now();
   let hovered: PortfolioChannelId | null = null;
   let isOverview = true;
-  // Prototype 2.0: the Projects set channel-surfs through real project screens while you look around.
+  // Prototype 2.0: every set channel-surfs while you look around. Projects cycles real project
+  // screens; Profile and Contact cycle captions under their names.
   const reelImages = loadReelImages();
   let reelLastFrame = 0;
   const reelFor = (id: PortfolioChannelId, time: number) =>
-    id === "portfolio" && isOverview && !motionPreference.matches ? reelFrame(reelImages, time) : null;
+    isOverview && !motionPreference.matches ? reelFrame(id, reelImages, time) : null;
   let focusedChannel: PortfolioChannelId | null = null;
   let animation: {
     startedAt: number;
@@ -480,13 +481,14 @@ export function createPortfolioScene(options: CreatePortfolioSceneOptions = {}):
         display.lastFrame = time;
       }
     }
-    if (!screenTransition && hovered !== "portfolio" && time - reelLastFrame > 70) {
-      const reel = reelFor("portfolio", time);
-      const display = displays.get("portfolio");
-      if (reel && display) {
-        drawScreen(display.canvas, PORTFOLIO_CHANNELS.portfolio.title.toUpperCase(), `CH ${PORTFOLIO_CHANNELS.portfolio.number}`, 0, reel);
+    if (!screenTransition && time - reelLastFrame > 70) {
+      reelLastFrame = time;
+      for (const channel of channels) {
+        const reel = channel.id === hovered ? null : reelFor(channel.id, time);
+        const display = displays.get(channel.id);
+        if (!reel || !display) continue;
+        drawScreen(display.canvas, channel.label, channel.subtitle, 0, reel);
         display.texture.needsUpdate = true;
-        reelLastFrame = time;
       }
     }
     renderer.render(scene, camera);
@@ -1108,12 +1110,20 @@ function createScreenDisplay(label: string, subtitle: string): ScreenDisplay {
 }
 
 interface ReelFrame {
-  image: HTMLImageElement;
+  image?: HTMLImageElement;
+  caption?: string;
   staticAmount: number;
 }
 
 const REEL_SLOT_MS = 2600;
 const REEL_STATIC_MS = 160;
+const CAPTION_SLOT_MS = 3200;
+
+// Captions stay to facts already on the Profile and Contact pages.
+const REEL_CAPTIONS: Partial<Record<PortfolioChannelId, { offset: number; captions: string[] }>> = {
+  home: { offset: 900, captions: ["SOFTWARE ENGINEER", "GAME DEVELOPER", "URI CS · 2025", "INFRA · PIXELMUX", "DATA ENG · REVATURE"] },
+  contact: { offset: 2100, captions: ["OPEN TO WORK", "SOFTWARE + GAMES", "LINKEDIN ▸ SAY HI", "GITHUB ▸ READ CODE"] },
+};
 
 function loadReelImages() {
   const featured = ["pullworth", "heros-quest", "toonsync", "physics-grab", "derma", "dont-get-caught", "shadi", "grow-your-plant"];
@@ -1126,7 +1136,15 @@ function loadReelImages() {
   });
 }
 
-function reelFrame(images: HTMLImageElement[], time: number): ReelFrame | null {
+function reelFrame(id: PortfolioChannelId, images: HTMLImageElement[], time: number): ReelFrame | null {
+  const captionReel = REEL_CAPTIONS[id];
+  if (captionReel) {
+    const local = time + captionReel.offset;
+    const intoSlot = local % CAPTION_SLOT_MS;
+    const caption = captionReel.captions[Math.floor(local / CAPTION_SLOT_MS) % captionReel.captions.length];
+    return { caption, staticAmount: intoSlot < REEL_STATIC_MS ? 1 - intoSlot / REEL_STATIC_MS : 0 };
+  }
+  if (id !== "portfolio") return null;
   const ready = images.filter((image) => image.complete && image.naturalWidth > 0);
   if (ready.length === 0) return null;
   const slot = Math.floor(time / REEL_SLOT_MS);
@@ -1134,8 +1152,20 @@ function reelFrame(images: HTMLImageElement[], time: number): ReelFrame | null {
   return { image: ready[slot % ready.length], staticAmount: intoSlot < REEL_STATIC_MS ? 1 - intoSlot / REEL_STATIC_MS : 0 };
 }
 
+function drawStatic(context: CanvasRenderingContext2D, x: number, y: number, width: number, height: number, amount: number) {
+  context.fillStyle = `rgba(20, 20, 24, ${amount})`;
+  context.fillRect(x, y, width, height);
+  const specks = (1400 * amount * width * height) / (768 * 432);
+  for (let index = 0; index < specks; index++) {
+    const shade = Math.floor(Math.random() * 255);
+    context.fillStyle = `rgb(${shade}, ${shade}, ${shade})`;
+    context.fillRect(x + Math.random() * width, y + Math.random() * height, 4, 2);
+  }
+}
+
 function drawReel(context: CanvasRenderingContext2D, width: number, height: number, reel: ReelFrame) {
   const { image } = reel;
+  if (!image) return;
   const scale = Math.max(width / image.naturalWidth, height / image.naturalHeight);
   const drawWidth = image.naturalWidth * scale;
   const drawHeight = image.naturalHeight * scale;
@@ -1143,15 +1173,23 @@ function drawReel(context: CanvasRenderingContext2D, width: number, height: numb
   // Keep the picture in the set's blue signal so the label stays readable.
   context.fillStyle = "rgba(8, 28, 96, .5)";
   context.fillRect(0, 0, width, height);
-  if (reel.staticAmount > 0) {
-    context.fillStyle = `rgba(20, 20, 24, ${reel.staticAmount})`;
-    context.fillRect(0, 0, width, height);
-    for (let index = 0; index < 1400 * reel.staticAmount; index++) {
-      const shade = Math.floor(Math.random() * 255);
-      context.fillStyle = `rgb(${shade}, ${shade}, ${shade})`;
-      context.fillRect(Math.random() * width, Math.random() * height, 4, 2);
-    }
-  }
+  if (reel.staticAmount > 0) drawStatic(context, 0, 0, width, height, reel.staticAmount);
+}
+
+// A teletext-style lower third under the channel name; only the strip breaks up between captions.
+function drawCaption(context: CanvasRenderingContext2D, width: number, height: number, reel: ReelFrame) {
+  if (!reel.caption) return;
+  const top = height * 0.64;
+  const bandHeight = 70;
+  context.shadowBlur = 0;
+  context.fillStyle = "rgba(2, 8, 30, .72)";
+  context.fillRect(0, top, width, bandHeight);
+  context.fillStyle = "#ffd84a";
+  context.fillRect(0, top, 10, bandHeight);
+  context.font = "700 40px monospace";
+  context.textAlign = "center";
+  context.fillText(reel.caption, width / 2, top + 49);
+  if (reel.staticAmount > 0) drawStatic(context, 0, top, width, bandHeight, reel.staticAmount);
 }
 
 function drawScreen(canvas: HTMLCanvasElement, label: string, subtitle: string, time: number, reel: ReelFrame | null = null) {
@@ -1184,6 +1222,7 @@ function drawScreen(canvas: HTMLCanvasElement, label: string, subtitle: string, 
   context.font = "600 25px monospace";
   context.textAlign = "left";
   context.fillText(subtitle, 34, 42);
+  if (reel) drawCaption(context, width, height, reel);
 
   context.shadowBlur = 0;
   context.fillStyle = "rgba(0, 18, 25, .16)";

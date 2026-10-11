@@ -35,8 +35,21 @@ function updateSurfaceRows(surface: HTMLElement, reducedMotion: boolean) {
   }
 }
 
-const ENTER_LINE = 0.9;
-const MAX_STAGGER_STEPS = 6;
+const ENTER_LINE = 0.96;
+const MAX_STAGGER_STEPS = 4;
+const STAGGER_MS = 55;
+// Above this speed (px/ms) content is passing by, as in a jump link; it appears at once instead of
+// leaving empty frames on screen while the page flies past.
+const FAST_SCROLL_SPEED = 2.4;
+const lastScrollBySurface = new WeakMap<HTMLElement, { top: number; time: number }>();
+
+function isScrollingFast(surface: HTMLElement) {
+  const now = performance.now();
+  const last = lastScrollBySurface.get(surface);
+  lastScrollBySurface.set(surface, { top: surface.scrollTop, time: now });
+  if (!last || now === last.time) return false;
+  return Math.abs(surface.scrollTop - last.top) / (now - last.time) > FAST_SCROLL_SPEED;
+}
 
 /**
  * Entrances replay in both directions: anything that drops fully below the screen
@@ -46,6 +59,7 @@ function updateSurfaceEntrances(surface: HTMLElement, reducedMotion: boolean) {
   const surfaceRect = surface.getBoundingClientRect();
   const viewportHeight = surface.clientHeight;
   const entering: HTMLElement[] = [];
+  const fast = isScrollingFast(surface);
 
   for (const element of surface.querySelectorAll<HTMLElement>("[data-enter]")) {
     if (element.closest(SCROLL_SURFACE_SELECTOR) !== surface) continue;
@@ -62,7 +76,8 @@ function updateSurfaceEntrances(surface: HTMLElement, reducedMotion: boolean) {
   }
 
   entering.forEach((element, index) => {
-    element.style.setProperty("--crt-enter-delay", `${Math.min(index, MAX_STAGGER_STEPS) * 70}ms`);
+    element.style.setProperty("--crt-enter-delay", fast ? "0ms" : `${Math.min(index, MAX_STAGGER_STEPS) * STAGGER_MS}ms`);
+    element.classList.toggle("is-entered-instant", fast);
     element.classList.add("is-entered");
   });
 

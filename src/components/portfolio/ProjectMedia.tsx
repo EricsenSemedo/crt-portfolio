@@ -1,0 +1,188 @@
+import { useEffect, useMemo, useRef, useState } from "react";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { type Project } from "../../types";
+import StaticNoise from "../StaticNoise";
+
+interface ProjectMediaProps {
+  project: Project;
+}
+
+/**
+ * ProjectMedia - The project's demo player: video, image, or a tuned slide set.
+ * It leads the project page and is where a carried gallery screen lands.
+ */
+export default function ProjectMedia({ project }: ProjectMediaProps) {
+  const reduceMotion = useReducedMotion();
+  const [failedSource, setFailedSource] = useState<string | null>(null);
+  const demo = project.demo;
+  const media = useMemo(() => project.media ?? (demo ? [demo] : []), [demo, project.media]);
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [isTuning, setIsTuning] = useState(false);
+  const pendingIndex = useRef<number | null>(null);
+
+  useEffect(() => {
+    setFailedSource(null);
+    setActiveIndex(0);
+    setIsTuning(false);
+    pendingIndex.current = null;
+  }, [project.id]);
+
+  useEffect(() => {
+    if (media.length === 0) return;
+
+    const preloadIndices = new Set([
+      activeIndex,
+      (activeIndex - 1 + media.length) % media.length,
+      (activeIndex + 1) % media.length,
+    ]);
+    const imagePreloads = [...preloadIndices]
+      .map((index) => media[index])
+      .filter((item) => item.type === "image" || item.type === "gif")
+      .map((item) => {
+        const image = new Image();
+        image.src = item.src;
+        return image;
+      });
+
+    return () => imagePreloads.forEach((image) => image.removeAttribute("src"));
+  }, [activeIndex, media]);
+
+  useEffect(() => {
+    if (!isTuning) return;
+
+    const timeout = window.setTimeout(() => {
+      if (pendingIndex.current !== null) setActiveIndex(pendingIndex.current);
+      pendingIndex.current = null;
+      setIsTuning(false);
+    }, 180);
+
+    return () => window.clearTimeout(timeout);
+  }, [isTuning]);
+
+  function selectMedia(index: number) {
+    if (index === activeIndex || isTuning) return;
+    if (reduceMotion) {
+      setActiveIndex(index);
+      return;
+    }
+    pendingIndex.current = index;
+    setIsTuning(true);
+  }
+
+  function moveMedia(direction: -1 | 1) {
+    selectMedia((activeIndex + direction + media.length) % media.length);
+  }
+
+  const activeMedia = media[activeIndex];
+
+  return (
+    <div>
+      <div data-carry-target className="relative aspect-video overflow-hidden border border-crt-border bg-crt-surface-primary">
+        {!activeMedia || failedSource === activeMedia.src ? (
+          <div className="absolute inset-0 flex items-center justify-center bg-crt-surface-secondary">
+            <div className="text-center px-6">
+              <p role="status" className="font-mono text-crt-text-tertiary">{activeMedia ? "This media could not be loaded." : "Demo media not available"}</p>
+              {activeMedia && <button type="button" className="mt-3 min-h-11 px-4 text-white underline" onClick={() => setFailedSource(null)}>Retry media</button>}
+            </div>
+          </div>
+        ) : activeMedia.type === 'video' ? (
+          <video
+            key={activeMedia.src}
+            src={activeMedia.src}
+            onError={() => setFailedSource(activeMedia.src)}
+            className="w-full h-full object-contain"
+            autoPlay={!reduceMotion}
+            loop
+            muted
+            playsInline
+            controls
+            preload="metadata"
+          />
+        ) : activeMedia.type === 'gif' ? (
+          <img
+            src={activeMedia.src}
+            onError={() => setFailedSource(activeMedia.src)}
+            alt={activeMedia.alt}
+            className="w-full h-full object-contain"
+          />
+        ) : (
+          <img
+            src={activeMedia.src}
+            onError={() => setFailedSource(activeMedia.src)}
+            alt={activeMedia.alt}
+            className="w-full h-full object-contain"
+          />
+        )}
+      
+        {/* Overlay for placeholder only */}
+        {activeMedia?.src.includes('placeholder') && failedSource !== activeMedia.src && (
+          <div className="absolute inset-0 flex items-center justify-center bg-crt-surface-secondary">
+            <div className="text-center">
+              <div className="text-6xl mb-4">📹</div>
+              <p className="text-crt-text-tertiary">Demo video coming soon</p>
+              <p className="text-sm text-crt-text-muted mt-2">{activeMedia.alt}</p>
+            </div>
+          </div>
+        )}
+
+        <AnimatePresence>
+          {isTuning && (
+            <motion.div
+              key="media-static"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.04 }}
+              className="absolute inset-0 z-10 overflow-hidden bg-black"
+              aria-hidden="true"
+            >
+              <StaticNoise intensity={7} />
+              <div className="demo-carousel__static absolute inset-0" />
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {media.length > 1 && (
+          <>
+            <button
+              type="button"
+              onClick={() => moveMedia(-1)}
+              className="min-h-11 min-w-11 absolute left-3 top-1/2 z-20 -translate-y-1/2 border border-white/50 bg-black/70 px-3 py-2 font-mono text-white transition-colors hover:bg-white hover:text-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-crt-accent"
+              aria-label="Previous project media"
+            >
+              ←
+            </button>
+            <button
+              type="button"
+              onClick={() => moveMedia(1)}
+              className="min-h-11 min-w-11 absolute right-3 top-1/2 z-20 -translate-y-1/2 border border-white/50 bg-black/70 px-3 py-2 font-mono text-white transition-colors hover:bg-white hover:text-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-crt-accent"
+              aria-label="Next project media"
+            >
+              →
+            </button>
+            <span className="absolute bottom-3 right-3 z-20 bg-black/75 px-2 py-1 font-mono text-xs text-white">
+              {String(activeIndex + 1).padStart(2, "0")} / {String(media.length).padStart(2, "0")}
+            </span>
+          </>
+        )}
+      </div>
+
+      {media.length > 1 && (
+        <div className="mt-2 flex flex-wrap justify-center gap-1.5" aria-label={`${project.title} media slides`}>
+          {media.map((item, index) => (
+            <button
+              key={item.src}
+              type="button"
+              onClick={() => selectMedia(index)}
+              className="flex h-11 w-11 items-center justify-center focus-visible:outline-2 focus-visible:outline-crt-accent-text"
+              aria-label={`Show media ${index + 1} of ${media.length}`}
+              aria-current={index === activeIndex ? "true" : undefined}
+            >
+              <span aria-hidden="true" className={"h-1.5 " + (index === activeIndex ? "w-8 bg-crt-accent-text" : "w-3 bg-crt-border")} />
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}

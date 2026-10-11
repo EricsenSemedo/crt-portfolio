@@ -2,20 +2,25 @@ import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useEffect, useRef, type RefObject } from "react";
 import { useModalAccessibility } from "../../hooks/useModalAccessibility";
 import type { Project } from "../../types";
-import CRTButton from "../CRTButton";
+import ChannelFlip from "../ChannelFlip";
 import CRTIconButton from "../CRTIconButton";
 import CRTScanlines from "../CRTScanlines";
-import DemoChannel from "./DemoChannel";
-import DescriptionChannel from "./DescriptionChannel";
-
-type ChannelType = 'demo' | 'description';
+import ProjectChannel from "./ProjectChannel";
 
 interface ProjectDetailViewProps {
   project: Project;
-  currentChannel: ChannelType;
-  onChannelChange: (channel: ChannelType) => void;
+  /** Ordered channel lineup; the project's place in it gives its number and neighbours. */
+  lineup: Project[];
+  onOpenProject: (project: Project) => void;
+  onContact?: () => void;
   onClose?: () => void;
+  /** A gallery screen is flying in, so the panel fades instead of expanding. */
+  carried?: boolean;
   backgroundRef?: RefObject<HTMLElement | null>;
+}
+
+function channelNumber(index: number) {
+  return String(index + 1).padStart(2, "0");
 }
 
 /**
@@ -24,12 +29,22 @@ interface ProjectDetailViewProps {
  */
 export default function ProjectDetailView({
   project,
-  currentChannel,
-  onChannelChange,
+  lineup,
+  onOpenProject,
+  onContact,
   onClose,
+  carried = false,
   backgroundRef,
 }: ProjectDetailViewProps) {
   const reduceMotion = useReducedMotion();
+  const index = Math.max(0, lineup.findIndex((item) => item.id === project.id));
+  const previousProject = lineup[(index - 1 + lineup.length) % lineup.length];
+  const nextProject = lineup[(index + 1) % lineup.length];
+  // AnimatePresence passes `custom` on exit, so a screen carried back to its card closes with a fade too.
+  const panelVariants = {
+    hidden: (carry: boolean) => ({ opacity: 0, scaleX: reduceMotion || carry ? 1 : 0.18 }),
+    shown: { opacity: 1, scaleX: 1 },
+  };
   const dialogRef = useRef<HTMLDivElement>(null);
 
   useModalAccessibility({
@@ -58,13 +73,15 @@ export default function ProjectDetailView({
       aria-label={project.title}
       tabIndex={-1}
     >
-      {/* Fast center-expansion transition without spring or bounce motion. */}
+      {/* Fast center-expansion without spring or bounce; a fade when a screen is carried in or out. */}
       <motion.div
         className="absolute inset-2 bg-crt-surface-secondary rounded-lg p-2 sm:inset-4 sm:p-4 border-2 border-crt-accent/50 shadow-lg shadow-crt-accent/20 overflow-hidden"
-        initial={{ opacity: 0, scaleX: reduceMotion ? 1 : 0.18 }}
-        animate={{ opacity: 1, scaleX: 1 }}
-        exit={{ opacity: 0, scaleX: reduceMotion ? 1 : 0.18 }}
-        transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
+        variants={panelVariants}
+        custom={carried}
+        initial="hidden"
+        animate="shown"
+        exit="hidden"
+        transition={{ duration: carried ? 0.28 : 0.2, ease: [0.22, 1, 0.36, 1] }}
       >
         {/* TV Screen Area */}
         <div className="relative bg-crt-shell-screen rounded border border-crt-border-secondary overflow-hidden h-full">
@@ -87,23 +104,24 @@ export default function ProjectDetailView({
                 <path d="m15 18-6-6 6-6" strokeWidth="2.4" strokeLinecap="square" strokeLinejoin="miter" />
               </svg>
             </CRTIconButton>
-            <div className="flex flex-1 justify-center gap-0 px-1 sm:absolute sm:left-1/2 sm:-translate-x-1/2 sm:gap-1 sm:px-0">
-              <CRTButton
-                onClick={() => onChannelChange('demo')}
-                aria-pressed={currentChannel === 'demo'}
-                variant={currentChannel === 'demo' ? 'primary' : 'ghost'}
-                size="sm"
-              >
-                Demo
-              </CRTButton>
-              <CRTButton
-                onClick={() => onChannelChange('description')}
-                aria-pressed={currentChannel === 'description'}
-                variant={currentChannel === 'description' ? 'primary' : 'ghost'}
-                size="sm"
-              >
-                Description
-              </CRTButton>
+            <p className="flex-1 truncate text-center font-mono text-sm text-crt-text-tertiary sm:text-base" aria-live="polite">
+              <span className="text-crt-accent-text">CH {channelNumber(index)}</span>
+              <span className="hidden sm:inline"> / {channelNumber(lineup.length - 1)}</span>
+            </p>
+            <div className="flex h-full shrink-0">
+              {[{ label: "Previous", target: previousProject, path: "m15 18-6-6 6-6" }, { label: "Next", target: nextProject, path: "m9 6 6 6-6 6" }].map(({ label, target, path }) => (
+                <CRTIconButton
+                  key={label}
+                  onClick={() => target && onOpenProject(target)}
+                  variant="accent"
+                  className="h-full px-3 sm:px-4"
+                  label={`${label} channel: ${target?.title ?? ""}`}
+                >
+                  <svg className="block h-5 w-5 fill-none stroke-current" viewBox="0 0 24 24" aria-hidden="true">
+                    <path d={path} strokeWidth="2.4" strokeLinecap="square" strokeLinejoin="miter" />
+                  </svg>
+                </CRTIconButton>
+              ))}
             </div>
           </motion.div>
 
@@ -111,34 +129,31 @@ export default function ProjectDetailView({
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 0.2, duration: 0.2 }}
-            className="absolute inset-0 overflow-hidden pt-16"
+            transition={{ delay: carried ? 0.08 : 0.2, duration: 0.2 }}
+            className="absolute inset-0 overflow-hidden"
           >
-            <AnimatePresence mode="wait">
-              {currentChannel === 'demo' ? (
-                <motion.div
-                  key="demo"
-                  className="h-full min-h-0"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  <DemoChannel project={project} />
-                </motion.div>
-              ) : (
-                <motion.div
-                  key="description"
-                  className="h-full min-h-0"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  <DescriptionChannel project={project} />
-                </motion.div>
-              )}
+            <AnimatePresence initial={false}>
+              <motion.div
+                key={project.id}
+                className="absolute inset-0 pt-16"
+                initial={reduceMotion ? { opacity: 0 } : { opacity: 0, y: "-4%", scaleY: 1.06 }}
+                animate={{ opacity: 1, y: "0%", scaleY: 1 }}
+                exit={reduceMotion
+                  ? { opacity: 0, transition: { duration: 0.01 } }
+                  : { opacity: 0, scaleY: 0.97, transition: { duration: 0.1, ease: "easeIn" } }}
+                transition={reduceMotion ? { duration: 0.01 } : { delay: 0.12, duration: 0.32, ease: [0.16, 1, 0.3, 1] }}
+              >
+                <ProjectChannel
+                  project={project}
+                  nextProject={nextProject}
+                  onNextProject={() => onOpenProject(nextProject)}
+                  onContact={onContact}
+                />
+              </motion.div>
             </AnimatePresence>
+            {!reduceMotion && (
+              <ChannelFlip flipKey={project.id} number={channelNumber(index)} title={project.title} osdClassName="right-5 top-20 sm:right-8" />
+            )}
           </motion.div>
 
           {/* CRT Effects */}

@@ -8,8 +8,6 @@ import ScreenCarry, { type ScreenCarryFlight } from "../components/portfolio/Scr
 import projects from "../data/projects";
 import type { NavigateFunction, Project } from "../types";
 
-type ChannelType = 'demo' | 'description';
-
 const softwareProjectIds = [
   "pullworth",
   "toonsync",
@@ -62,31 +60,23 @@ interface PortfolioProps {
 }
 
 export default function Portfolio({ onNavigate, selectedProject, onOpenProject, onCloseProject }: PortfolioProps) {
-  const [currentChannel, setCurrentChannel] = useState<ChannelType>('demo');
   const backgroundRef = useRef<HTMLDivElement>(null);
   const softwareProjects = projectsById(softwareProjectIds);
   const gameDevelopmentProjects = projectsById(gameDevelopmentProjectIds);
   const additionalProjects = projects.filter((project) => !featuredProjectIds.includes(project.id));
-
-  // Reset the local demo tab for a new route, including browser Back/Forward.
-  const projectId = selectedProject?.id ?? null;
-  const [previousProjectId, setPreviousProjectId] = useState(projectId);
-  if (previousProjectId !== projectId) {
-    setPreviousProjectId(projectId);
-    setCurrentChannel('demo');
-  }
+  const lineup = [...softwareProjects, ...gameDevelopmentProjects, ...additionalProjects];
 
   const reduceMotion = useReducedMotion();
   const [flight, setFlight] = useState<ScreenCarryFlight | null>(null);
   const flightKey = useRef(0);
-  const carrySource = useRef<Element | null>(null);
+  const carrySource = useRef<{ id: string; element: Element } | null>(null);
   const endFlight = useCallback(() => setFlight(null), []);
 
   // The clicked screen carries into the project page, and back into its card on close.
   function openWithCarry(project: Project, source?: Element | null) {
     const src = carryImage(project);
     const screen = source ?? cardScreen(project.id);
-    carrySource.current = screen;
+    carrySource.current = screen ? { id: project.id, element: screen } : null;
     if (src && !reduceMotion && screen) {
       setFlight({ key: ++flightKey.current, src, from: () => screen.getBoundingClientRect(), to: demoRect, direction: "open" });
     }
@@ -96,9 +86,16 @@ export default function Portfolio({ onNavigate, selectedProject, onOpenProject, 
   function closeWithCarry() {
     const src = selectedProject ? carryImage(selectedProject) : null;
     const from = demoRect();
-    if (selectedProject && src && from && !reduceMotion && currentChannel === "demo") {
-      const screen = carrySource.current?.isConnected ? carrySource.current : cardScreen(selectedProject.id);
-      setFlight({ key: ++flightKey.current, src, from: () => from, to: () => screen?.getBoundingClientRect() ?? null, direction: "close" });
+    // Only carry the screen home when the demo is still on screen.
+    const demoInView = from && from.bottom > 0 && from.top < window.innerHeight;
+    if (selectedProject && src && from && demoInView && !reduceMotion) {
+      // After flipping channels, the screen goes home to the card of the project now showing.
+      const source = carrySource.current;
+      const screen = source?.id === selectedProject.id && source.element.isConnected ? source.element : cardScreen(selectedProject.id);
+      const home = screen?.getBoundingClientRect();
+      if (home && home.bottom > 0 && home.top < window.innerHeight) {
+        setFlight({ key: ++flightKey.current, src, from: () => from, to: () => screen?.getBoundingClientRect() ?? null, direction: "close" });
+      }
     }
     onCloseProject();
   }
@@ -204,14 +201,16 @@ export default function Portfolio({ onNavigate, selectedProject, onOpenProject, 
       </div>
 
       {/* Project Detail Overlay */}
-      <AnimatePresence>
+      <AnimatePresence custom={flight?.direction === "close"}>
         {selectedProject && (
           <ProjectDetailView
-            key={selectedProject.id}
+            key="project-detail"
             project={selectedProject}
-            currentChannel={currentChannel}
-            onChannelChange={setCurrentChannel}
+            lineup={lineup}
+            onOpenProject={onOpenProject}
+            onContact={() => onNavigate?.("contact")}
             onClose={closeWithCarry}
+            carried={flight?.direction === "open"}
             backgroundRef={backgroundRef}
           />
         )}
