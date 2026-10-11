@@ -41,6 +41,28 @@ export interface Project {
   detailedDescription: ProjectDetailedDescription;
 }
 
+// A client website shown on the Websites channel
+interface ClientSiteBase {
+  id: string;
+  client: string;
+  business: string;
+  summary: string;
+}
+
+export interface PublicClientSite extends ClientSiteBase {
+  visibility: 'public';
+  poster: string;
+  clip?: string;
+  liveUrl?: string;
+}
+
+/** Private sites carry no media: anything in the build can be downloaded, so previews are sent by hand. */
+export interface PrivateClientSite extends ClientSiteBase {
+  visibility: 'private';
+}
+
+export type ClientSite = PublicClientSite | PrivateClientSite;
+
 // Pan/Camera state
 export interface PanState {
   selectedId: string | null;

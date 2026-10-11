@@ -31,6 +31,13 @@ export default function Contact({ onNavigate }: ContactProps) {
           </div>
         </section>
 
+        <p data-enter="copy" className="text-center text-crt-text-secondary">
+          Need a website for your business?{" "}
+          <button type="button" onClick={() => onNavigate?.("websites")} className="min-h-11 font-semibold text-crt-accent-text underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-crt-accent-text">
+            See my client sites →
+          </button>
+        </p>
+
         <footer data-enter="copy" className="flex justify-center" aria-label="Contact navigation">
           <CRTButton onClick={() => onNavigate?.("home")} variant="secondary">Back to Profile</CRTButton>
         </footer>

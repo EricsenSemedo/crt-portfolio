@@ -1,13 +1,13 @@
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useEffect, useRef, type ReactNode, type RefObject } from "react";
-import { PORTFOLIO_CHANNELS, type PortfolioChannelId } from "../data/channels";
+import { SCREEN_CHANNELS, type ScreenChannelId } from "../data/channels";
 import { useModalAccessibility } from "../hooks/useModalAccessibility";
 import useScrollMotion from "../hooks/useScrollMotion";
 import ChannelFlip from "./ChannelFlip";
 import Navbar from "./Navbar";
 
 interface SelectedItem {
-  id: PortfolioChannelId;
+  id: ScreenChannelId;
 }
 
 interface TVZoomOverlayProps {
@@ -78,7 +78,7 @@ export default function TVZoomOverlay({
           role="dialog"
           aria-modal="true"
           aria-labelledby={hideHeader ? undefined : "tv-overlay-title"}
-          aria-label={hideHeader ? PORTFOLIO_CHANNELS[selectedItem.id].title : undefined}
+          aria-label={hideHeader ? SCREEN_CHANNELS[selectedItem.id].title : undefined}
           tabIndex={-1}
         >
           {/* Full-screen content container with CRT effects */}
@@ -129,15 +129,15 @@ export default function TVZoomOverlay({
                         ? { duration: 0.01 }
                         : { delay: 0.12, duration: 0.32, ease: [0.16, 1, 0.3, 1] }}
                     >
-                      {!hideHeader && <Navbar title={PORTFOLIO_CHANNELS[selectedItem.id].title} onClose={onClose} />}
+                      {!hideHeader && <Navbar title={SCREEN_CHANNELS[selectedItem.id].title} onClose={onClose} />}
                       <div className="absolute inset-0">{children}</div>
                     </motion.div>
                   </AnimatePresence>
                   {!reduceMotion && (
                     <ChannelFlip
                       flipKey={selectedItem.id}
-                      number={PORTFOLIO_CHANNELS[selectedItem.id].number}
-                      title={PORTFOLIO_CHANNELS[selectedItem.id].title}
+                      number={SCREEN_CHANNELS[selectedItem.id].number}
+                      title={SCREEN_CHANNELS[selectedItem.id].title}
                     />
                   )}
                 </div>

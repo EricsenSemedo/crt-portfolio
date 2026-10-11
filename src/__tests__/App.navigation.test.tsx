@@ -56,6 +56,12 @@ vi.mock("../components/portfolio", () => ({
   ),
 }));
 
+vi.mock("../pages/Websites", () => ({
+  default: ({ onNavigate }: { onNavigate?: (id: string) => void }) => (
+    <button onClick={() => onNavigate?.("portfolio")}>See all my work</button>
+  ),
+}));
+
 describe("App hash navigation", () => {
   let host: HTMLDivElement;
   let root: Root;
@@ -128,6 +134,42 @@ describe("App hash navigation", () => {
   function overlayChannel() {
     return host.querySelector("[data-testid=tv-overlay]")?.getAttribute("data-channel");
   }
+
+  it("opens a shared Websites link without loading the room, and loads it on the way out", async () => {
+    await mount("#/websites");
+    expect(overlayChannel()).toBe("websites");
+    expect(host.querySelector("[data-testid=stage]")).toBeNull();
+
+    click("Close TV");
+    expect(window.location.hash).toBe("#/");
+    completeOverlayExit();
+    await act(async () => {
+      await vi.dynamicImportSettled();
+    });
+    expect(host.querySelector("[data-testid=stage]")).not.toBeNull();
+    expect(overlayChannel()).toBe("overview");
+  });
+
+  it("flips from Websites straight to Projects while the room loads behind", async () => {
+    await mount("#/websites");
+    click("See all my work");
+    expect(window.location.hash).toBe("#/portfolio");
+    expect(overlayChannel()).toBe("portfolio");
+    await act(async () => {
+      await vi.dynamicImportSettled();
+    });
+    expect(latestStage?.requestedChannel).toBe("portfolio");
+  });
+
+  it("powers Websites on over the room when reached from Contact", async () => {
+    await mount();
+    await selectFromStage("contact");
+    completeFocus("contact");
+    click("See my client sites →");
+    expect(window.location.hash).toBe("#/websites");
+    expect(overlayChannel()).toBe("websites");
+    expect(latestStage?.requestedChannel).toBe("contact");
+  });
 
   it("uses browser Back and Forward for overview and profile while retaining the scene", async () => {
     await mount();

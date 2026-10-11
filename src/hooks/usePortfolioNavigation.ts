@@ -1,6 +1,6 @@
 import { useCallback } from "react";
 import { matchPath, useLocation, useNavigate } from "react-router";
-import { type PortfolioChannelId } from "../data/channels";
+import { type ScreenChannelId } from "../data/channels";
 import projects from "../data/projects";
 import type { Project } from "../types";
 
@@ -11,7 +11,7 @@ interface PortfolioNavigationState {
 }
 
 interface PortfolioNavigation {
-  channel: PortfolioChannelId | null;
+  channel: ScreenChannelId | null;
   project: Project | null;
   redirectTo: string | null;
   navigateToTV: (targetId: string) => void;
@@ -20,10 +20,11 @@ interface PortfolioNavigation {
   closeTV: () => void;
 }
 
-const channelPaths: Record<PortfolioChannelId, string> = {
+const channelPaths: Record<ScreenChannelId, string> = {
   home: "/profile",
   portfolio: "/portfolio",
   contact: "/contact",
+  websites: "/websites",
 };
 
 function getPreviousPathname(state: unknown) {
@@ -38,7 +39,7 @@ export default function usePortfolioNavigation(): PortfolioNavigation {
     ? projects.find((candidate) => candidate.id === projectMatch.params.projectId) ?? null
     : null;
 
-  let channel: PortfolioChannelId | null = null;
+  let channel: ScreenChannelId | null = null;
   let redirectTo: string | null = null;
 
   if (matchPath("/", location.pathname)) {
@@ -53,13 +54,15 @@ export default function usePortfolioNavigation(): PortfolioNavigation {
     if (!project) redirectTo = "/portfolio";
   } else if (matchPath("/contact", location.pathname)) {
     channel = "contact";
+  } else if (matchPath("/websites", location.pathname)) {
+    channel = "websites";
   } else {
     redirectTo = "/";
   }
 
   const navigateToTV = useCallback((targetId: string) => {
     if (!Object.prototype.hasOwnProperty.call(channelPaths, targetId)) return;
-    const targetPath = channelPaths[targetId as PortfolioChannelId];
+    const targetPath = channelPaths[targetId as ScreenChannelId];
     if (location.pathname === targetPath) return;
     navigate(targetPath, {
       state: { portfolioNavigation: { previousPathname: location.pathname } },
