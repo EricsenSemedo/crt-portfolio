@@ -37,7 +37,7 @@ export default function CRTButton({
 
   // Color variants using theme tokens
   const variantClasses: Record<ButtonVariant, string> = {
-    primary: 'bg-crt-accent text-white border border-crt-accent',
+    primary: 'bg-crt-accent text-crt-on-accent border border-crt-accent',
     secondary: 'bg-transparent border border-crt-border-secondary text-crt-text',
     ghost: 'bg-transparent border border-transparent text-crt-text'
   };

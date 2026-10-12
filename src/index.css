@@ -35,6 +35,7 @@
 
   /* Accent: Primary */
   --color-crt-accent-text: rgb(var(--crt-text-accent));
+  --color-crt-on-accent: rgb(var(--crt-text-on-accent));
   --color-crt-accent: rgb(var(--crt-accent-primary));
   --color-crt-accent-hover: rgb(var(--crt-accent-primary-hover));
   --color-crt-accent-muted: rgb(var(--crt-accent-primary-muted));
@@ -64,11 +65,12 @@
 }
 
 /*
- * CRT Portfolio Design Tokens
+ * CRT Portfolio Design Tokens: "Tungsten Den"
  *
- * 60/30/10 visual balance (approximate, not literal pixel quotas):
- * 60% charcoal canvas; 30% neutral surfaces and silver content;
- * 10% electric blue for actions, focus, and selection.
+ * A warm, dark living room late at night, lit by a lamp and the TV.
+ * 60% warm near-black room; 30% walnut surfaces and cream content;
+ * 10% tungsten amber for actions, focus, and selection.
+ * Blue is the TV signal itself: screen glow and transitions only.
  *
  * Token naming follows the pattern:
  *   --crt-{category}-{role}
@@ -83,59 +85,60 @@
   color-scheme: dark;
 
   /* Backgrounds */
-  --crt-bg-base: 26 26 26;
-  --crt-bg-elevated: 31 31 31;
-  --crt-bg-surface: 37 37 37;
-  --crt-bg-overlay: 17 17 17;
+  --crt-bg-base: 16 13 11;
+  --crt-bg-elevated: 23 19 15;
+  --crt-bg-surface: 31 26 21;
+  --crt-bg-overlay: 11 9 7;
 
   /* Surfaces (cards, panels) */
-  --crt-surface-primary: 35 35 35;
-  --crt-surface-secondary: 45 45 45;
-  --crt-surface-tertiary: 58 58 58;
+  --crt-surface-primary: 26 22 18;
+  --crt-surface-secondary: 36 30 25;
+  --crt-surface-tertiary: 54 46 38;
 
   /* Text */
-  --crt-text-primary: 248 250 250;
-  --crt-text-secondary: 211 220 223;
-  --crt-text-tertiary: 157 177 183;
-  --crt-text-muted: 153 174 182;
-  --crt-text-accent: 139 168 255;
+  --crt-text-primary: 243 235 221;
+  --crt-text-secondary: 214 202 182;
+  --crt-text-tertiary: 176 161 140;
+  --crt-text-muted: 168 152 130;
+  --crt-text-accent: 255 196 120;
+  --crt-text-on-accent: 26 18 8;
 
   /* Borders */
-  --crt-border-primary: 89 89 89;
-  --crt-border-secondary: 126 126 126;
-  --crt-border-subtle: 55 55 55;
+  --crt-border-primary: 92 78 64;
+  --crt-border-secondary: 134 117 96;
+  --crt-border-subtle: 56 47 39;
 
-  /* Accent: Primary (electric terminal blue) */
-  --crt-accent-primary: 36 87 255;
-  --crt-accent-primary-hover: 74 116 255;
-  --crt-accent-primary-muted: 26 61 176;
-  --crt-accent-primary-deep: 17 43 128;
+  /* Accent: Primary (tungsten amber) */
+  --crt-accent-primary: 255 179 71;
+  --crt-accent-primary-hover: 255 200 125;
+  --crt-accent-primary-muted: 191 128 40;
+  --crt-accent-primary-deep: 110 70 18;
 
-  /* Accent: Secondary (neutral signal gray) */
-  --crt-accent-secondary: 186 186 186;
-  --crt-accent-secondary-hover: 255 255 255;
+  /* Accent: Secondary (warm parchment) */
+  --crt-accent-secondary: 214 202 182;
+  --crt-accent-secondary-hover: 243 235 221;
 
   /* Semantic accents */
-  --crt-accent-info: 157 177 183;
-  --crt-accent-info-hover: 211 220 223;
-  --crt-accent-danger: 248 250 250;
-  --crt-accent-warning: 157 177 183;
-  --crt-accent-success: 0 255 102;
+  --crt-accent-info: 176 161 140;
+  --crt-accent-info-hover: 214 202 182;
+  --crt-accent-danger: 255 112 82;
+  --crt-accent-warning: 255 196 120;
+  --crt-accent-success: 132 224 120;
 
   /* TV Shell (the physical hardware) */
-  --crt-shell-body: 45 45 45;
-  --crt-shell-bezel: 17 17 17;
-  --crt-shell-screen: 12 20 49;
-  --crt-shell-detail: 36 87 255;
-  --crt-shell-indicator: 211 220 223;
+  --crt-shell-body: 44 37 31;
+  --crt-shell-bezel: 14 11 9;
+  --crt-shell-screen: 13 13 15;
+  --crt-shell-detail: 255 179 71;
+  --crt-shell-indicator: 214 202 182;
 
-  /* CRT Effects (glow, scanlines, vignette) */
-  --crt-glow-color: 248 250 250;
-  --crt-glow-accent: 36 87 255;
-  --crt-scanline-color: 211 220 223;
+  /* CRT Effects (glow, scanlines, vignette); glow-accent is the blue TV signal */
+  --crt-glow-color: 255 236 210;
+  --crt-glow-accent: 47 91 255;
+  --crt-scanline-color: 214 202 182;
   --crt-vignette-color: 0 0 0;       /* black vignette */
-  --crt-noise-light: 248 250 250;
-  --crt-noise-dark: 17 17 17;
+  --crt-noise-light: 243 235 221;
+  --crt-noise-dark: 11 9 7;
 
   /* CRT Effect Intensities (multipliers for dark room) */
   --crt-scanline-opacity: 1;
@@ -145,8 +148,8 @@
   --crt-bloom-opacity: 1;
 
   /* Gradient endpoints */
-  --crt-gradient-from: 211 220 223;
-  --crt-gradient-to: 36 87 255;
+  --crt-gradient-from: 243 235 221;
+  --crt-gradient-to: 255 179 71;
 }
 
 /* ========================================
@@ -166,7 +169,7 @@ body {
 }
 
 .bg-page-tint {
-  background-color: #1a1a1a;
+  background-color: rgb(var(--crt-bg-base));
 }
 
 .crt-content-container {
@@ -179,7 +182,7 @@ body {
 }
 
 .crt-screen-frame {
-  border: 1px solid rgb(186 186 186 / .32);
+  border: 1px solid rgb(var(--crt-border-secondary) / .32);
   border-radius: 0;
   box-shadow: inset 0 0 70px rgb(0 0 0 / .62), inset 0 0 2px rgb(255 255 255 / .42);
 }
@@ -303,7 +306,7 @@ body {
 }
 
 .crt-page {
-  scrollbar-color: rgb(186 186 186 / .22) transparent;
+  scrollbar-color: rgb(var(--crt-accent-secondary) / .22) transparent;
   scrollbar-width: thin;
 }
 
@@ -318,11 +321,11 @@ body {
 
 .crt-page::-webkit-scrollbar-thumb {
   border-radius: 999px;
-  background: rgb(186 186 186 / .22);
+  background: rgb(var(--crt-accent-secondary) / .22);
 }
 
 .crt-page::-webkit-scrollbar-thumb:hover {
-  background: rgb(186 186 186 / .42);
+  background: rgb(var(--crt-accent-secondary) / .42);
 }
 
 @keyframes crt-scan-beam {

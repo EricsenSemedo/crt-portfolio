@@ -50,7 +50,7 @@ export default function ProjectTV({ project, onClick }: ProjectTVProps) {
     >
       {/* CRT TV Bezel */}
       <div className="relative overflow-hidden rounded-lg border-2 border-crt-border bg-crt-surface-secondary p-4 transition-colors duration-200">
-        <span className={"absolute inset-0 bg-white transition-transform duration-200 ease-out " + (
+        <span className={"absolute inset-0 bg-crt-text transition-transform duration-200 ease-out " + (
           fill.fillOrigin === "top" ? "origin-top " :
           fill.fillOrigin === "right" ? "origin-right " :
           fill.fillOrigin === "left" ? "origin-left " : "origin-bottom "
@@ -116,7 +116,7 @@ export default function ProjectTV({ project, onClick }: ProjectTVProps) {
         {/* TV Controls */}
         <div className="mt-3 flex justify-between items-center">
           <div className="flex space-x-2">
-            <span className="border border-crt-accent bg-crt-accent px-3 py-1.5 font-mono text-xs text-white" aria-hidden="true">
+            <span className="border border-crt-accent bg-crt-accent px-3 py-1.5 font-mono text-xs text-crt-on-accent" aria-hidden="true">
               Tune In
             </span>
           </div>

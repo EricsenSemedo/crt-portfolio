@@ -110,7 +110,7 @@ export default function Navbar({ title, onClose }: NavbarProps) {
   }, []);
 
   return (
-    <div ref={headerRef} className="smart-header pointer-events-none absolute left-0 right-0 top-0 flex h-16 items-center border-b border-white/30 bg-[#1a1a1a]/95">
+    <div ref={headerRef} className="smart-header pointer-events-none absolute left-0 right-0 top-0 flex h-16 items-center border-b border-crt-text/25 bg-crt-base/95">
       <CRTIconButton
         onClick={onClose}
         variant="accent"

@@ -22,7 +22,7 @@ export function createTelevisionPreview(tint: string) {
   attachTelevisionScreen(screenPlane, television);
   // Retain ownership when the display later moves to the detailed model.
   const screenGeometry = screenPlane.geometry;
-  const hoverLight = new PointLight("#2457ff", 0.08, 2.8);
+  const hoverLight = new PointLight("#4a74ff", 0.08, 2.8);
   hoverLight.position.set(0, 0.3, 0.3);
   group.add(hoverLight);
   return {
