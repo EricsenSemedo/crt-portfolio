@@ -160,3 +160,22 @@ it("falls back to section navigation if preparing the first frame fails", async 
   expect(host.querySelector('[role="progressbar"]')).toBeNull();
   expect(host.querySelector(".is-unavailable")).not.toBeNull();
 });
+
+it("does not replay the zoom when the App re-renders between a click and its requested channel", async () => {
+  const select = vi.fn();
+  await act(async () => root.render(<ThreeCRTStage onSelect={select} onOverviewComplete={vi.fn()} quickTransition />));
+  await act(async () => root.render(<ThreeCRTStage onSelect={select} onOverviewComplete={vi.fn()} />));
+  vi.mocked(controller.reset).mockClear();
+  await act(async () => host.querySelector("button")!.click());
+  expect(select).toHaveBeenCalledWith("home");
+
+  // The route changes first, handing the stage new callbacks before the requested channel catches up.
+  const complete = vi.fn();
+  await act(async () => root.render(<ThreeCRTStage onSelect={select} onRequestedFocusComplete={vi.fn()} quickTransition />));
+  await act(async () => root.render(<ThreeCRTStage onSelect={select} requestedChannel="home" onRequestedFocusComplete={complete} quickTransition />));
+
+  expect(controller.reset).not.toHaveBeenCalled();
+  expect(controller.focus).toHaveBeenCalledOnce();
+  expect(controller.transitionScreen).toHaveBeenCalledOnce();
+  expect(complete).toHaveBeenCalledWith("home");
+});

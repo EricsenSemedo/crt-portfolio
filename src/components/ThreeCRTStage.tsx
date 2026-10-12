@@ -139,14 +139,25 @@ export default function ThreeCRTStage({
     sceneRef.current?.setScreenEffectActive(screenEffectActive);
   }, [screenEffectActive]);
 
+  // Speed is read when a request starts. A new callback or speed alone must not restart
+  // the camera: the App re-renders between a click and its matching request, and a restart replays the zoom.
+  const requestOptionsRef = useRef({ quickTransition, onRequestedFocusComplete, onOverviewComplete });
+  useEffect(() => {
+    requestOptionsRef.current = { quickTransition, onRequestedFocusComplete, onOverviewComplete };
+  }, [onOverviewComplete, onRequestedFocusComplete, quickTransition]);
+
   useEffect(() => {
     if (!ready) return;
+    const { quickTransition } = requestOptionsRef.current;
+    // Completions go to the latest callbacks, which know the latest route.
+    const onRequestedFocusComplete = (id: PortfolioChannelId) => requestOptionsRef.current.onRequestedFocusComplete?.(id);
+    const onOverviewComplete = () => requestOptionsRef.current.onOverviewComplete?.();
     const controller = sceneRef.current;
     const request = ++focusRequestRef.current;
     const isCurrent = () => sceneRef.current === controller && focusRequestRef.current === request;
     if (unavailable) {
-      if (requestedChannel) onRequestedFocusComplete?.(requestedChannel);
-      else onOverviewComplete?.();
+      if (requestedChannel) onRequestedFocusComplete(requestedChannel);
+      else onOverviewComplete();
       return;
     }
     if (!requestedChannel) {
@@ -159,7 +170,7 @@ export default function ThreeCRTStage({
           if (!isCurrent()) return;
           selectingRef.current = false;
           resettingRef.current = false;
-          onOverviewComplete?.();
+          onOverviewComplete();
           const pending = pendingSelectRef.current;
           pendingSelectRef.current = null;
           if (pending) selectChannelRef.current(pending);
@@ -167,7 +178,7 @@ export default function ThreeCRTStage({
       return;
     }
     if (focusedRef.current === requestedChannel) {
-      onRequestedFocusComplete?.(requestedChannel);
+      onRequestedFocusComplete(requestedChannel);
       return;
     }
     selectingRef.current = true;
@@ -186,9 +197,9 @@ export default function ThreeCRTStage({
         }
         focusedRef.current = requestedChannel;
         selectingRef.current = false;
-        onRequestedFocusComplete?.(requestedChannel);
+        onRequestedFocusComplete(requestedChannel);
       });
-  }, [onOverviewComplete, onRequestedFocusComplete, quickTransition, ready, requestedChannel, unavailable]);
+  }, [ready, requestedChannel, unavailable]);
 
   async function selectChannel(id: PortfolioChannelId) {
     const controller = sceneRef.current;
