@@ -69,10 +69,15 @@ export default function usePortfolioNavigation(): PortfolioNavigation {
   const openProject = useCallback((nextProject: Project) => {
     const targetPath = `/portfolio/${nextProject.id}`;
     if (location.pathname === targetPath) return;
+    // Flipping between projects replaces the entry, so Back and Close still return to the gallery.
+    if (location.pathname.startsWith("/portfolio/")) {
+      navigate(targetPath, { replace: true, state: location.state });
+      return;
+    }
     navigate(targetPath, {
       state: { portfolioNavigation: { previousPathname: location.pathname } },
     });
-  }, [location.pathname, navigate]);
+  }, [location.pathname, location.state, navigate]);
 
   const closeProject = useCallback(() => {
     if (getPreviousPathname(location.state) === "/portfolio") {

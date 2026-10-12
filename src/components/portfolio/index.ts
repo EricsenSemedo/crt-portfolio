@@ -1,4 +1,4 @@
-export { default as DemoChannel } from './DemoChannel';
-export { default as DescriptionChannel } from './DescriptionChannel';
+export { default as ProjectChannel } from './ProjectChannel';
 export { default as ProjectDetailView } from './ProjectDetailView';
+export { default as ProjectMedia } from './ProjectMedia';
 export { default as ProjectShelves } from './ProjectShelves';

@@ -1,12 +1,10 @@
 import { AnimatePresence } from "framer-motion";
-import { useRef, useState } from "react";
+import { useRef } from "react";
 import CRTButton from "../components/CRTButton";
 import ScrambleHeading from "../components/ScrambleHeading";
 import { ProjectDetailView, ProjectShelves } from "../components/portfolio";
-import { browseGroups } from "../data/browse";
+import { browseGroups, browseLineup } from "../data/browse";
 import type { NavigateFunction, Project } from "../types";
-
-type ChannelType = 'demo' | 'description';
 
 interface PortfolioProps {
   onNavigate?: NavigateFunction;
@@ -16,16 +14,7 @@ interface PortfolioProps {
 }
 
 export default function Portfolio({ onNavigate, selectedProject, onOpenProject, onCloseProject }: PortfolioProps) {
-  const [currentChannel, setCurrentChannel] = useState<ChannelType>('demo');
   const backgroundRef = useRef<HTMLDivElement>(null);
-
-  // Reset the local demo tab for a new route, including browser Back/Forward.
-  const projectId = selectedProject?.id ?? null;
-  const [previousProjectId, setPreviousProjectId] = useState(projectId);
-  if (previousProjectId !== projectId) {
-    setPreviousProjectId(projectId);
-    setCurrentChannel('demo');
-  }
 
   return (
     <div tabIndex={-1} className="crt-page bg-page-tint w-full h-full overflow-y-auto text-crt-text">
@@ -75,10 +64,10 @@ export default function Portfolio({ onNavigate, selectedProject, onOpenProject, 
       <AnimatePresence>
         {selectedProject && (
           <ProjectDetailView
-            key={selectedProject.id}
             project={selectedProject}
-            currentChannel={currentChannel}
-            onChannelChange={setCurrentChannel}
+            lineup={browseLineup}
+            onOpenProject={onOpenProject}
+            onContact={() => onNavigate?.("contact")}
             onClose={onCloseProject}
             backgroundRef={backgroundRef}
           />
