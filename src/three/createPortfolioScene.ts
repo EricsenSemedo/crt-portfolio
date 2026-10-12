@@ -29,6 +29,7 @@ import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { MeshoptDecoder } from "three/examples/jsm/libs/meshopt_decoder.module.js";
 import { HDRLoader } from "three/examples/jsm/loaders/HDRLoader.js";
 import { PORTFOLIO_CHANNELS, type PortfolioChannelId } from "../data/channels";
+import projects from "../data/projects";
 import { createGarageExterior } from "./assets/createGarageExterior";
 import { loadGarageStructure } from "./assets/loadGarageStructure";
 import { containBasketball } from "./assets/garageBounds";
@@ -327,6 +328,13 @@ export function createPortfolioScene(options: CreatePortfolioSceneOptions = {}):
   let lastFrameTime = performance.now();
   let hovered: PortfolioChannelId | null = null;
   let isOverview = true;
+  // Every set previews its channel while you look around. Projects cycles real project
+  // screens; Profile and Contact scroll through their own pages.
+  const reelImages = loadReelImages();
+  const pagePreviews = loadPagePreviews();
+  let reelLastFrame = 0;
+  const reelFor = (id: PortfolioChannelId, time: number) =>
+    isOverview && !motionPreference.matches ? reelFrame(id, reelImages, pagePreviews, time) : null;
   let focusedChannel: PortfolioChannelId | null = null;
   let animation: {
     startedAt: number;
@@ -469,9 +477,19 @@ export function createPortfolioScene(options: CreatePortfolioSceneOptions = {}):
       const display = displays.get(hovered);
       const channel = channels.find((item) => item.id === hovered);
       if (display && channel && time - display.lastFrame > 70) {
-        drawScreen(display.canvas, channel.label, channel.subtitle, time - display.hoverStartedAt);
+        drawScreen(display.canvas, channel.label, channel.subtitle, time - display.hoverStartedAt, reelFor(hovered, time));
         display.texture.needsUpdate = true;
         display.lastFrame = time;
+      }
+    }
+    if (!screenTransition && time - reelLastFrame > 70) {
+      reelLastFrame = time;
+      for (const channel of channels) {
+        const reel = channel.id === hovered ? null : reelFor(channel.id, time);
+        const display = displays.get(channel.id);
+        if (!reel || !display) continue;
+        drawScreen(display.canvas, channel.label, channel.subtitle, 0, reel);
+        display.texture.needsUpdate = true;
       }
     }
     renderer.render(scene, camera);
@@ -524,7 +542,8 @@ export function createPortfolioScene(options: CreatePortfolioSceneOptions = {}):
       channel.asset.hoverLight.intensity = channel.id === next ? SCREEN_GLOW_HOVERED : SCREEN_GLOW;
       const display = displays.get(channel.id);
       if (display && channel.id !== next) {
-        drawScreen(display.canvas, channel.label, channel.subtitle, 0);
+        // Repaint with the set's current reel frame; a bare card flashes for a frame before the reel loop catches up.
+        drawScreen(display.canvas, channel.label, channel.subtitle, 0, reelFor(channel.id, performance.now()));
         display.texture.needsUpdate = true;
       }
     });
@@ -1092,7 +1111,104 @@ function createScreenDisplay(label: string, subtitle: string): ScreenDisplay {
   return { canvas, texture, material, lastFrame: 0, hoverStartedAt: 0 };
 }
 
-function drawScreen(canvas: HTMLCanvasElement, label: string, subtitle: string, time: number) {
+interface ReelFrame {
+  image?: HTMLImageElement;
+  /** How far down a page preview has scrolled, 0 to 1. */
+  scroll?: number;
+  staticAmount: number;
+}
+
+const REEL_SLOT_MS = 2600;
+const REEL_STATIC_MS = 160;
+// A page preview rests at the top, glides to the bottom, rests, then cuts back through static.
+const PAGE_HOLD_TOP_MS = 1400;
+const PAGE_SCROLL_MS = 7000;
+const PAGE_HOLD_BOTTOM_MS = 1400;
+const PAGE_CYCLE_MS = PAGE_HOLD_TOP_MS + PAGE_SCROLL_MS + PAGE_HOLD_BOTTOM_MS;
+
+// Stills of the real pages, regenerated with scripts/capture-room-previews.mjs. Offsets keep the sets out of step.
+const PAGE_PREVIEWS: Partial<Record<PortfolioChannelId, { src: string; offset: number }>> = {
+  home: { src: "/crt-portfolio/room/profile-preview.jpg", offset: 0 },
+  contact: { src: "/crt-portfolio/room/contact-preview.jpg", offset: 4300 },
+};
+
+function loadPagePreviews() {
+  const previews = new Map<PortfolioChannelId, { image: HTMLImageElement; offset: number }>();
+  for (const [id, preview] of Object.entries(PAGE_PREVIEWS) as [PortfolioChannelId, { src: string; offset: number }][]) {
+    const image = new Image();
+    image.src = preview.src;
+    previews.set(id, { image, offset: preview.offset });
+  }
+  return previews;
+}
+
+function loadReelImages() {
+  const featured = ["pullworth", "heros-quest", "toonsync", "physics-grab", "derma", "dont-get-caught", "shadi", "grow-your-plant"];
+  return featured.flatMap((id) => {
+    const src = projects.find((project) => project.id === id)?.image;
+    if (!src || /\.(webm|mp4)$/.test(src)) return [];
+    const image = new Image();
+    image.src = src;
+    return [image];
+  });
+}
+
+function reelFrame(
+  id: PortfolioChannelId,
+  images: HTMLImageElement[],
+  pages: Map<PortfolioChannelId, { image: HTMLImageElement; offset: number }>,
+  time: number,
+): ReelFrame | null {
+  const page = pages.get(id);
+  if (page) {
+    if (!page.image.complete || page.image.naturalWidth === 0) return null;
+    const intoCycle = (time + page.offset) % PAGE_CYCLE_MS;
+    const scrolled = Math.min(Math.max((intoCycle - PAGE_HOLD_TOP_MS) / PAGE_SCROLL_MS, 0), 1);
+    return {
+      image: page.image,
+      scroll: easeInOutCubic(scrolled),
+      staticAmount: intoCycle < REEL_STATIC_MS ? 1 - intoCycle / REEL_STATIC_MS : 0,
+    };
+  }
+  if (id !== "portfolio") return null;
+  const ready = images.filter((image) => image.complete && image.naturalWidth > 0);
+  if (ready.length === 0) return null;
+  const slot = Math.floor(time / REEL_SLOT_MS);
+  const intoSlot = time % REEL_SLOT_MS;
+  return { image: ready[slot % ready.length], staticAmount: intoSlot < REEL_STATIC_MS ? 1 - intoSlot / REEL_STATIC_MS : 0 };
+}
+
+function drawStatic(context: CanvasRenderingContext2D, x: number, y: number, width: number, height: number, amount: number) {
+  context.fillStyle = `rgba(20, 20, 24, ${amount})`;
+  context.fillRect(x, y, width, height);
+  const specks = (1400 * amount * width * height) / (768 * 432);
+  for (let index = 0; index < specks; index++) {
+    const shade = Math.floor(Math.random() * 255);
+    context.fillStyle = `rgb(${shade}, ${shade}, ${shade})`;
+    context.fillRect(x + Math.random() * width, y + Math.random() * height, 4, 2);
+  }
+}
+
+function drawReel(context: CanvasRenderingContext2D, width: number, height: number, reel: ReelFrame) {
+  const { image } = reel;
+  if (!image) return;
+  if (reel.scroll !== undefined) {
+    // A page fills the width and scrolls like a visitor reading it.
+    const drawHeight = image.naturalHeight * (width / image.naturalWidth);
+    context.drawImage(image, 0, -Math.max(drawHeight - height, 0) * reel.scroll, width, drawHeight);
+  } else {
+    const scale = Math.max(width / image.naturalWidth, height / image.naturalHeight);
+    const drawWidth = image.naturalWidth * scale;
+    const drawHeight = image.naturalHeight * scale;
+    context.drawImage(image, (width - drawWidth) / 2, (height - drawHeight) / 2, drawWidth, drawHeight);
+  }
+  // Keep the picture in the set's blue signal so the label stays readable.
+  context.fillStyle = "rgba(8, 28, 96, .5)";
+  context.fillRect(0, 0, width, height);
+  if (reel.staticAmount > 0) drawStatic(context, 0, 0, width, height, reel.staticAmount);
+}
+
+function drawScreen(canvas: HTMLCanvasElement, label: string, subtitle: string, time: number, reel: ReelFrame | null = null) {
   const context = canvas.getContext("2d");
   if (!context) return;
   const { width, height } = canvas;
@@ -1102,6 +1218,7 @@ function drawScreen(canvas: HTMLCanvasElement, label: string, subtitle: string, 
   gradient.addColorStop(1, "#050b22");
   context.fillStyle = gradient;
   context.fillRect(0, 0, width, height);
+  if (reel) drawReel(context, width, height, reel);
 
   if (time > 0) {
     const rollY = (time * 0.19) % height;
