@@ -520,6 +520,13 @@ export function createPortfolioScene(options: CreatePortfolioSceneOptions = {}):
 
   function updateGlance(time: number, delta: number) {
     const idle = !motionPreference.matches && time - lastPointerAt > GLANCE_IDLE_MS;
+    if (motionPreference.matches) {
+      // Reduced motion switched on mid-glance: stop where the room is level, not after a drift.
+      glance.current.set(0, 0);
+      glance.velocity.set(0, 0);
+      glance.target.set(0, 0);
+      return;
+    }
     if (!idle) {
       glance.target.set(0, 0);
     } else if (time >= glance.nextAt) {
