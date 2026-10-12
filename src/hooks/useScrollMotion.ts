@@ -1,5 +1,5 @@
 import Lenis from "lenis";
-import { useEffect, type RefObject } from "react";
+import { useEffect, useLayoutEffect, type RefObject } from "react";
 import { getScrollRevealState, hasScrollableOverflow, shouldUseDesktopSmoothScroll } from "../utils/scrollMotion";
 
 const SCROLL_SURFACE_SELECTOR = ".crt-page, [data-crt-scroll-container]";
@@ -82,13 +82,15 @@ function updateSurfaceEntrances(surface: HTMLElement, reducedMotion: boolean) {
   });
 
   // Screens drift slightly inside their bezels, scrubbed by scroll in both directions.
-  for (const image of surface.querySelectorAll<HTMLElement>(".crt-parallax")) {
-    if (image.closest(SCROLL_SURFACE_SELECTOR) !== surface) continue;
-    const rect = image.getBoundingClientRect();
-    const center = (rect.top + rect.height / 2 - surfaceRect.top) / viewportHeight;
-    const offset = reducedMotion ? 0 : Math.max(-1.2, Math.min(1.2, (center - 0.5) * 2));
-    image.style.setProperty("--crt-parallax", offset.toFixed(3));
-  }
+  // Measure every picture before writing any, so one scroll update forces a single layout.
+  const offsets = [...surface.querySelectorAll<HTMLElement>(".crt-parallax")]
+    .filter((image) => image.closest(SCROLL_SURFACE_SELECTOR) === surface)
+    .map((image) => {
+      const rect = image.getBoundingClientRect();
+      const center = (rect.top + rect.height / 2 - surfaceRect.top) / viewportHeight;
+      return [image, reducedMotion ? 0 : Math.max(-1.2, Math.min(1.2, (center - 0.5) * 2))] as const;
+    });
+  offsets.forEach(([image, offset]) => image.style.setProperty("--crt-parallax", offset.toFixed(3)));
 }
 
 export default function useScrollMotion(
@@ -96,6 +98,14 @@ export default function useScrollMotion(
   lifecycleKey: string | undefined,
   initializationDelay = 0,
 ) {
+  // Arm entrances before the first paint so content waits for the screen to finish powering on.
+  useLayoutEffect(() => {
+    const root = rootRef.current;
+    if (!root || !lifecycleKey || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    root.classList.add("crt-enter-ready");
+    return () => root.classList.remove("crt-enter-ready");
+  }, [lifecycleKey, rootRef]);
+
   useEffect(() => {
     if (!rootRef.current || !lifecycleKey) return;
     const root: HTMLElement = rootRef.current;
@@ -109,9 +119,6 @@ export default function useScrollMotion(
     let isDesktopSmooth = false;
     let reducedMotion = false;
     let started = false;
-
-    // Arm entrances now so content waits for the screen to finish powering on.
-    if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) root.classList.add("crt-enter-ready");
 
     function updateAllRows() {
       root.querySelectorAll<HTMLElement>(SCROLL_SURFACE_SELECTOR).forEach((surface) => {
@@ -254,7 +261,6 @@ export default function useScrollMotion(
 
     return () => {
       if (startTimer !== undefined) window.clearTimeout(startTimer);
-      root.classList.remove("crt-enter-ready");
       mutationObserver.disconnect();
       resizeObserver.disconnect();
       window.removeEventListener("resize", configureInputMode);

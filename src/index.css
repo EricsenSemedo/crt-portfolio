@@ -558,5 +558,6 @@ body {
 
 @media (prefers-reduced-motion: reduce) {
   .crt-parallax { translate: none; scale: none; }
-  [data-enter] { animation: none !important; }
+  [data-enter],
+  [data-enter]::after { animation: none !important; transition: none !important; }
 }
