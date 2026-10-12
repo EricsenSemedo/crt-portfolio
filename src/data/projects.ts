@@ -227,6 +227,7 @@ export const projects: Project[] = [
       src: "/crt-portfolio/projects/edgewood-demo-v2.webm",
       alt: "Edgewood Remodeling website homepage and approach section",
     },
+    sources: [{ label: "Visit site", href: "https://edgewood-preview-940siwnb.ericsen-semedo.workers.dev/" }],
     detailedDescription: {
       contribution: "Redesigned and implemented the responsive site, reusable service and project layouts, optimized media pipeline, navigation, and inquiry paths.",
       problem: "The client's existing website needed a current, professional replacement that represented the business clearly and helped Rhode Island homeowners evaluate its services and work.",
@@ -237,6 +238,37 @@ export const projects: Project[] = [
         "Modern image formats and multiple output sizes",
         "Accessible navigation and conversion-focused content",
         "Reusable project and service presentation patterns",
+      ],
+    },
+  },
+  {
+    id: "btb-creative-vision",
+    title: "BTB Creative Vision",
+    category: "Client Web / Redesign",
+    description: "A redesign for a Providence filmmaker that keeps his colours and lets his footage lead, with motion borrowed from his own edits.",
+    status: "Client Preview",
+    tech: ["React", "TypeScript", "Vite", "Three.js", "Cloudflare Workers"],
+    image: "/crt-portfolio/projects/browse/btb-creative-vision.jpg",
+    demo: {
+      type: "video",
+      src: "/crt-portfolio/projects/btb-tour.mp4",
+      alt: "Tour of the BTB Creative Vision site",
+    },
+    media: [
+      { type: "video", src: "/crt-portfolio/projects/btb-tour.mp4", alt: "Tour of the BTB Creative Vision site" },
+      { type: "video", src: "/crt-portfolio/projects/btb-logo.webm", alt: "Dragging the 3D BTB logo to spin it in the About section" },
+    ],
+    sources: [{ label: "Visit site", href: "https://btb-creative-vision-preview.ericsen-semedo.workers.dev/?key=h_as_yC_TroF4XhnitebCBxZ" }],
+    detailedDescription: {
+      contribution: "Redesigned and rebuilt the client's existing site, keeping his colour scheme and copy while adding interactive motion, a draggable hero filmstrip and a 3D logo visitors can spin.",
+      problem: "His work lives in video, but the old site presented it as static pages, so visitors read about the films instead of seeing them move.",
+      solution: "Made the videography the interactive focal point: a hero filmstrip you can drag and fling, clips that play as you reach them, and animations modelled on the edits he uses in his own films, carried through every page.",
+      impact: "A client-review preview that presents his reels the way he cuts them, ready for his approval before a public launch.",
+      highlights: [
+        "Hero filmstrip with drag, momentum and keyboard nudges",
+        "Animations that echo the client's own editing style",
+        "Interactive Three.js chrome logo, rebuilt in Blender from his artwork, that turns with a drag or the arrow keys",
+        "Reduced-motion fallbacks throughout",
       ],
     },
   },
@@ -424,7 +456,7 @@ export const projects: Project[] = [
     description: "Learning project: Recursive backtracking maze generator with binary-encoded walls",
     status: "Proof of Concept",
     tech: ["C++", "OOP", "Algorithms"],
-    image: "/api/placeholder/300/200",
+    image: "/crt-portfolio/projects/browse/maze-generator.jpg",
     demo: {
       type: "video",
       src: "/crt-portfolio/videos/maze-generator-demo.mp4",
@@ -452,7 +484,7 @@ export const projects: Project[] = [
     description: "Learning project: Multiplayer game built with 10-member team using Python/Pygame",
     status: "Learning Experience",
     tech: ["Python", "Pygame", "Team Leadership"],
-    image: "/api/placeholder/300/200",
+    image: "/crt-portfolio/projects/browse/zombies-game.jpg",
     demo: {
       type: "video",
       src: "/crt-portfolio/videos/zombies-game-demo.mp4",
@@ -481,7 +513,7 @@ export const projects: Project[] = [
     description: "Learning project: Project management app with SQL database and web interface",
     status: "Learning Experience",
     tech: ["SQL", "PHP", "HTML", "CSS"],
-    image: "/api/placeholder/300/200",
+    image: "/crt-portfolio/projects/browse/project-manager-pro.jpg",
     sources: [{ label: "GitHub Repository", href: "https://github.com/EricsenSemedo/project_manager_pro" }],
     demo: {
       type: "video",
