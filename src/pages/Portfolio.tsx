@@ -64,6 +64,7 @@ export default function Portfolio({ onNavigate, selectedProject, onOpenProject, 
       <AnimatePresence>
         {selectedProject && (
           <ProjectDetailView
+            key="project-detail"
             project={selectedProject}
             lineup={browseLineup}
             onOpenProject={onOpenProject}
