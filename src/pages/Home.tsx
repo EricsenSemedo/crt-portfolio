@@ -65,18 +65,18 @@ export default function Home({ onNavigate }: HomeProps) {
 
         {/* Education Section */}
         <section className="crt-scroll-reveal py-12 text-center">
-          <h3 className="font-display text-2xl font-semibold tracking-wide text-crt-text">Education</h3>
-          <p className="mt-5 text-crt-text-secondary">University of Rhode Island</p>
+          <h3 data-enter="heading" className="font-display text-2xl font-semibold tracking-wide text-crt-text">Education</h3>
+          <p data-enter="copy" className="mt-5 text-crt-text-secondary">University of Rhode Island</p>
           <p className="mt-2 text-sm text-crt-text-tertiary">Bachelor of Arts in Computer Science</p>
           <p className="mt-1 text-sm text-crt-text-tertiary">Graduated May 2025</p>
         </section>
 
         {/* Skills Section */}
         <section className="py-12">
-          <h3 className="mb-7 text-center font-display text-2xl font-semibold tracking-wide text-crt-text">Skills &amp; Technologies</h3>
+          <h3 data-enter="heading" className="mb-7 text-center font-display text-2xl font-semibold tracking-wide text-crt-text">Skills &amp; Technologies</h3>
           <div className="grid grid-cols-2 md:grid-cols-3">
             {skills.map((skill, index) => (
-              <div key={skill} className={"crt-scroll-reveal px-2 py-3 text-center" + (index < skills.length - 2 ? " border-b border-crt-border" : "") + (index === skills.length - 3 ? " md:border-b-0" : "")}>
+              <div key={skill} data-enter="copy" className={"crt-scroll-reveal px-2 py-3 text-center" + (index < skills.length - 2 ? " border-b border-crt-border" : "") + (index === skills.length - 3 ? " md:border-b-0" : "")}>
                 <span className="text-sm font-mono font-medium text-crt-text-secondary">{skill}</span>
               </div>
             ))}
@@ -85,19 +85,19 @@ export default function Home({ onNavigate }: HomeProps) {
 
         {/* Experience Section */}
         <section className="pb-12">
-          <h3 className="mb-7 text-center font-display text-2xl font-semibold tracking-wide text-crt-text">Experience</h3>
+          <h3 data-enter="heading" className="mb-7 text-center font-display text-2xl font-semibold tracking-wide text-crt-text">Experience</h3>
           <div>
             {experience.map((item) => (
               <article key={item.title} className="grid gap-5 py-8 md:grid-cols-[minmax(12rem,0.7fr)_minmax(0,1.3fr)] md:gap-10">
-                <div className="crt-scroll-reveal">
+                <div data-enter="copy" className="crt-scroll-reveal">
                   <h4 className="text-xl font-semibold text-crt-text">{item.title}</h4>
                   <p className="mt-1 text-crt-text-secondary">{item.company}</p>
                   <p className="mt-1 text-sm text-crt-text-tertiary">{item.dates}</p>
                 </div>
                 <div className="space-y-4 md:pt-1">
-                  <p className="crt-scroll-reveal font-mono text-sm text-crt-text">{item.role}</p>
+                  <p data-enter="copy" className="crt-scroll-reveal font-mono text-sm text-crt-text">{item.role}</p>
                   {item.details.map((detail) => (
-                    <p key={detail} className="crt-scroll-reveal max-w-3xl leading-relaxed text-crt-text-secondary">{detail}</p>
+                    <p key={detail} data-enter="copy" className="crt-scroll-reveal max-w-3xl leading-relaxed text-crt-text-secondary">{detail}</p>
                   ))}
                 </div>
               </article>
@@ -107,17 +107,17 @@ export default function Home({ onNavigate }: HomeProps) {
 
         {/* Stats */}
         <section className="grid gap-10 py-8 text-center sm:grid-cols-2">
-          <div className="crt-scroll-reveal">
+          <div data-enter="copy" className="crt-scroll-reveal">
             <div className="font-display text-3xl font-bold text-crt-accent-text">1+</div>
             <div className="mt-3 text-sm uppercase tracking-[0.16em] text-crt-text-tertiary">Years Professional</div>
           </div>
-          <div className="crt-scroll-reveal">
+          <div data-enter="copy" className="crt-scroll-reveal">
             <div className="font-display text-3xl font-bold text-crt-accent-text">{projects.length}+</div>
             <div className="mt-3 text-sm uppercase tracking-[0.16em] text-crt-text-tertiary">Projects Built</div>
           </div>
         </section>
 
-        <footer className="mt-10 flex flex-wrap justify-center gap-4 py-10" aria-label="Profile navigation">
+        <footer data-enter="copy" className="mt-10 flex flex-wrap justify-center gap-4 py-10" aria-label="Profile navigation">
           <CRTButton onClick={() => onNavigate?.('portfolio')} variant="primary">View Projects</CRTButton>
           <CRTButton onClick={() => onNavigate?.('contact')} variant="secondary">Contact Me</CRTButton>
         </footer>

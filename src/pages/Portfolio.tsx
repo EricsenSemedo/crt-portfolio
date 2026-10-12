@@ -35,7 +35,7 @@ export default function Portfolio({ onNavigate, selectedProject, onOpenProject, 
           <ScrambleHeading className="pb-2 text-4xl font-display font-bold leading-tight tracking-wide text-crt-text md:text-5xl">
             Project Gallery
           </ScrambleHeading>
-          <nav className="flex flex-wrap justify-center gap-3" aria-label="Jump to project group">
+          <nav data-enter="copy" className="flex flex-wrap justify-center gap-3" aria-label="Jump to project group">
             {browseGroups.map((group) => (
               <CRTButton
                 key={group.id}
@@ -53,7 +53,7 @@ export default function Portfolio({ onNavigate, selectedProject, onOpenProject, 
           <ProjectShelves groups={browseGroups} onOpen={onOpenProject} />
         </div>
 
-        <footer className="px-2 py-10 text-center sm:px-6" aria-label="Project gallery navigation">
+        <footer data-enter="copy" className="px-2 py-10 text-center sm:px-6" aria-label="Project gallery navigation">
           <div className="flex flex-wrap justify-center gap-4">
             <CRTButton
               onClick={() => onNavigate?.('home')}

@@ -1,5 +1,5 @@
 import Lenis from "lenis";
-import { useEffect, type RefObject } from "react";
+import { useEffect, useLayoutEffect, type RefObject } from "react";
 import { getScrollRevealState, hasScrollableOverflow, shouldUseDesktopSmoothScroll } from "../utils/scrollMotion";
 
 const SCROLL_SURFACE_SELECTOR = ".crt-page, [data-crt-scroll-container]";
@@ -35,11 +35,77 @@ function updateSurfaceRows(surface: HTMLElement, reducedMotion: boolean) {
   }
 }
 
+const ENTER_LINE = 0.96;
+const MAX_STAGGER_STEPS = 4;
+const STAGGER_MS = 55;
+// Above this speed (px/ms) content is passing by, as in a jump link; it appears at once instead of
+// leaving empty frames on screen while the page flies past.
+const FAST_SCROLL_SPEED = 2.4;
+const lastScrollBySurface = new WeakMap<HTMLElement, { top: number; time: number }>();
+
+function isScrollingFast(surface: HTMLElement) {
+  const now = performance.now();
+  const last = lastScrollBySurface.get(surface);
+  lastScrollBySurface.set(surface, { top: surface.scrollTop, time: now });
+  if (!last || now === last.time) return false;
+  return Math.abs(surface.scrollTop - last.top) / (now - last.time) > FAST_SCROLL_SPEED;
+}
+
+/**
+ * Entrances replay in both directions: anything that drops fully below the screen
+ * re-arms, so it plays again on the way back down. Nothing above the fold re-hides.
+ */
+function updateSurfaceEntrances(surface: HTMLElement, reducedMotion: boolean) {
+  const surfaceRect = surface.getBoundingClientRect();
+  const viewportHeight = surface.clientHeight;
+  const entering: HTMLElement[] = [];
+  const fast = isScrollingFast(surface);
+
+  for (const element of surface.querySelectorAll<HTMLElement>("[data-enter]")) {
+    if (element.closest(SCROLL_SURFACE_SELECTOR) !== surface) continue;
+    const rect = element.getBoundingClientRect();
+    const top = rect.top - surfaceRect.top;
+    const entered = element.classList.contains("is-entered");
+    if (reducedMotion) {
+      element.classList.add("is-entered");
+    } else if (!entered && top < viewportHeight * ENTER_LINE && rect.bottom > surfaceRect.top) {
+      entering.push(element);
+    } else if (entered && top > viewportHeight) {
+      element.classList.remove("is-entered");
+    }
+  }
+
+  entering.forEach((element, index) => {
+    element.style.setProperty("--crt-enter-delay", fast ? "0ms" : `${Math.min(index, MAX_STAGGER_STEPS) * STAGGER_MS}ms`);
+    element.classList.toggle("is-entered-instant", fast);
+    element.classList.add("is-entered");
+  });
+
+  // Screens drift slightly inside their bezels, scrubbed by scroll in both directions.
+  // Measure every picture before writing any, so one scroll update forces a single layout.
+  const offsets = [...surface.querySelectorAll<HTMLElement>(".crt-parallax")]
+    .filter((image) => image.closest(SCROLL_SURFACE_SELECTOR) === surface)
+    .map((image) => {
+      const rect = image.getBoundingClientRect();
+      const center = (rect.top + rect.height / 2 - surfaceRect.top) / viewportHeight;
+      return [image, reducedMotion ? 0 : Math.max(-1.2, Math.min(1.2, (center - 0.5) * 2))] as const;
+    });
+  offsets.forEach(([image, offset]) => image.style.setProperty("--crt-parallax", offset.toFixed(3)));
+}
+
 export default function useScrollMotion(
   rootRef: RefObject<HTMLElement | null>,
   lifecycleKey: string | undefined,
   initializationDelay = 0,
 ) {
+  // Arm entrances before the first paint so content waits for the screen to finish powering on.
+  useLayoutEffect(() => {
+    const root = rootRef.current;
+    if (!root || !lifecycleKey || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    root.classList.add("crt-enter-ready");
+    return () => root.classList.remove("crt-enter-ready");
+  }, [lifecycleKey, rootRef]);
+
   useEffect(() => {
     if (!rootRef.current || !lifecycleKey) return;
     const root: HTMLElement = rootRef.current;
@@ -52,10 +118,13 @@ export default function useScrollMotion(
     let surfaceSyncFrame: number | undefined;
     let isDesktopSmooth = false;
     let reducedMotion = false;
+    let started = false;
 
     function updateAllRows() {
-      root.querySelectorAll<HTMLElement>(SCROLL_SURFACE_SELECTOR)
-        .forEach((surface) => updateSurfaceRows(surface, reducedMotion));
+      root.querySelectorAll<HTMLElement>(SCROLL_SURFACE_SELECTOR).forEach((surface) => {
+        updateSurfaceRows(surface, reducedMotion);
+        if (started) updateSurfaceEntrances(surface, reducedMotion);
+      });
     }
 
     function requestRowUpdate() {
@@ -178,6 +247,7 @@ export default function useScrollMotion(
     ];
 
     function start() {
+      started = true;
       configureInputMode();
       mutationObserver.observe(root, { childList: true, subtree: true });
       window.addEventListener("resize", configureInputMode, { passive: true });

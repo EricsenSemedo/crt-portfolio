@@ -20,7 +20,7 @@ function ShelfCard({ project, active, onActive, onOpen, spotlightRef }: {
   const glow = usePosterColor(browseMedia(project)?.poster);
 
   return (
-    <li ref={spotlightRef} className="w-[78%] shrink-0 snap-start sm:w-[44%] lg:w-[31%]">
+    <li ref={spotlightRef} data-enter="media" className="w-[78%] shrink-0 snap-start sm:w-[44%] lg:w-[31%]">
       <button
         type="button"
         onClick={() => onOpen(project)}
@@ -75,10 +75,10 @@ function Shelf({ group, activeId, setActiveId, onOpen, register }: {
     <section id={group.id} className="scroll-mt-6 border-t border-crt-border-subtle pt-10" aria-labelledby={`${group.id}-title`}>
       <div className="mb-4 flex items-end justify-between gap-4">
         <div>
-          <h2 id={`${group.id}-title`} className="font-display text-2xl font-bold tracking-wide text-crt-text">
+          <h2 id={`${group.id}-title`} data-enter="heading" className="font-display text-2xl font-bold tracking-wide text-crt-text">
             {group.title} <span className="ml-1 font-mono text-sm font-normal text-crt-text-tertiary">{group.projects.length}</span>
           </h2>
-          <p className="mt-2 max-w-2xl text-sm text-crt-text-tertiary">{group.blurb}</p>
+          <p data-enter="copy" className="mt-2 max-w-2xl text-sm text-crt-text-tertiary">{group.blurb}</p>
         </div>
         {group.projects.length > 1 && (
           <div className="hidden shrink-0 gap-2 sm:flex">
