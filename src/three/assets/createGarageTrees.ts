@@ -16,8 +16,11 @@ type TreeVariant = keyof typeof TREE_ATLAS;
 type Placement = [number, number, number, TreeVariant];
 
 const STREET_PLANTING: Placement[] = [
-  // Yard trees around the house across the street.
+  // Yard trees beside the houses across the street.
   [-7, -23, 8, "broad"], [13, -31, 11, "jacaranda"], [-12.5, -33, -10, "jacaranda"], [-1.8, -33.5, 9.5, "slender"],
+  // Foundation shrubs along the house fronts.
+  [0.6, -24.6, 1.3, "shrubWide"], [2.1, -24.7, -1.1, "shrub"], [7.4, -24.6, 1.2, "shrub"], [9.2, -24.7, -1.3, "shrubWide"],
+  [-13.2, -27.3, 1.2, "shrub"], [-18.6, -27.2, -1.3, "shrubWide"],
 ];
 const VARIANTS: TreeVariant[] = ["jacaranda", "broad", "slender"];
 // Staggered heights and mirrored variants break up the skyline; a smaller front row
