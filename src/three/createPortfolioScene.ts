@@ -542,7 +542,8 @@ export function createPortfolioScene(options: CreatePortfolioSceneOptions = {}):
       channel.asset.hoverLight.intensity = channel.id === next ? SCREEN_GLOW_HOVERED : SCREEN_GLOW;
       const display = displays.get(channel.id);
       if (display && channel.id !== next) {
-        drawScreen(display.canvas, channel.label, channel.subtitle, 0);
+        // Repaint with the set's current reel frame; a bare card flashes for a frame before the reel loop catches up.
+        drawScreen(display.canvas, channel.label, channel.subtitle, 0, reelFor(channel.id, performance.now()));
         display.texture.needsUpdate = true;
       }
     });
