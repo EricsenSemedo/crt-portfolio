@@ -1,10 +1,23 @@
-import { AnimatePresence } from "framer-motion";
-import { useRef } from "react";
+import { AnimatePresence, useReducedMotion } from "framer-motion";
+import { useCallback, useRef, useState } from "react";
 import CRTButton from "../components/CRTButton";
 import ScrambleHeading from "../components/ScrambleHeading";
 import { ProjectDetailView, ProjectShelves } from "../components/portfolio";
-import { browseGroups, browseLineup } from "../data/browse";
+import ScreenCarry, { type ScreenCarryFlight } from "../components/portfolio/ScreenCarry";
+import { browseGroups, browseLineup, browseMedia } from "../data/browse";
 import type { NavigateFunction, Project } from "../types";
+
+function cardScreen(id: string) {
+  return document.querySelector(`[data-crt-screen="${id}"]`);
+}
+
+function demoRect() {
+  return document.querySelector("[data-carry-target]")?.getBoundingClientRect() ?? null;
+}
+
+function inView(rect: DOMRect | null | undefined): rect is DOMRect {
+  return Boolean(rect && rect.bottom > 0 && rect.top < window.innerHeight);
+}
 
 interface PortfolioProps {
   onNavigate?: NavigateFunction;
@@ -15,6 +28,31 @@ interface PortfolioProps {
 
 export default function Portfolio({ onNavigate, selectedProject, onOpenProject, onCloseProject }: PortfolioProps) {
   const backgroundRef = useRef<HTMLDivElement>(null);
+  const reduceMotion = useReducedMotion();
+  const [flight, setFlight] = useState<ScreenCarryFlight | null>(null);
+  const flightKey = useRef(0);
+  const endFlight = useCallback(() => setFlight(null), []);
+
+  // The clicked screen carries into the project page, and back to its shelf on close.
+  function openWithCarry(project: Project, screen: Element | null) {
+    const src = browseMedia(project)?.poster;
+    if (src && screen && !reduceMotion) {
+      setFlight({ key: ++flightKey.current, src, from: () => screen.getBoundingClientRect(), to: demoRect, direction: "open" });
+    }
+    onOpenProject(project);
+  }
+
+  function closeWithCarry() {
+    const src = selectedProject ? browseMedia(selectedProject)?.poster : undefined;
+    const from = demoRect();
+    // After flipping channels this is the card of the project now showing. Only carry it home
+    // when both ends are on screen.
+    const screen = selectedProject ? cardScreen(selectedProject.id) : null;
+    if (src && inView(from) && inView(screen?.getBoundingClientRect()) && !reduceMotion) {
+      setFlight({ key: ++flightKey.current, src, from: () => from, to: () => screen?.getBoundingClientRect() ?? null, direction: "close" });
+    }
+    onCloseProject();
+  }
 
   return (
     <div tabIndex={-1} className="crt-page bg-page-tint w-full h-full overflow-y-auto text-crt-text">
@@ -39,7 +77,7 @@ export default function Portfolio({ onNavigate, selectedProject, onOpenProject, 
         </section>
 
         <div className="mt-10 px-2 sm:px-6">
-          <ProjectShelves groups={browseGroups} onOpen={onOpenProject} />
+          <ProjectShelves groups={browseGroups} onOpen={openWithCarry} />
         </div>
 
         <footer data-enter="copy" className="px-2 py-10 text-center sm:px-6" aria-label="Project gallery navigation">
@@ -61,7 +99,7 @@ export default function Portfolio({ onNavigate, selectedProject, onOpenProject, 
       </div>
 
       {/* Project Detail Overlay */}
-      <AnimatePresence>
+      <AnimatePresence custom={flight?.direction === "close"}>
         {selectedProject && (
           <ProjectDetailView
             key="project-detail"
@@ -69,11 +107,13 @@ export default function Portfolio({ onNavigate, selectedProject, onOpenProject, 
             lineup={browseLineup}
             onOpenProject={onOpenProject}
             onContact={() => onNavigate?.("contact")}
-            onClose={onCloseProject}
+            onClose={closeWithCarry}
+            carried={flight?.direction === "open"}
             backgroundRef={backgroundRef}
           />
         )}
       </AnimatePresence>
+      {flight && <ScreenCarry key={flight.key} flight={flight} onDone={endFlight} />}
     </div>
   );
 }
