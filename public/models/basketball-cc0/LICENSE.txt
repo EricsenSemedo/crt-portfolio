@@ -20,4 +20,4 @@
 	Follow on Twitter for updates:
 	https://twitter.com/DigitalN8m4r3
 Source: https://opengameart.org/content/basketballs
-Website version: classic texture set, 512px JPEG textures embedded in GLB.
+Website version: classic texture set, 512px WebP textures embedded in a Meshopt-compressed GLB.

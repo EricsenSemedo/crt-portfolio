@@ -55,32 +55,44 @@
   "textures": [
     {
       "sampler": 0,
-      "source": 0
+      "extensions": {
+        "EXT_texture_webp": {
+          "source": 0
+        }
+      }
     },
     {
       "sampler": 0,
-      "source": 1
+      "extensions": {
+        "EXT_texture_webp": {
+          "source": 1
+        }
+      }
     },
     {
       "sampler": 0,
-      "source": 2
+      "extensions": {
+        "EXT_texture_webp": {
+          "source": 2
+        }
+      }
     }
   ],
   "images": [
     {
-      "mimeType": "image/jpeg",
+      "mimeType": "image/webp",
       "name": "Television_01_nor_gl",
-      "uri": "textures/Television_01_nor_gl_1k.jpg"
+      "uri": "textures/Television_01_nor_gl_1k.webp"
     },
     {
-      "mimeType": "image/jpeg",
+      "mimeType": "image/webp",
       "name": "Television_01_diff",
-      "uri": "textures/Television_01_diff_1k.jpg"
+      "uri": "textures/Television_01_diff_1k.webp"
     },
     {
-      "mimeType": "image/jpeg",
+      "mimeType": "image/webp",
       "name": "Television_01_metallic-Television_01_roughness",
-      "uri": "textures/Television_01_arm_1k.jpg"
+      "uri": "textures/Television_01_arm_1k.webp"
     }
   ],
   "accessors": [
@@ -95,7 +107,7 @@
       ],
       "min": [
         -0.29999998211860657,
-        -0.000015506739146076143,
+        -1.5506739146076143e-05,
         -0.25836652517318726
       ],
       "type": "VEC3"
@@ -164,5 +176,11 @@
       "byteLength": 90548,
       "uri": "Television_01.bin"
     }
+  ],
+  "extensionsUsed": [
+    "EXT_texture_webp"
+  ],
+  "extensionsRequired": [
+    "EXT_texture_webp"
   ]
 }
