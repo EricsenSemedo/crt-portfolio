@@ -7,7 +7,7 @@ Use imported assets selectively. The authored CRT layout and camera anchors rema
 | Asset | Creator | Source | License | Modified | Notes |
 | --- | --- | --- | --- | --- | --- |
 | Basketball | DigitalN8m4r3 / Miodrag Sejic | [OpenGameArt](https://opengameart.org/content/basketballs) | CC0 | Yes | Smooth mesh with classic leather textures; 512px WebP maps in a Meshopt GLB (about 74 KB), loaded asynchronously |
-| Wooden Table 01 | Ethan Place | [Poly Haven](https://polyhaven.com/a/WoodenTable_01) | CC0 | Yes | Downloaded 2026-09-08; worn wooden media table with shaped legs; 952 triangles, 1K WebP textures, Meshopt GLB about 232 KB |
+| Walnut media console | Project-authored geometry; veneer by Jenelle van Heerden | [Walnut Veneer, Poly Haven](https://polyhaven.com/a/walnut_veneer) | Veneer: CC0 | Yes | Mid-century console with slatted doors, drawers and a VHS bay, built to `TABLE_LAYOUT` by `scripts/build-media-console.py`; 7,088 triangles, 1K WebP maps, Meshopt GLB about 231 KB |
 | Modern residential garage | Project-authored geometry; plaster by Amal Kumar | [Painted Plaster Wall, Poly Haven](https://polyhaven.com/a/painted_plaster_wall) | Plaster: CC0 | Yes | Finished walls and ceiling, sealed floor, sectional door hardware and cabinets; Meshopt GLB, 8,268 triangles, 7 materials, WebP maps, about 211 KB |
 
 ## Recommended sources
@@ -81,13 +81,26 @@ When using a complete source scene, extract only the architecture needed by the 
 
 ### Sunset garage
 
-`createGarageRoom.ts` provides the immediate fallback garage shell and shelf. `loadGarageStructure.ts` replaces it asynchronously with a project-authored modern residential garage. The finished walls use Poly Haven Painted Plaster Wall maps. The flat ceiling, sealed floor, cabinets, sectional door, curved tracks, hinges and opener are modeled offline, fitted to `GARAGE_BOUNDS`, and merged by material. Color/roughness maps are 1K and the normal map is 512px. The former distressed Shed asset is no longer shipped. The worn Wooden Table 01 loads separately with the same decoder and fits the existing tabletop bounds; the procedural table remains its download fallback. `createGarageExterior.ts` asynchronously adds an asphalt driveway and road, open lawn, and a ranch house. Material maps are 512px JPEG; static architectural boxes are merged by material. Sources and licenses are recorded alongside the assets.
+`createGarageRoom.ts` provides the immediate fallback garage shell and shelf. `loadGarageStructure.ts` replaces it asynchronously with a project-authored modern residential garage. The finished walls use Poly Haven Painted Plaster Wall maps. The flat ceiling, sealed floor, cabinets, sectional door, curved tracks, hinges and opener are modeled offline, fitted to `GARAGE_BOUNDS`, and merged by material. Color/roughness maps are 1K and the normal map is 512px. The former distressed Shed asset is no longer shipped. The walnut media console loads separately with the same decoder. It is built offline to `TABLE_LAYOUT`, so it needs no runtime fitting; the procedural console remains its download fallback, and one collider box covers it because its legs are shorter than the basketball. `createGarageExterior.ts` asynchronously adds an asphalt driveway and road, open lawn, and a ranch house. Material maps are 512px JPEG; static architectural boxes are merged by material. Sources and licenses are recorded alongside the assets.
 
 The lawn has a green material tint to retain its color under sunset lighting. `createGarageTrees.ts` adds a staggered tree line and smaller understory behind the house, plus three nearer trees. All 35 trees share one simplified, Meshopt-compressed [Poly Haven Jacaranda](https://polyhaven.com/a/jacaranda_tree) model (19,508 triangles) in three instanced draws, without extra shadow passes. Placement preserves the source transforms and seats each base slightly below the lawn. Geometry, materials, textures, and instance buffers are released with the exterior.
 
 The sky follows [Three.js's equirectangular background setup](https://threejs.org/manual/en/backgrounds.html). Industrial Sunset 02 (Pure Sky) supplies a 4K WebP background at infinity and a matching HDR for reflections, box-filtered from 1K to 256 x 128 by `scripts/resize-hdr.py` (at 0.12 environment intensity the smaller map lights the room the same and saves about 1 MB). Both use the same rotation; the directional light follows the source sun's measured direction. This avoids a landscape horizon on a nearby sphere. The global CRT filter covers both the garage and expanded content; the TVs also retain their own screen effects.
 
 `garageBounds.ts` shares the doorway, roof, and raised-door heights with basketball containment. A fast upward throw is clamped beneath the ceiling and rebounds downward. The floor extends beneath the seated viewer while the ball stays within reach. Environment downloads do not block TV navigation, and late results dispose themselves after the scene closes.
+
+### Rebuilding the media console
+
+Download the 1K JPG Diffuse, Rough and OpenGL normal maps from [Walnut Veneer](https://polyhaven.com/a/walnut_veneer) into a local directory, then run:
+
+```bash
+blender --background --factory-startup --disable-autoexec \
+  --python scripts/build-media-console.py -- \
+  --textures /path/to/walnut_veneer --output /tmp/console-raw.glb
+bunx @gltf-transform/cli optimize /tmp/console-raw.glb \
+  public/models/media-console/media-console.glb --compress meshopt \
+  --texture-compress webp --texture-size 1024 --instance false --palette false --simplify false
+```
 
 ### Rebuilding the modern garage
 

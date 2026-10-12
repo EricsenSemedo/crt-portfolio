@@ -35,7 +35,7 @@ import { loadGarageStructure } from "./assets/loadGarageStructure";
 import { containBasketball } from "./assets/garageBounds";
 import { createGarageRoom } from "./assets/createGarageRoom";
 import { createTelevisionPreview } from "./assets/createTelevisionPreview";
-import { createTable, TABLE_LAYOUT } from "./assets/createTable";
+import { createTable, createTableColliders, TABLE_LAYOUT } from "./assets/createTable";
 import { createWantedPoster } from "./assets/createWantedPoster";
 import {
   getScreenTransitionDuration,
@@ -252,7 +252,7 @@ export function createPortfolioScene(options: CreatePortfolioSceneOptions = {}):
   scene.add(interactionPrompt.sprite);
 
   const importedResources: Array<{ dispose: () => void }> = [];
-  const roomColliders = createBasketballColliders();
+  const roomColliders = createTableColliders();
   const basketballColliders = [...roomColliders];
   const basketballHitTargets: Object3D[] = [];
   let basketballBody: BasketballBody | null = null;
@@ -840,26 +840,6 @@ function updateBasketballPhysics(body: BasketballBody, colliders: Box3[], delta:
   }
 }
 
-function createBasketballColliders() {
-  const tableMinZ = TABLE_LAYOUT.centerZ - TABLE_LAYOUT.halfDepth;
-  const tableMaxZ = TABLE_LAYOUT.centerZ + TABLE_LAYOUT.halfDepth;
-  return [
-    new Box3(
-      new Vector3(-TABLE_LAYOUT.halfWidth, TABLE_LAYOUT.topY - TABLE_LAYOUT.topThickness, tableMinZ),
-      new Vector3(TABLE_LAYOUT.halfWidth, TABLE_LAYOUT.topY, tableMaxZ),
-    ),
-    ...[-TABLE_LAYOUT.legX, TABLE_LAYOUT.legX].flatMap((x) => (
-      [-TABLE_LAYOUT.legZ, TABLE_LAYOUT.legZ].map((offsetZ) => {
-        const z = TABLE_LAYOUT.centerZ + offsetZ;
-        return new Box3(
-          new Vector3(x - TABLE_LAYOUT.legHalfWidth, TABLE_LAYOUT.floorY, z - TABLE_LAYOUT.legHalfDepth),
-          new Vector3(x + TABLE_LAYOUT.legHalfWidth, TABLE_LAYOUT.topY - TABLE_LAYOUT.topThickness, z + TABLE_LAYOUT.legHalfDepth),
-        );
-      })
-    )),
-  ];
-}
-
 function resolveSphereBoxCollision(body: BasketballBody, collider: Box3) {
   const closest = collider.clampPoint(body.group.position, new Vector3());
   const normal = body.group.position.clone().sub(closest);
@@ -1028,22 +1008,12 @@ async function loadBasketballModel() {
 async function loadWoodenTable() {
   try {
     const result = await new GLTFLoader().setMeshoptDecoder(MeshoptDecoder).loadAsync(
-      `${import.meta.env.BASE_URL}models/workbench/workbench.glb`,
+      `${import.meta.env.BASE_URL}models/media-console/media-console.glb`,
     );
     const group = result.scene;
-    group.name = "WoodenWorkbench-PolyHaven-CC0";
-    group.updateMatrixWorld(true);
-    const sourceBounds = new Box3().setFromObject(group);
-    const sourceSize = sourceBounds.getSize(new Vector3());
-    group.scale.set(
-      TABLE_LAYOUT.halfWidth * 2 / Math.max(sourceSize.x, 0.001),
-      (TABLE_LAYOUT.topY - TABLE_LAYOUT.floorY) / Math.max(sourceSize.y, 0.001),
-      TABLE_LAYOUT.halfDepth * 2 / Math.max(sourceSize.z, 0.001),
-    );
-    group.updateMatrixWorld(true);
-    const scaledBounds = new Box3().setFromObject(group);
-    const scaledCenter = scaledBounds.getCenter(new Vector3());
-    group.position.set(-scaledCenter.x, TABLE_LAYOUT.floorY - scaledBounds.min.y, TABLE_LAYOUT.centerZ - scaledCenter.z);
+    group.name = "WalnutMediaConsole";
+    // Built to TABLE_LAYOUT offline (scripts/build-media-console.py): floor at y = 0, centered.
+    group.position.set(0, TABLE_LAYOUT.floorY, TABLE_LAYOUT.centerZ);
     group.traverse((object) => {
       if (!(object instanceof Mesh)) return;
       object.castShadow = true;
