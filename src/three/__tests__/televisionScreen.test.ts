@@ -58,7 +58,7 @@ it("keeps preview geometry and glass identical to the detailed TV", () => {
   const body = preview.group.getObjectByName("Television_01") as Mesh;
   expect(Array.from(body.geometry.getAttribute("position").array)).toEqual(Array.from(source.getAttribute("position").array));
   expect(Array.from(body.geometry.getAttribute("normal").array)).toEqual(Array.from(source.getAttribute("normal").array));
-  expect(diffuseDigest).toBe(createHash("sha256").update(readFileSync("public/models/television-01/textures/Television_01_diff_1k.jpg")).digest("hex"));
+  expect(diffuseDigest).toBe(createHash("sha256").update(readFileSync("public/models/television-01/textures/Television_01_diff_1k.webp")).digest("hex"));
   expect(Array.from(body.geometry.index!.array)).toEqual(Array.from(source.index!.array));
   const before = Array.from(preview.screenPlane.geometry.getAttribute("position").array);
   const center = preview.screenPlane.position.clone();

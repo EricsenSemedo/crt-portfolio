@@ -6,9 +6,9 @@ Use imported assets selectively. The authored CRT layout and camera anchors rema
 
 | Asset | Creator | Source | License | Modified | Notes |
 | --- | --- | --- | --- | --- | --- |
-| Basketball | DigitalN8m4r3 / Miodrag Sejic | [OpenGameArt](https://opengameart.org/content/basketballs) | CC0 | Yes | Smooth mesh with classic leather textures; 512px JPEG maps embedded in GLB, loaded asynchronously |
-| Wooden Table 01 | Ethan Place | [Poly Haven](https://polyhaven.com/a/WoodenTable_01) | CC0 | Yes | Downloaded 2026-09-08; worn wooden media table with shaped legs; 952 triangles, 1K textures, Meshopt GLB about 523 KB |
-| Modern residential garage | Project-authored geometry; plaster by Amal Kumar | [Painted Plaster Wall, Poly Haven](https://polyhaven.com/a/painted_plaster_wall) | Plaster: CC0 | Yes | Finished walls and ceiling, sealed floor, sectional door hardware and cabinets; Meshopt GLB, 8,268 triangles, 7 materials, about 272 KB |
+| Basketball | DigitalN8m4r3 / Miodrag Sejic | [OpenGameArt](https://opengameart.org/content/basketballs) | CC0 | Yes | Smooth mesh with classic leather textures; 512px WebP maps in a Meshopt GLB (about 74 KB), loaded asynchronously |
+| Wooden Table 01 | Ethan Place | [Poly Haven](https://polyhaven.com/a/WoodenTable_01) | CC0 | Yes | Downloaded 2026-09-08; worn wooden media table with shaped legs; 952 triangles, 1K WebP textures, Meshopt GLB about 232 KB |
+| Modern residential garage | Project-authored geometry; plaster by Amal Kumar | [Painted Plaster Wall, Poly Haven](https://polyhaven.com/a/painted_plaster_wall) | Plaster: CC0 | Yes | Finished walls and ceiling, sealed floor, sectional door hardware and cabinets; Meshopt GLB, 8,268 triangles, 7 materials, WebP maps, about 211 KB |
 
 ## Recommended sources
 
@@ -72,8 +72,8 @@ When using a complete source scene, extract only the architecture needed by the 
 | Asset | Creator | Source | License | Modified | Notes |
 | --- | --- | --- | --- | --- | --- |
 | Example CRT | Artist name | Direct model URL | CC BY 4.0 | Yes | Decimated, textures resized |
-| Television 01 | Gabriel Radić | https://polyhaven.com/a/Television_01 | CC0 | Yes | 1K glTF art-directed into three distinct CRT variants |
-| Sunset sky | Sergej Majboroda / Jarod Guest | https://polyhaven.com/a/industrial_sunset_02_puresky | CC0 | Yes | 4K JPEG background and matching 1K HDR lighting |
+| Television 01 | Gabriel Radić | https://polyhaven.com/a/Television_01 | CC0 | Yes | 1K glTF with WebP maps, art-directed into three distinct CRT variants |
+| Sunset sky | Sergej Majboroda / Jarod Guest | https://polyhaven.com/a/industrial_sunset_02_puresky | CC0 | Yes | 4K WebP background and matching 256 x 128 HDR lighting |
 
 ### Immediate TV preview
 
@@ -85,7 +85,7 @@ When using a complete source scene, extract only the architecture needed by the 
 
 The lawn has a green material tint to retain its color under sunset lighting. `createGarageTrees.ts` adds a staggered tree line and smaller understory behind the house, plus three nearer trees. All 35 trees share one simplified, Meshopt-compressed [Poly Haven Jacaranda](https://polyhaven.com/a/jacaranda_tree) model (19,508 triangles) in three instanced draws, without extra shadow passes. Placement preserves the source transforms and seats each base slightly below the lawn. Geometry, materials, textures, and instance buffers are released with the exterior.
 
-The sky follows [Three.js's equirectangular background setup](https://threejs.org/manual/en/backgrounds.html). Industrial Sunset 02 (Pure Sky) supplies a 4K JPEG background at infinity and a matching 1K HDR for reflections. Both use the same rotation; the directional light follows the source sun's measured direction. This avoids a landscape horizon on a nearby sphere. The global CRT filter covers both the garage and expanded content; the TVs also retain their own screen effects.
+The sky follows [Three.js's equirectangular background setup](https://threejs.org/manual/en/backgrounds.html). Industrial Sunset 02 (Pure Sky) supplies a 4K WebP background at infinity and a matching HDR for reflections, box-filtered from 1K to 256 x 128 by `scripts/resize-hdr.py` (at 0.12 environment intensity the smaller map lights the room the same and saves about 1 MB). Both use the same rotation; the directional light follows the source sun's measured direction. This avoids a landscape horizon on a nearby sphere. The global CRT filter covers both the garage and expanded content; the TVs also retain their own screen effects.
 
 `garageBounds.ts` shares the doorway, roof, and raised-door heights with basketball containment. A fast upward throw is clamped beneath the ceiling and rebounds downward. The floor extends beneath the seated viewer while the ball stays within reach. Environment downloads do not block TV navigation, and late results dispose themselves after the scene closes.
 

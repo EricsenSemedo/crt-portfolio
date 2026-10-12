@@ -956,8 +956,8 @@ function createInteractionPrompt() {
 async function loadSunsetEnvironment(renderer: WebGLRenderer, scene: Scene, disposed: () => boolean) {
   const root = `${import.meta.env.BASE_URL}environments/`;
   const [hdrResult, skyResult] = await Promise.allSettled([
-    new HDRLoader().loadAsync(root + "sunset-1k.hdr"),
-    new TextureLoader().loadAsync(root + "sunset-4k.jpg"),
+    new HDRLoader().loadAsync(root + "sunset-256.hdr"),
+    new TextureLoader().loadAsync(root + "sunset-4k.webp"),
   ]);
   const source = hdrResult.status === "fulfilled" ? hdrResult.value : null;
   const sky = skyResult.status === "fulfilled" ? skyResult.value : null;
@@ -1000,7 +1000,7 @@ async function loadSunsetEnvironment(renderer: WebGLRenderer, scene: Scene, disp
 
 async function loadBasketballModel() {
   try {
-    const result = await new GLTFLoader().loadAsync(
+    const result = await new GLTFLoader().setMeshoptDecoder(MeshoptDecoder).loadAsync(
       `${import.meta.env.BASE_URL}models/basketball-cc0/basketball.glb`,
     );
     const group = result.scene;
@@ -1057,7 +1057,7 @@ async function loadWoodenTable() {
 
 async function loadPlayStation2Model() {
   try {
-    const result = await new GLTFLoader().loadAsync(
+    const result = await new GLTFLoader().setMeshoptDecoder(MeshoptDecoder).loadAsync(
       `${import.meta.env.BASE_URL}models/playstation2/playstation2.glb`,
     );
     const group = result.scene;

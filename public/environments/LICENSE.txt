@@ -3,4 +3,5 @@ Original: Sergej Majboroda; sky edits: Jarod Guest
 https://polyhaven.com/a/industrial_sunset_02_puresky
 CC0 1.0 Universal
 https://creativecommons.org/publicdomain/zero/1.0/
-Downloaded 2026-09-08. Original 1K HDR for lighting; tonemapped panorama resized to 4096 x 2048 JPEG for the background.
+Downloaded 2026-09-08. The 1K HDR is box-filtered to 256 x 128 for lighting
+(scripts/resize-hdr.py); the tonemapped panorama is a 4096 x 2048 WebP background.

@@ -24,7 +24,7 @@ position = attribute(primitive['attributes']['POSITION'])
 normal = attribute(primitive['attributes']['NORMAL'])
 uv = list(struct.iter_unpack('<ff', attribute(primitive['attributes']['TEXCOORD_0'])))
 indices = attribute(primitive['indices'])
-diffuse = source / 'textures/Television_01_diff_1k.jpg'
+diffuse = source / 'textures/Television_01_diff_1k.webp'
 image = Image.open(diffuse).convert('RGB')
 colors = bytearray()
 for u, v in uv:

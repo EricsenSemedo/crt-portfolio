@@ -1,0 +1,6 @@
+Television 01 — Gabriel Radić / Poly Haven
+Source: https://polyhaven.com/a/Television_01
+CC0 1.0 Universal
+https://creativecommons.org/publicdomain/zero/1.0/
+Modifications: original 1K glTF geometry; color, normal and metal/roughness maps
+re-encoded as 1K WebP (EXT_texture_webp).
