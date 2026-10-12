@@ -36,6 +36,7 @@ import { containBasketball } from "./assets/garageBounds";
 import { createGarageRoom } from "./assets/createGarageRoom";
 import { createTelevisionPreview } from "./assets/createTelevisionPreview";
 import { createTable, TABLE_LAYOUT } from "./assets/createTable";
+import { createWantedPoster } from "./assets/createWantedPoster";
 import {
   getScreenTransitionDuration,
   getRandomScreenTransitionKind,
@@ -136,6 +137,14 @@ export interface CreatePortfolioSceneOptions {
 const OVERVIEW_POSITION = new Vector3(0, 1.82, 7.55);
 const OVERVIEW_TARGET = new Vector3(0, 0.05, -0.4);
 // Each screen lights the room around it; hovering turns the set up.
+// Left alone, the viewer glances around the way a person would: mostly small looks across the
+// sets, now and then a wider one toward a wall. Radians; yaw narrows on tall screens.
+const GLANCE_IDLE_MS = 2200;
+const GLANCE_YAW = 0.03;
+const GLANCE_YAW_WIDE = 0.06;
+const GLANCE_PITCH = 0.014;
+// A critically damped spring, so each head turn eases in and settles instead of snapping.
+const GLANCE_STIFFNESS = 5;
 const SCREEN_GLOW = 5;
 const SCREEN_GLOW_HOVERED = 9;
 
@@ -178,7 +187,12 @@ export function createPortfolioScene(options: CreatePortfolioSceneOptions = {}):
   const room = createGarageRoom();
   const table = createTable();
   table.group.position.set(0, TABLE_LAYOUT.topY, TABLE_LAYOUT.centerZ);
-  scene.add(room.group, table.group);
+  // Pinned to the right-hand wall, in view of the overview and of a glance that way.
+  const wantedPoster = createWantedPoster();
+  wantedPoster.group.position.set(4.66, 1.78, 0.35);
+  wantedPoster.group.rotation.set(0, -Math.PI / 2, 0.03);
+  wantedPoster.group.scale.setScalar(1.2);
+  scene.add(room.group, table.group, wantedPoster.group);
 
   const channels: ChannelConfig[] = [
     {
@@ -319,6 +333,7 @@ export function createPortfolioScene(options: CreatePortfolioSceneOptions = {}):
   const allAssets: SceneAsset[] = [
     room,
     table,
+    wantedPoster,
     ...channels.map((channel) => channel.asset),
   ];
   const raycaster = new Raycaster();
@@ -326,6 +341,8 @@ export function createPortfolioScene(options: CreatePortfolioSceneOptions = {}):
   const parallaxTarget = new Vector2();
   const parallaxCurrent = new Vector2();
   const lookTarget = OVERVIEW_TARGET.clone();
+  const glance = { current: new Vector2(), velocity: new Vector2(), target: new Vector2(), nextAt: 0 };
+  let lastPointerAt = -Infinity;
   let lastFrameTime = performance.now();
   let hovered: PortfolioChannelId | null = null;
   let isOverview = true;
@@ -430,6 +447,11 @@ export function createPortfolioScene(options: CreatePortfolioSceneOptions = {}):
       lookTarget.set(...sceneLayout.target);
       lookTarget.x += parallaxCurrent.x * 0.28;
       lookTarget.y += parallaxCurrent.y * 0.18;
+      // Applied to the look target, so a click that starts a zoom carries on from the glance.
+      updateGlance(time, delta);
+      const distance = camera.position.distanceTo(lookTarget);
+      lookTarget.x += Math.tan(glance.current.x) * distance;
+      lookTarget.y += Math.tan(glance.current.y) * distance;
       camera.lookAt(lookTarget);
     }
 
@@ -496,6 +518,31 @@ export function createPortfolioScene(options: CreatePortfolioSceneOptions = {}):
     renderer.render(scene, camera);
   }
 
+  function updateGlance(time: number, delta: number) {
+    const idle = !motionPreference.matches && time - lastPointerAt > GLANCE_IDLE_MS;
+    if (motionPreference.matches) {
+      // Reduced motion switched on mid-glance: stop where the room is level, not after a drift.
+      glance.current.set(0, 0);
+      glance.velocity.set(0, 0);
+      glance.target.set(0, 0);
+      return;
+    }
+    if (!idle) {
+      glance.target.set(0, 0);
+    } else if (time >= glance.nextAt) {
+      glance.nextAt = time + 2400 + Math.random() * 3200;
+      const narrow = Math.min(1, camera.aspect / 1.4);
+      const roll = Math.random();
+      if (roll < 0.2) glance.target.set(0, 0);
+      else if (roll < 0.45) glance.target.set(Math.sign(Math.random() - 0.5) * GLANCE_YAW_WIDE * narrow, -GLANCE_PITCH * 0.3);
+      else glance.target.set((Math.random() * 2 - 1) * GLANCE_YAW * narrow, (Math.random() * 2 - 1) * GLANCE_PITCH);
+    }
+    const damping = 2 * Math.sqrt(GLANCE_STIFFNESS);
+    glance.velocity.x += ((glance.target.x - glance.current.x) * GLANCE_STIFFNESS - glance.velocity.x * damping) * delta;
+    glance.velocity.y += ((glance.target.y - glance.current.y) * GLANCE_STIFFNESS - glance.velocity.y * damping) * delta;
+    glance.current.addScaledVector(glance.velocity, delta);
+  }
+
   function pickHit(clientX: number, clientY: number) {
     setRaycasterFromClient(clientX, clientY);
     const televisionHit = raycaster.intersectObjects(hitTargets, false)[0];
@@ -534,6 +581,7 @@ export function createPortfolioScene(options: CreatePortfolioSceneOptions = {}):
   }
 
   function setParallax(x: number, y: number) {
+    lastPointerAt = performance.now();
     parallaxTarget.set(motionPreference.matches ? 0 : MathUtils.clamp(x, -1, 1), motionPreference.matches ? 0 : MathUtils.clamp(y, -1, 1));
   }
 
@@ -588,6 +636,10 @@ export function createPortfolioScene(options: CreatePortfolioSceneOptions = {}):
     }
     heldScreenEffect = null;
     focusedChannel = id;
+    // The zoom starts from the glance; coming back out, the room starts level again.
+    glance.current.set(0, 0);
+    glance.velocity.set(0, 0);
+    glance.target.set(0, 0);
     interactionPrompt.sprite.visible = false;
     isOverview = false;
     return animateTo(destination.position, destination.target, reducedMotion ? 1 : quick ? 380 : 760, 0.18);
