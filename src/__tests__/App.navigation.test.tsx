@@ -8,6 +8,7 @@ import { navigateHistory } from "../testUtils/history";
 type StageProps = {
   onSelect: (id: PortfolioChannelId) => void;
   requestedChannel?: PortfolioChannelId | null;
+  instantFocus?: boolean;
   onOverviewComplete?: () => void;
   onRequestedFocusComplete?: (id: PortfolioChannelId) => void;
 };
@@ -122,6 +123,13 @@ describe("App hash navigation", () => {
     });
   }
 
+  async function mountRoomWhenIdle() {
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 350));
+      await vi.dynamicImportSettled();
+    });
+  }
+
   function overlayChannel() {
     return host.querySelector("[data-testid=tv-overlay]")?.getAttribute("data-channel");
   }
@@ -171,12 +179,17 @@ describe("App hash navigation", () => {
     expect(latestStage?.requestedChannel).toBeNull();
   });
 
-  it("opens a direct project URL and its in-page close returns to the gallery", async () => {
+  it("opens a direct project URL at once, loads the room behind it, and its in-page close returns to the gallery", async () => {
     await mount("#/portfolio/pullworth");
-    expect(latestStage?.requestedChannel).toBe("portfolio");
-    completeFocus("portfolio");
     expect(overlayChannel()).toBe("portfolio");
     expect(host.querySelector("[data-testid=project-id]")?.textContent).toBe("pullworth");
+    expect(latestStage).toBeNull();
+
+    await mountRoomWhenIdle();
+    expect(latestStage?.requestedChannel).toBe("portfolio");
+    expect(latestStage?.instantFocus).toBe(true);
+    completeFocus("portfolio");
+    expect(overlayChannel()).toBe("portfolio");
 
     click("Back to project gallery");
     expect(window.location.hash).toBe("#/portfolio");
@@ -201,8 +214,24 @@ describe("App hash navigation", () => {
     expect(latestStage?.requestedChannel).toBeNull();
   });
 
+  it("pulls back to the room when a shared link is closed before the room has loaded", async () => {
+    await mount("#/profile");
+    expect(overlayChannel()).toBe("home");
+    expect(latestStage).toBeNull();
+
+    // Nothing to go back to, so Close replaces the entry instead of traversing history.
+    click("Close TV");
+    expect(window.location.hash).toBe("#/");
+    completeOverlayExit();
+    await mountRoomWhenIdle();
+    expect(latestStage?.requestedChannel).toBeNull();
+    completeOverview();
+    expect(overlayChannel()).toBe("overview");
+  });
+
   it("ignores a stale focus completion when the target changes during a transition", async () => {
-    await mount("#/portfolio");
+    await mount();
+    await selectFromStage("portfolio");
     expect(latestStage?.requestedChannel).toBe("portfolio");
 
     await navigateHistory(() => {

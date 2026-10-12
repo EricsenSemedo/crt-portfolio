@@ -11,6 +11,8 @@ interface ThreeCRTStageProps {
   onSelect: (id: PortfolioChannelId) => void;
   requestedChannel?: PortfolioChannelId | null;
   quickTransition?: boolean;
+  /** The page already covers the room: land on the set at once, with no zoom or effect. */
+  instantFocus?: boolean;
   screenEffectActive?: boolean;
   onRequestedFocusComplete?: (id: PortfolioChannelId) => void;
   onOverviewComplete?: () => void;
@@ -21,6 +23,7 @@ export default function ThreeCRTStage({
   onSelect,
   requestedChannel = null,
   quickTransition = false,
+  instantFocus = false,
   screenEffectActive = false,
   onRequestedFocusComplete,
   onOverviewComplete,
@@ -141,14 +144,14 @@ export default function ThreeCRTStage({
 
   // Speed is read when a request starts. A new callback or speed alone must not restart
   // the camera: the App re-renders between a click and its matching request, and a restart replays the zoom.
-  const requestOptionsRef = useRef({ quickTransition, onRequestedFocusComplete, onOverviewComplete });
+  const requestOptionsRef = useRef({ quickTransition, instantFocus, onRequestedFocusComplete, onOverviewComplete });
   useEffect(() => {
-    requestOptionsRef.current = { quickTransition, onRequestedFocusComplete, onOverviewComplete };
-  }, [onOverviewComplete, onRequestedFocusComplete, quickTransition]);
+    requestOptionsRef.current = { quickTransition, instantFocus, onRequestedFocusComplete, onOverviewComplete };
+  }, [instantFocus, onOverviewComplete, onRequestedFocusComplete, quickTransition]);
 
   useEffect(() => {
     if (!ready) return;
-    const { quickTransition } = requestOptionsRef.current;
+    const { quickTransition, instantFocus } = requestOptionsRef.current;
     // Completions go to the latest callbacks, which know the latest route.
     const onRequestedFocusComplete = (id: PortfolioChannelId) => requestOptionsRef.current.onRequestedFocusComplete?.(id);
     const onOverviewComplete = () => requestOptionsRef.current.onOverviewComplete?.();
@@ -185,7 +188,7 @@ export default function ThreeCRTStage({
     resettingRef.current = false;
     pendingSelectRef.current = null;
     focusedRef.current = null;
-    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const reducedMotion = instantFocus || window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     void controller
       ?.focus(requestedChannel, reducedMotion, quickTransition)
       .then(() => isCurrent() ? controller.transitionScreen(requestedChannel, reducedMotion) : "cancelled")

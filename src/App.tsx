@@ -30,11 +30,36 @@ export default function App() {
 
 function PortfolioApp() {
   const { channel, project, redirectTo, navigateToTV, openProject, closeProject, closeTV } = usePortfolioNavigation();
-  const [selectedId, setSelectedId] = useState<PortfolioChannelId | null>(null);
+  // A shared link opens its page straight away; the room loads behind it and is waiting at that
+  // set, so closing the page still pulls back to the room.
+  const [selectedId, setSelectedId] = useState<PortfolioChannelId | null>(channel);
   const [sceneChannel, setSceneChannel] = useState<PortfolioChannelId | null>(channel);
-  const [phase, setPhase] = useState<"overview" | "ready" | "focusing" | "open" | "exiting">(channel ? "focusing" : "overview");
-  const [screenEffectActive, setScreenEffectActive] = useState(Boolean(channel));
+  const [phase, setPhase] = useState<"overview" | "ready" | "focusing" | "open" | "exiting">(channel ? "open" : "overview");
+  const [screenEffectActive, setScreenEffectActive] = useState(false);
+  const [stageMounted, setStageMounted] = useState(!channel);
   const backgroundRef = useRef<HTMLDivElement>(null);
+
+  // Behind an open page the room waits until the page itself has loaded, so its pictures go first.
+  useEffect(() => {
+    if (stageMounted) return;
+    if (phase !== "open") {
+      setStageMounted(true);
+      return;
+    }
+    let idle = 0;
+    let timer = 0;
+    function mountWhenIdle() {
+      if (window.requestIdleCallback) idle = window.requestIdleCallback(() => setStageMounted(true), { timeout: 2000 });
+      else timer = window.setTimeout(() => setStageMounted(true), 300);
+    }
+    if (document.readyState === "complete") mountWhenIdle();
+    else window.addEventListener("load", mountWhenIdle, { once: true });
+    return () => {
+      window.removeEventListener("load", mountWhenIdle);
+      if (idle) window.cancelIdleCallback(idle);
+      window.clearTimeout(timer);
+    };
+  }, [phase, stageMounted]);
 
   // The URL chooses the destination; animation callbacks only advance its presentation.
   useEffect(() => {
@@ -66,11 +91,11 @@ function PortfolioApp() {
   }, []);
   const handleOverlayEnterComplete = useCallback(() => setScreenEffectActive(false), []);
   const handleRequestedFocusComplete = useCallback((id: PortfolioChannelId) => {
-    if (id !== channel) return;
+    if (id !== channel || selectedId === id) return;
     setScreenEffectActive(true);
     setSelectedId(id);
     setPhase("open");
-  }, [channel]);
+  }, [channel, selectedId]);
 
   const byId: Record<string, React.ReactNode> = {
     home: <Home onNavigate={navigateToTV} />,
@@ -82,17 +107,20 @@ function PortfolioApp() {
     <div className="relative min-h-screen overflow-hidden bg-crt-overlay">
       {redirectTo && <Navigate to={redirectTo} replace />}
       <div ref={backgroundRef}>
-        <Suspense fallback={<CRTLoadingScreen />}>
-          <ThreeCRTStage
-            onSelect={navigateToTV}
-            requestedChannel={sceneChannel}
-            quickTransition={phase === "overview" || phase === "focusing"}
-            screenEffectActive={screenEffectActive}
-            paused={Boolean(selectedId) && !screenEffectActive}
-            onOverviewComplete={handleOverviewComplete}
-            onRequestedFocusComplete={handleRequestedFocusComplete}
-          />
-        </Suspense>
+        {stageMounted ? (
+          <Suspense fallback={<CRTLoadingScreen />}>
+            <ThreeCRTStage
+              onSelect={navigateToTV}
+              requestedChannel={sceneChannel}
+              quickTransition={phase === "overview" || phase === "focusing"}
+              instantFocus={phase === "open"}
+              screenEffectActive={screenEffectActive}
+              paused={Boolean(selectedId) && !screenEffectActive}
+              onOverviewComplete={handleOverviewComplete}
+              onRequestedFocusComplete={handleRequestedFocusComplete}
+            />
+          </Suspense>
+        ) : <CRTLoadingScreen />}
       </div>
 
       <TVZoomOverlay
