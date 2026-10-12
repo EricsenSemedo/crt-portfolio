@@ -22,6 +22,7 @@ clip pullworth public/projects/pullworth-dashboard-v2.webm 1.5 0 -
 clip toonsync public/projects/toonsync-demo-v2.webm 2 0 -
 clip stitch public/projects/stitch-docs-v1.webm 3 2.6 -
 clip edgewood-remodeling public/projects/edgewood-demo-v2.webm 1 0 -
+clip btb-creative-vision public/projects/btb-tour.mp4 0.5 0 -
 clip heros-quest public/projects/heros-quest/gameplay.mp4 3 2 -
 clip physics-grab public/projects/physics-grab/demo.webm 30 27 -
 clip dont-get-caught public/projects/dont_get_caught_demo.mp4 4 1 crop=1088:864:328:116

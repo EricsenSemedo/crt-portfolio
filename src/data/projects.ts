@@ -241,6 +241,32 @@ export const projects: Project[] = [
     },
   },
   {
+    id: "btb-creative-vision",
+    title: "BTB Creative Vision",
+    category: "Client Web / Redesign",
+    description: "A redesign for a Providence filmmaker that keeps his colours and lets his footage lead, with motion borrowed from his own edits.",
+    status: "Client Preview",
+    tech: ["React", "TypeScript", "Vite", "Three.js", "Cloudflare Workers"],
+    image: "/crt-portfolio/projects/browse/btb-creative-vision.jpg",
+    demo: {
+      type: "video",
+      src: "/crt-portfolio/projects/btb-tour.mp4",
+      alt: "Tour of the BTB Creative Vision site",
+    },
+    detailedDescription: {
+      contribution: "Redesigned and rebuilt the client's existing site, keeping his colour scheme and copy while adding interactive motion, a draggable hero filmstrip and a 3D logo.",
+      problem: "His work lives in video, but the old site presented it as static pages, so visitors read about the films instead of seeing them move.",
+      solution: "Made the videography the interactive focal point: a hero filmstrip you can drag and fling, clips that play as you reach them, and animations modelled on the edits he uses in his own films, carried through every page.",
+      impact: "A client-review preview that presents his reels the way he cuts them, ready for his approval before a public launch.",
+      highlights: [
+        "Hero filmstrip with drag, momentum and keyboard nudges",
+        "Animations that echo the client's own editing style",
+        "Three.js chrome logo rebuilt from his artwork in Blender",
+        "Reduced-motion fallbacks throughout",
+      ],
+    },
+  },
+  {
     id: "stitch",
     title: "Stitch",
     category: "Developer Tooling / Roblox",
