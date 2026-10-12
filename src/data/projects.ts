@@ -424,7 +424,7 @@ export const projects: Project[] = [
     description: "Learning project: Recursive backtracking maze generator with binary-encoded walls",
     status: "Proof of Concept",
     tech: ["C++", "OOP", "Algorithms"],
-    image: "/api/placeholder/300/200",
+    image: "/crt-portfolio/projects/browse/maze-generator.jpg",
     demo: {
       type: "video",
       src: "/crt-portfolio/videos/maze-generator-demo.mp4",
@@ -452,7 +452,7 @@ export const projects: Project[] = [
     description: "Learning project: Multiplayer game built with 10-member team using Python/Pygame",
     status: "Learning Experience",
     tech: ["Python", "Pygame", "Team Leadership"],
-    image: "/api/placeholder/300/200",
+    image: "/crt-portfolio/projects/browse/zombies-game.jpg",
     demo: {
       type: "video",
       src: "/crt-portfolio/videos/zombies-game-demo.mp4",
@@ -481,7 +481,7 @@ export const projects: Project[] = [
     description: "Learning project: Project management app with SQL database and web interface",
     status: "Learning Experience",
     tech: ["SQL", "PHP", "HTML", "CSS"],
-    image: "/api/placeholder/300/200",
+    image: "/crt-portfolio/projects/browse/project-manager-pro.jpg",
     sources: [{ label: "GitHub Repository", href: "https://github.com/EricsenSemedo/project_manager_pro" }],
     demo: {
       type: "video",
