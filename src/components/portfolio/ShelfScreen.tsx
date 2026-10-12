@@ -37,7 +37,7 @@ export default function ShelfScreen({ project, active, className = "", style, ch
     <div className={"relative overflow-hidden bg-crt-shell-screen " + className} style={style}>
       {media ? (
         <>
-          <img src={media.poster} alt="" loading="lazy" className="absolute inset-0 h-full w-full object-cover object-top" />
+          <img src={media.poster} alt="" loading="lazy" className="crt-parallax absolute inset-0 h-full w-full object-cover object-top" />
           {media.clip && (
             <video
               ref={videoRef}
@@ -49,7 +49,7 @@ export default function ShelfScreen({ project, active, className = "", style, ch
               aria-hidden="true"
               onPlaying={() => setPlaying(true)}
               onPause={() => setPlaying(false)}
-              className={"absolute inset-0 h-full w-full object-cover object-top transition-opacity duration-200 " + (shouldPlay && playing ? "opacity-100" : "opacity-0")}
+              className={"crt-parallax absolute inset-0 h-full w-full object-cover object-top transition-opacity duration-200 " + (shouldPlay && playing ? "opacity-100" : "opacity-0")}
             />
           )}
         </>
