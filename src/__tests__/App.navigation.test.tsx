@@ -42,11 +42,8 @@ vi.mock("../components/TVZoomOverlay", () => ({
 }));
 
 vi.mock("../components/portfolio", () => ({
-  AdditionalProjectRow: ({ project, onClick }: { project: { title: string }; onClick: () => void }) => (
-    <button onClick={onClick}>{project.title}</button>
-  ),
-  ProjectTV: ({ project, onClick }: { project: { id: string; title: string }; onClick: () => void }) => (
-    <button onClick={onClick}>Open {project.id}</button>
+  ProjectShelves: ({ onOpen }: { onOpen: (project: { id: string }) => void }) => (
+    <button onClick={() => onOpen({ id: "pullworth" })}>Open pullworth</button>
   ),
   ProjectDetailView: ({ project, onClose }: { project: { id: string; title: string }; onClose: () => void }) => (
     <section role="dialog" aria-label={project.title}>
