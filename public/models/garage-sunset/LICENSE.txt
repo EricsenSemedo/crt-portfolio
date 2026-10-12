@@ -1,4 +1,4 @@
-Garage sunset assets — downloaded 2026-09-08
+Garage sunset assets — downloaded 2026-09-08 and 2026-10-12
 All source assets: CC0 1.0 Universal
 https://creativecommons.org/publicdomain/zero/1.0/
 
@@ -8,16 +8,12 @@ https://polyhaven.com/a/garage_floor
 asphalt_02 — Rob Tuytel
 https://polyhaven.com/a/asphalt_02
 
-roof_slates_02 — Rob Tuytel
-https://polyhaven.com/a/roof_slates_02
-
 leafy_grass — Charlotte Baglioni
 https://polyhaven.com/a/leafy_grass
 
-Modifications: material texture maps resized to 512px JPEG.
-The house and garage architecture are authored in code.
+Ground modifications: material texture maps resized to 512px JPEG.
 
-street-trees.webp (downloaded 2026-10-12) — cutouts rendered from:
+street-trees.webp — cutouts rendered from:
 jacaranda_tree — Rico Cilliers (All), Rob Tuytel (guidance)
 https://polyhaven.com/a/jacaranda_tree
 tree_small_02 — Rico Cilliers
@@ -29,3 +25,15 @@ https://polyhaven.com/a/searsia_lucida
 Modifications: each 1K glTF model rendered front-on in Cycles under an even sky
 (scripts/render-tree-impostors.py), cropped and packed into one WebP atlas with alpha
 (scripts/pack-tree-atlas.py). No model geometry is shipped.
+
+street-house.glb — colonial house geometry authored for CRT Portfolio
+(scripts/build-street-house.py), using:
+white_planks_clean — Rob Tuytel
+https://polyhaven.com/a/white_planks_clean
+grey_roof_01 — Rob Tuytel
+https://polyhaven.com/a/grey_roof_01
+red_brick_03 — Rob Tuytel
+https://polyhaven.com/a/red_brick_03
+Modifications: color and normal maps only, WebP at 512px (siding), 256px (roof) and
+128px (brick); siding boards turned horizontal and tinted by material colour.
+Meshopt-compressed. The road, curbs, sidewalk and drives are authored in code.
