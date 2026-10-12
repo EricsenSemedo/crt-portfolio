@@ -38,7 +38,11 @@ function PortfolioApp() {
 
   // The URL chooses the destination; animation callbacks only advance its presentation.
   useEffect(() => {
-    if (phase === "open" && selectedId !== channel) {
+    if (phase === "open" && channel && selectedId && selectedId !== channel) {
+      // Already inside a set: flip channels on this screen. The camera stays put behind the page,
+      // so closing still pulls back to the room.
+      setSelectedId(channel);
+    } else if (phase === "open" && selectedId !== channel) {
       setScreenEffectActive(true);
       setSelectedId(null);
       setPhase("exiting");

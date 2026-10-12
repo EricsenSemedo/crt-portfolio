@@ -5,8 +5,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import projects from "../../../data/projects";
 import DemoChannel from "../DemoChannel";
 
-vi.mock("../../StaticNoise", () => ({
-  default: function StaticNoiseMock() {
+vi.mock("../../TVStatic", () => ({
+  default: function TVStaticMock() {
     return null;
   },
 }));

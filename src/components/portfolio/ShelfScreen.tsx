@@ -3,7 +3,7 @@ import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 
 import { browseMedia } from "../../data/browse";
 import type { Project } from "../../types";
 import CRTScanlines from "../CRTScanlines";
-import StaticNoise from "../StaticNoise";
+import TVStatic from "../TVStatic";
 
 interface ShelfScreenProps {
   project: Project;
@@ -55,8 +55,7 @@ export default function ShelfScreen({ project, active, className = "", style, ch
         </>
       ) : (
         <div className="absolute inset-0 bg-black">
-          <StaticNoise intensity={5} />
-          <div className="demo-carousel__static absolute inset-0" />
+          <TVStatic className="opacity-70" />
           <p className="absolute inset-0 m-auto h-fit w-fit border border-crt-border bg-crt-base/90 px-3 py-1.5 font-mono text-xs text-crt-text">
             Off air
           </p>
