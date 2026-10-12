@@ -56,6 +56,12 @@ vi.mock("../components/portfolio", () => ({
   ),
 }));
 
+vi.mock("../components/browse/BrowseDirections", () => ({
+  default: ({ onOpen }: { onOpen: (project: { id: string }) => void }) => (
+    <button onClick={() => onOpen({ id: "pullworth" })}>Open pullworth</button>
+  ),
+}));
+
 vi.mock("../pages/Websites", () => ({
   default: ({ onNavigate }: { onNavigate?: (id: string) => void }) => (
     <button onClick={() => onNavigate?.("portfolio")}>See all my work</button>

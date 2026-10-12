@@ -240,6 +240,28 @@ export const projects: Project[] = [
       ],
     },
   },
+  // Prototype: BTB joins Projects with draft copy until the write-up exists.
+  {
+    id: "btb-creative-vision",
+    title: "BTB Creative Vision",
+    category: "Client Web / Portfolio",
+    description: "Portfolio site that puts a Providence filmmaker's reels front and centre.",
+    status: "Client Work",
+    tech: ["Next.js", "React", "Tailwind CSS"],
+    image: "/crt-portfolio/websites/btb-poster.jpg",
+    demo: {
+      type: "video",
+      src: "/crt-portfolio/websites/btb-tour.mp4",
+      alt: "Tour of the BTB Creative Vision site",
+    },
+    detailedDescription: {
+      contribution: "Draft: designed and built the site for the client.",
+      problem: "Draft: a filmmaker's work lives in video, so the site had to lead with reels rather than text.",
+      solution: "Draft: a reel-first portfolio that opens on the work and keeps the booking call in reach.",
+      impact: "Draft: to be written with the client's outcome.",
+      highlights: [],
+    },
+  },
   {
     id: "stitch",
     title: "Stitch",
@@ -424,7 +446,7 @@ export const projects: Project[] = [
     description: "Learning project: Recursive backtracking maze generator with binary-encoded walls",
     status: "Proof of Concept",
     tech: ["C++", "OOP", "Algorithms"],
-    image: "/api/placeholder/300/200",
+    image: "/crt-portfolio/projects/browse/maze-generator.jpg",
     demo: {
       type: "video",
       src: "/crt-portfolio/videos/maze-generator-demo.mp4",
@@ -452,7 +474,7 @@ export const projects: Project[] = [
     description: "Learning project: Multiplayer game built with 10-member team using Python/Pygame",
     status: "Learning Experience",
     tech: ["Python", "Pygame", "Team Leadership"],
-    image: "/api/placeholder/300/200",
+    image: "/crt-portfolio/projects/browse/zombies-game.jpg",
     demo: {
       type: "video",
       src: "/crt-portfolio/videos/zombies-game-demo.mp4",
@@ -481,7 +503,7 @@ export const projects: Project[] = [
     description: "Learning project: Project management app with SQL database and web interface",
     status: "Learning Experience",
     tech: ["SQL", "PHP", "HTML", "CSS"],
-    image: "/api/placeholder/300/200",
+    image: "/crt-portfolio/projects/browse/project-manager-pro.jpg",
     sources: [{ label: "GitHub Repository", href: "https://github.com/EricsenSemedo/project_manager_pro" }],
     demo: {
       type: "video",

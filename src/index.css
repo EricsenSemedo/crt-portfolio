@@ -598,3 +598,12 @@ body {
 .project-channel__media {
   max-width: min(100%, max(22rem, calc((100svh - 17rem) * 16 / 9)));
 }
+
+/* Prototype: browse rows slide sideways without a scrollbar. */
+.browse-shelf {
+  scrollbar-width: none;
+}
+
+.browse-shelf::-webkit-scrollbar {
+  display: none;
+}
