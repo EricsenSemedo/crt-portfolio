@@ -1,0 +1,13 @@
+Mid-century walnut media console — geometry authored for CRT Portfolio.
+Rebuild source: scripts/build-media-console.py (sized from TABLE_LAYOUT in createTable.ts).
+
+Surface asset: Walnut Veneer — Jenelle van Heerden / Poly Haven
+https://polyhaven.com/a/walnut_veneer
+Downloaded 2026-10-12. CC0 1.0 Universal.
+https://creativecommons.org/publicdomain/zero/1.0/
+Modifications: 1K color, normal and roughness maps re-encoded as WebP; the color map
+is darkened to oiled walnut by a material tint. Planar UVs repeat the veneer at the
+room's prop scale.
+
+The top, case, slatted doors, drawers, splayed legs, brass pulls and VHS tapes are
+custom geometry. Meshopt-compressed for web delivery.

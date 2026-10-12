@@ -50,7 +50,7 @@ export const viewableAssets: ViewableAsset[] = [
   },
   {
     id: "table",
-    label: "Long Table",
+    label: "Media Console",
     category: "Furniture",
     accent: "#f59e0b",
     create: createTable,
