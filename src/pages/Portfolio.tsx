@@ -2,40 +2,11 @@ import { AnimatePresence } from "framer-motion";
 import { useRef, useState } from "react";
 import CRTButton from "../components/CRTButton";
 import ScrambleHeading from "../components/ScrambleHeading";
-import { AdditionalProjectRow, ProjectDetailView, ProjectTV } from "../components/portfolio";
-import projects from "../data/projects";
+import { ProjectDetailView, ProjectShelves } from "../components/portfolio";
+import { browseGroups } from "../data/browse";
 import type { NavigateFunction, Project } from "../types";
 
 type ChannelType = 'demo' | 'description';
-
-const softwareProjectIds = [
-  "pullworth",
-  "toonsync",
-  "derma",
-  "shadi",
-];
-
-const gameDevelopmentProjectIds = [
-  "heros-quest",
-  "physics-grab",
-  "dont-get-caught",
-  "grow-your-plant",
-];
-
-// Hiring managers for either track can skip straight to their group.
-const projectGroups = [
-  { id: "software-and-ai", label: "Software & AI" },
-  { id: "game-development", label: "Game Development" },
-];
-
-const featuredProjectIds = [...softwareProjectIds, ...gameDevelopmentProjectIds];
-
-function projectsById(ids: string[]) {
-  return ids.flatMap((id) => {
-    const project = projects.find((candidate) => candidate.id === id);
-    return project ? [project] : [];
-  });
-}
 
 interface PortfolioProps {
   onNavigate?: NavigateFunction;
@@ -47,9 +18,6 @@ interface PortfolioProps {
 export default function Portfolio({ onNavigate, selectedProject, onOpenProject, onCloseProject }: PortfolioProps) {
   const [currentChannel, setCurrentChannel] = useState<ChannelType>('demo');
   const backgroundRef = useRef<HTMLDivElement>(null);
-  const softwareProjects = projectsById(softwareProjectIds);
-  const gameDevelopmentProjects = projectsById(gameDevelopmentProjectIds);
-  const additionalProjects = projects.filter((project) => !featuredProjectIds.includes(project.id));
 
   // Reset the local demo tab for a new route, including browser Back/Forward.
   const projectId = selectedProject?.id ?? null;
@@ -68,73 +36,22 @@ export default function Portfolio({ onNavigate, selectedProject, onOpenProject, 
             Project Gallery
           </ScrambleHeading>
           <nav className="flex flex-wrap justify-center gap-3" aria-label="Jump to project group">
-            {projectGroups.map((group) => (
+            {browseGroups.map((group) => (
               <CRTButton
                 key={group.id}
                 variant="secondary"
                 className="min-h-11"
                 onClick={() => document.getElementById(group.id)?.scrollIntoView({ behavior: "smooth", block: "start" })}
               >
-                {group.label}
+                {group.title}
               </CRTButton>
             ))}
           </nav>
         </section>
 
-        <section id="software-and-ai" className="border-t border-crt-border-subtle px-2 pt-10 sm:px-6">
-          <h2 className="font-display text-2xl font-bold tracking-wide text-crt-text">Software &amp; AI</h2>
-          <p className="mt-2 max-w-2xl text-sm text-crt-text-tertiary">
-            Product, client, and hackathon work spanning field tools, social platforms, and applied AI systems.
-          </p>
-        </section>
-
-        <section className="grid grid-cols-1 gap-8 px-2 py-8 sm:px-6 md:grid-cols-2">
-          {softwareProjects.map((project) => (
-            <ProjectTV
-              key={project.id}
-              project={project}
-              channel={featuredProjectIds.indexOf(project.id) + 1}
-              onClick={() => onOpenProject(project)}
-            />
-          ))}
-        </section>
-
-        <section id="game-development" className="border-t border-crt-border-subtle px-2 pt-10 sm:px-6">
-          <h2 className="font-display text-2xl font-bold tracking-wide text-crt-text">Game Development</h2>
-          <p className="mt-2 max-w-2xl text-sm text-crt-text-tertiary">
-            Roblox games and gameplay systems built around arcade and multiplayer loops, progression, and responsive cross-platform controls.
-          </p>
-        </section>
-
-        <section className="grid grid-cols-1 gap-8 px-2 py-8 sm:px-6 md:grid-cols-2">
-          {gameDevelopmentProjects.map((project) => (
-            <ProjectTV
-              key={project.id}
-              project={project}
-              channel={featuredProjectIds.indexOf(project.id) + 1}
-              onClick={() => onOpenProject(project)}
-            />
-          ))}
-        </section>
-
-        <section className="border-t border-crt-border-subtle px-2 pt-10 sm:px-6">
-          <h2 className="font-display text-2xl font-bold tracking-wide text-crt-text">Additional Projects</h2>
-          <p className="mt-2 max-w-2xl text-sm text-crt-text-tertiary">
-            Experiments, coursework, client systems, and earlier builds that shaped the featured work above.
-          </p>
-        </section>
-
-        <section className="px-2 py-8 sm:px-6">
-          <div className="border-t border-crt-border">
-            {additionalProjects.map((project) => (
-              <AdditionalProjectRow
-                key={project.id}
-                project={project}
-                onClick={() => onOpenProject(project)}
-              />
-            ))}
-          </div>
-        </section>
+        <div className="mt-10 px-2 sm:px-6">
+          <ProjectShelves groups={browseGroups} onOpen={onOpenProject} />
+        </div>
 
         <footer className="px-2 py-10 text-center sm:px-6" aria-label="Project gallery navigation">
           <div className="flex flex-wrap justify-center gap-4">

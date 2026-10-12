@@ -464,3 +464,12 @@ body {
   outline: 2px solid rgb(var(--crt-text-accent));
   outline-offset: 4px;
 }
+
+/* Shelves scroll sideways by swipe, trackpad or their arrow buttons; the bar itself is noise. */
+.project-shelf {
+  scrollbar-width: none;
+}
+
+.project-shelf::-webkit-scrollbar {
+  display: none;
+}
