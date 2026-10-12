@@ -9,9 +9,10 @@ import { mergeGeometries } from "three/examples/jsm/utils/BufferGeometryUtils.js
 import { disposeObjectTree } from "../disposeObjectTree";
 import { createGarageTrees } from "./createGarageTrees";
 
-// Houses across the street: x, front z, scale (negative mirrors), siding colour.
+// Houses across the street: x, front z, scale (negative mirrors), siding colour. Set back and
+// off-centre so their lit windows sit beside the TVs in the overview rather than behind them.
 const STREET_HOUSES: Array<[number, number, number, string | null]> = [
-  [4, -25.4, 0.9, null], [-16, -28, -0.9, "#c9b48f"],
+  [5.5, -29, 0.75, null], [-16.5, -31.5, -0.75, "#c9b48f"],
 ];
 
 /** Colonial houses built by scripts/build-street-house.py; lit windows are emissive. */
@@ -112,10 +113,10 @@ export async function createGarageExterior() {
     for (const x of [-14.4, 14.4]) box([19, 0.18, 0.25], [x, -1.1, -14], curb);
     box([48, 0.16, 0.25], [0, -1.1, -19], curb);
     ground(48, 1.2, 0, -19.7, concrete, -1.12);
-    ground(1.1, 4.5, 4, -22.4, concrete, -1.13);
+    ground(0.95, 8.7, 5.5, -24.65, concrete, -1.13);
     // Concrete drives up to each house's garage wing.
-    ground(3.2, 5.2, -2.6, -22.8, concrete, -1.135);
-    ground(3.2, 8.2, -9.4, -24.4, concrete, -1.135);
+    ground(2.7, 8.7, 0, -24.65, concrete, -1.135);
+    ground(2.7, 11.2, -11, -25.9, concrete, -1.135);
 
     for (const [m, parts] of batches) {
       const merged = mergeGeometries(parts);
