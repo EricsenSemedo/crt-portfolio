@@ -15,8 +15,9 @@ function demoRect() {
   return document.querySelector("[data-carry-target]")?.getBoundingClientRect() ?? null;
 }
 
+// Shelves scroll sideways too, so a card can be off screen to the left or right.
 function inView(rect: DOMRect | null | undefined): rect is DOMRect {
-  return Boolean(rect && rect.bottom > 0 && rect.top < window.innerHeight);
+  return Boolean(rect && rect.bottom > 0 && rect.top < window.innerHeight && rect.right > 0 && rect.left < window.innerWidth);
 }
 
 interface PortfolioProps {
