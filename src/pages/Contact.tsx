@@ -9,7 +9,7 @@ interface ContactProps {
 
 export default function Contact({ onNavigate }: ContactProps) {
   return (
-    <div className="crt-page bg-page-tint h-full w-full overflow-y-auto text-crt-text">
+    <div tabIndex={-1} className="crt-page bg-page-tint h-full w-full overflow-y-auto text-crt-text">
       <div className="crt-content-container flex min-h-full flex-col items-center justify-center gap-12 py-16">
         <section className="text-center">
           <ScrambleHeading className="font-display text-4xl font-bold tracking-wide text-crt-text md:text-5xl">Connect With Me</ScrambleHeading>

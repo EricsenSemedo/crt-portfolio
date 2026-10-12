@@ -54,7 +54,7 @@ export default function Portfolio({ onNavigate, selectedProject, onOpenProject, 
   }
 
   return (
-    <div className="crt-page bg-page-tint w-full h-full overflow-y-auto text-crt-text">
+    <div tabIndex={-1} className="crt-page bg-page-tint w-full h-full overflow-y-auto text-crt-text">
       <div ref={backgroundRef} className="crt-content-container min-h-full">
         {/* Header */}
         <section className="space-y-4 px-2 pt-20 text-center sm:px-6">
@@ -75,6 +75,7 @@ export default function Portfolio({ onNavigate, selectedProject, onOpenProject, 
             <ProjectTV
               key={project.id}
               project={project}
+              channel={featuredProjectIds.indexOf(project.id) + 1}
               onClick={() => onOpenProject(project)}
             />
           ))}
@@ -92,6 +93,7 @@ export default function Portfolio({ onNavigate, selectedProject, onOpenProject, 
             <ProjectTV
               key={project.id}
               project={project}
+              channel={featuredProjectIds.indexOf(project.id) + 1}
               onClick={() => onOpenProject(project)}
             />
           ))}
