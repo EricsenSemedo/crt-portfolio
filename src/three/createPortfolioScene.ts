@@ -328,12 +328,13 @@ export function createPortfolioScene(options: CreatePortfolioSceneOptions = {}):
   let lastFrameTime = performance.now();
   let hovered: PortfolioChannelId | null = null;
   let isOverview = true;
-  // Prototype 2.0: every set channel-surfs while you look around. Projects cycles real project
-  // screens; Profile and Contact cycle captions under their names.
+  // Prototype 2.0: every set previews its channel while you look around. Projects cycles real project
+  // screens; Profile and Contact scroll through their own pages.
   const reelImages = loadReelImages();
+  const pagePreviews = loadPagePreviews();
   let reelLastFrame = 0;
   const reelFor = (id: PortfolioChannelId, time: number) =>
-    isOverview && !motionPreference.matches ? reelFrame(id, reelImages, time) : null;
+    isOverview && !motionPreference.matches ? reelFrame(id, reelImages, pagePreviews, time) : null;
   let focusedChannel: PortfolioChannelId | null = null;
   let animation: {
     startedAt: number;
@@ -1111,19 +1112,34 @@ function createScreenDisplay(label: string, subtitle: string): ScreenDisplay {
 
 interface ReelFrame {
   image?: HTMLImageElement;
-  caption?: string;
+  /** How far down a page preview has scrolled, 0 to 1. */
+  scroll?: number;
   staticAmount: number;
 }
 
 const REEL_SLOT_MS = 2600;
 const REEL_STATIC_MS = 160;
-const CAPTION_SLOT_MS = 3200;
+// A page preview rests at the top, glides to the bottom, rests, then cuts back through static.
+const PAGE_HOLD_TOP_MS = 1400;
+const PAGE_SCROLL_MS = 7000;
+const PAGE_HOLD_BOTTOM_MS = 1400;
+const PAGE_CYCLE_MS = PAGE_HOLD_TOP_MS + PAGE_SCROLL_MS + PAGE_HOLD_BOTTOM_MS;
 
-// Captions stay to facts already on the Profile and Contact pages.
-const REEL_CAPTIONS: Partial<Record<PortfolioChannelId, { offset: number; captions: string[] }>> = {
-  home: { offset: 900, captions: ["SOFTWARE ENGINEER", "GAME DEVELOPER", "URI CS · 2025", "INFRA · PIXELMUX", "DATA ENG · REVATURE"] },
-  contact: { offset: 2100, captions: ["OPEN TO WORK", "SOFTWARE + GAMES", "LINKEDIN ▸ SAY HI", "GITHUB ▸ READ CODE"] },
+// Stills of the real pages, regenerated with scripts/capture-room-previews.mjs. Offsets keep the sets out of step.
+const PAGE_PREVIEWS: Partial<Record<PortfolioChannelId, { src: string; offset: number }>> = {
+  home: { src: "/crt-portfolio/room/profile-preview.jpg", offset: 0 },
+  contact: { src: "/crt-portfolio/room/contact-preview.jpg", offset: 4300 },
 };
+
+function loadPagePreviews() {
+  const previews = new Map<PortfolioChannelId, { image: HTMLImageElement; offset: number }>();
+  for (const [id, preview] of Object.entries(PAGE_PREVIEWS) as [PortfolioChannelId, { src: string; offset: number }][]) {
+    const image = new Image();
+    image.src = preview.src;
+    previews.set(id, { image, offset: preview.offset });
+  }
+  return previews;
+}
 
 function loadReelImages() {
   const featured = ["pullworth", "heros-quest", "toonsync", "physics-grab", "derma", "dont-get-caught", "shadi", "grow-your-plant"];
@@ -1136,13 +1152,22 @@ function loadReelImages() {
   });
 }
 
-function reelFrame(id: PortfolioChannelId, images: HTMLImageElement[], time: number): ReelFrame | null {
-  const captionReel = REEL_CAPTIONS[id];
-  if (captionReel) {
-    const local = time + captionReel.offset;
-    const intoSlot = local % CAPTION_SLOT_MS;
-    const caption = captionReel.captions[Math.floor(local / CAPTION_SLOT_MS) % captionReel.captions.length];
-    return { caption, staticAmount: intoSlot < REEL_STATIC_MS ? 1 - intoSlot / REEL_STATIC_MS : 0 };
+function reelFrame(
+  id: PortfolioChannelId,
+  images: HTMLImageElement[],
+  pages: Map<PortfolioChannelId, { image: HTMLImageElement; offset: number }>,
+  time: number,
+): ReelFrame | null {
+  const page = pages.get(id);
+  if (page) {
+    if (!page.image.complete || page.image.naturalWidth === 0) return null;
+    const intoCycle = (time + page.offset) % PAGE_CYCLE_MS;
+    const scrolled = Math.min(Math.max((intoCycle - PAGE_HOLD_TOP_MS) / PAGE_SCROLL_MS, 0), 1);
+    return {
+      image: page.image,
+      scroll: easeInOutCubic(scrolled),
+      staticAmount: intoCycle < REEL_STATIC_MS ? 1 - intoCycle / REEL_STATIC_MS : 0,
+    };
   }
   if (id !== "portfolio") return null;
   const ready = images.filter((image) => image.complete && image.naturalWidth > 0);
@@ -1166,30 +1191,20 @@ function drawStatic(context: CanvasRenderingContext2D, x: number, y: number, wid
 function drawReel(context: CanvasRenderingContext2D, width: number, height: number, reel: ReelFrame) {
   const { image } = reel;
   if (!image) return;
-  const scale = Math.max(width / image.naturalWidth, height / image.naturalHeight);
-  const drawWidth = image.naturalWidth * scale;
-  const drawHeight = image.naturalHeight * scale;
-  context.drawImage(image, (width - drawWidth) / 2, (height - drawHeight) / 2, drawWidth, drawHeight);
+  if (reel.scroll !== undefined) {
+    // A page fills the width and scrolls like a visitor reading it.
+    const drawHeight = image.naturalHeight * (width / image.naturalWidth);
+    context.drawImage(image, 0, -Math.max(drawHeight - height, 0) * reel.scroll, width, drawHeight);
+  } else {
+    const scale = Math.max(width / image.naturalWidth, height / image.naturalHeight);
+    const drawWidth = image.naturalWidth * scale;
+    const drawHeight = image.naturalHeight * scale;
+    context.drawImage(image, (width - drawWidth) / 2, (height - drawHeight) / 2, drawWidth, drawHeight);
+  }
   // Keep the picture in the set's blue signal so the label stays readable.
   context.fillStyle = "rgba(8, 28, 96, .5)";
   context.fillRect(0, 0, width, height);
   if (reel.staticAmount > 0) drawStatic(context, 0, 0, width, height, reel.staticAmount);
-}
-
-// A teletext-style lower third under the channel name; only the strip breaks up between captions.
-function drawCaption(context: CanvasRenderingContext2D, width: number, height: number, reel: ReelFrame) {
-  if (!reel.caption) return;
-  const top = height * 0.64;
-  const bandHeight = 70;
-  context.shadowBlur = 0;
-  context.fillStyle = "rgba(2, 8, 30, .72)";
-  context.fillRect(0, top, width, bandHeight);
-  context.fillStyle = "#ffd84a";
-  context.fillRect(0, top, 10, bandHeight);
-  context.font = "700 40px monospace";
-  context.textAlign = "center";
-  context.fillText(reel.caption, width / 2, top + 49);
-  if (reel.staticAmount > 0) drawStatic(context, 0, top, width, bandHeight, reel.staticAmount);
 }
 
 function drawScreen(canvas: HTMLCanvasElement, label: string, subtitle: string, time: number, reel: ReelFrame | null = null) {
@@ -1222,7 +1237,6 @@ function drawScreen(canvas: HTMLCanvasElement, label: string, subtitle: string, 
   context.font = "600 25px monospace";
   context.textAlign = "left";
   context.fillText(subtitle, 34, 42);
-  if (reel) drawCaption(context, width, height, reel);
 
   context.shadowBlur = 0;
   context.fillStyle = "rgba(0, 18, 25, .16)";
