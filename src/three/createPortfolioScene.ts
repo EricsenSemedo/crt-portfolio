@@ -42,6 +42,7 @@ import {
   type ScreenTransitionKind,
 } from "./screenTransition";
 import { disposeObjectTree } from "./disposeObjectTree";
+import { drawTvStatic } from "../utils/tvStatic";
 import { SceneLoadingTracker, type SceneLoadingProgress } from "./sceneLoading";
 import { attachTelevisionScreen } from "./televisionScreen";
 import {
@@ -598,10 +599,11 @@ export function createPortfolioScene(options: CreatePortfolioSceneOptions = {}):
     const display = displays.get(id);
     if (!channel || !display || reducedMotion) return Promise.resolve("completed" as const);
     if (screenTransition) screenTransition.resolve("cancelled");
+    // Start from the picture already on the set, so the click never cuts to a bare card first.
     const source = document.createElement("canvas");
     source.width = display.canvas.width;
     source.height = display.canvas.height;
-    drawScreen(source, channel.label, channel.subtitle, 0);
+    source.getContext("2d")?.drawImage(display.canvas, 0, 0);
     const kind = getRandomScreenTransitionKind();
     return new Promise<ScreenTransitionResult>((resolve) => {
       screenTransition = {
@@ -1179,14 +1181,7 @@ function reelFrame(
 }
 
 function drawStatic(context: CanvasRenderingContext2D, x: number, y: number, width: number, height: number, amount: number) {
-  context.fillStyle = `rgba(20, 20, 24, ${amount})`;
-  context.fillRect(x, y, width, height);
-  const specks = (1400 * amount * width * height) / (768 * 432);
-  for (let index = 0; index < specks; index++) {
-    const shade = Math.floor(Math.random() * 255);
-    context.fillStyle = `rgb(${shade}, ${shade}, ${shade})`;
-    context.fillRect(x + Math.random() * width, y + Math.random() * height, 4, 2);
-  }
+  drawTvStatic(context, x, y, width, height, amount, performance.now());
 }
 
 function drawReel(context: CanvasRenderingContext2D, width: number, height: number, reel: ReelFrame) {
@@ -1280,20 +1275,15 @@ function drawScreenTransition(
   }
 
   if (kind === "signal-acquisition") {
-    context.drawImage(source, 0, 0, width, height);
     const noiseOpacity = hold ? 1 : reverse ? 1 - progress : progress;
-    context.globalAlpha = noiseOpacity;
-    context.imageSmoothingEnabled = false;
-    const cell = 8;
-    const phase = Math.floor(progress * 29);
-    for (let y = 0; y < height; y += cell) {
-      for (let x = 0; x < width; x += cell) {
-        const noise = (x * 17 + y * 31 + phase * 47) % 101;
-        const value = noise < 34 ? 24 : noise < 67 ? 112 : 224;
-        context.fillStyle = `rgb(${value} ${value} ${value})`;
-        context.fillRect(x, y, cell, cell);
-      }
+    // The picture loses horizontal hold in slices as the signal goes, then drowns in snow.
+    const slice = 24;
+    for (let y = 0; y < height; y += slice) {
+      const tear = (Math.random() - 0.5) * 70 * noiseOpacity * noiseOpacity;
+      context.drawImage(source, 0, y, width, slice, tear, y, width, slice);
     }
+    drawTvStatic(context, 0, 0, width, height, noiseOpacity, performance.now());
+    context.globalAlpha = noiseOpacity;
     const bandY = ((progress * 2.8) % 1) * height;
     const band = context.createLinearGradient(0, bandY - 42, 0, bandY + 42);
     band.addColorStop(0, "rgba(248,250,250,0)");

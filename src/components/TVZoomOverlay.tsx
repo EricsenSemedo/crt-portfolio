@@ -1,9 +1,11 @@
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { useEffect, useRef, type ReactNode, type RefObject } from "react";
+import { AnimatePresence, motion, useIsPresent, useReducedMotion } from "framer-motion";
+import { useEffect, useRef, useState, type ReactNode, type RefObject } from "react";
 import { PORTFOLIO_CHANNELS, type PortfolioChannelId } from "../data/channels";
 import { useModalAccessibility } from "../hooks/useModalAccessibility";
 import useScrollMotion from "../hooks/useScrollMotion";
+import ChannelFlip from "./ChannelFlip";
 import Navbar from "./Navbar";
+import TVStatic from "./TVStatic";
 
 interface SelectedItem {
   id: PortfolioChannelId;
@@ -17,6 +19,25 @@ interface TVZoomOverlayProps {
   hideHeader?: boolean;
   children?: ReactNode;
   backgroundRef?: RefObject<HTMLElement | null>;
+}
+
+/** The set tunes in through snow as it warms up, and fizzles back into it on the way out. */
+function TuneInSnow() {
+  const isPresent = useIsPresent();
+  const [settled, setSettled] = useState(false);
+  return (
+    <motion.div
+      className="pointer-events-none absolute inset-0 z-50"
+      initial={{ opacity: 0.85 }}
+      animate={{ opacity: 0 }}
+      exit={{ opacity: 0.85, transition: { duration: 0.12, ease: "easeIn" } }}
+      transition={{ delay: 0.1, duration: 0.3, ease: "easeOut" }}
+      onAnimationComplete={() => { if (isPresent) setSettled(true); }}
+      aria-hidden="true"
+    >
+      <TVStatic paused={isPresent && settled} />
+    </motion.div>
+  );
 }
 
 /**
@@ -68,11 +89,6 @@ export default function TVZoomOverlay({
         <motion.div
           ref={dialogRef}
           className="fixed inset-0 z-40 flex items-center justify-center"
-          style={{ backgroundColor: "rgb(var(--crt-bg-overlay) / 0.6)" }}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: reduceMotion ? 0.01 : 0.24, ease: "easeOut" }}
-          exit={{ opacity: 0, transition: { duration: reduceMotion ? 0.01 : 0.32, ease: "easeIn" } }}
           onClick={onClose}
           role="dialog"
           aria-modal="true"
@@ -80,6 +96,16 @@ export default function TVZoomOverlay({
           aria-label={hideHeader ? PORTFOLIO_CHANNELS[selectedItem.id].title : undefined}
           tabIndex={-1}
         >
+          {/* The room dims behind the set; the power line stays at full brightness above it. */}
+          <motion.div
+            className="absolute inset-0"
+            style={{ backgroundColor: "rgb(var(--crt-bg-overlay) / 0.6)" }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: reduceMotion ? 0.01 : 0.24, ease: "easeOut" }}
+            exit={{ opacity: 0, transition: { duration: reduceMotion ? 0.01 : 0.32, ease: "easeIn" } }}
+            aria-hidden="true"
+          />
           {/* Full-screen content container with CRT effects */}
           <motion.div
             className="crt-screen-frame relative h-full w-full overflow-hidden bg-crt-base"
@@ -114,11 +140,48 @@ export default function TVZoomOverlay({
               transition={{ duration: reduceMotion ? 0.01 : 0.2 }}
             >
                 <div className="absolute inset-0">
-                  {!hideHeader && <Navbar title={PORTFOLIO_CHANNELS[selectedItem.id].title} onClose={onClose} />}
-                  <div className="absolute inset-0">{children}</div>
+                  <AnimatePresence initial={false}>
+                    <motion.div
+                      key={selectedItem.id}
+                      className="absolute inset-0"
+                      // The new picture rolls into vertical hold under the snow; transform and opacity only.
+                      initial={reduceMotion ? { opacity: 0 } : { opacity: 0, y: "-4%", scaleY: 1.06 }}
+                      animate={{ opacity: 1, y: "0%", scaleY: 1 }}
+                      exit={reduceMotion
+                        ? { opacity: 0, transition: { duration: 0.01 } }
+                        : { opacity: 0, scaleY: 0.97, transition: { duration: 0.1, ease: "easeIn" } }}
+                      transition={reduceMotion
+                        ? { duration: 0.01 }
+                        : { delay: 0.12, duration: 0.32, ease: [0.16, 1, 0.3, 1] }}
+                    >
+                      {!hideHeader && <Navbar title={PORTFOLIO_CHANNELS[selectedItem.id].title} onClose={onClose} />}
+                      <div className="absolute inset-0">{children}</div>
+                    </motion.div>
+                  </AnimatePresence>
+                  {!reduceMotion && (
+                    <>
+                      <TuneInSnow />
+                      <ChannelFlip
+                        flipKey={selectedItem.id}
+                        number={PORTFOLIO_CHANNELS[selectedItem.id].number}
+                        title={PORTFOLIO_CHANNELS[selectedItem.id].title}
+                      />
+                    </>
+                  )}
                 </div>
               </motion.div>
             </motion.div>
+          {!reduceMotion && (
+            // The bright line the picture opens out of and collapses back into, as on the set in the room.
+            <motion.div
+              className="tv-power-line pointer-events-none absolute inset-x-0 top-1/2 z-50 h-[2px] -translate-y-1/2"
+              initial={{ scaleX: 0.06, opacity: 1 }}
+              animate={{ scaleX: [0.06, 1, 1], opacity: [1, 1, 0] }}
+              transition={{ duration: 0.42, times: [0, 0.3, 0.45], ease: [0.22, 1, 0.36, 1] }}
+              exit={{ scaleX: [1, 1, 0.06], opacity: [0, 1, 0], transition: { duration: 0.32, times: [0, 0.72, 1], ease: [0.55, 0, 1, 0.45] } }}
+              aria-hidden="true"
+            />
+          )}
         </motion.div>
       )}
     </AnimatePresence>

@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { type Project } from "../../types";
 import ProjectContentHeading from "./ProjectContentHeading";
-import StaticNoise from "../StaticNoise";
+import TVStatic from "../TVStatic";
 
 interface DemoChannelProps {
   project: Project;
@@ -153,8 +153,7 @@ export default function DemoChannel({ project }: DemoChannelProps) {
                 className="absolute inset-0 z-10 overflow-hidden bg-black"
                 aria-hidden="true"
               >
-                <StaticNoise intensity={7} />
-                <div className="demo-carousel__static absolute inset-0" />
+                <TVStatic />
               </motion.div>
             )}
           </AnimatePresence>

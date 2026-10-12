@@ -201,25 +201,38 @@ describe("App hash navigation", () => {
     expect(latestStage?.requestedChannel).toBeNull();
   });
 
-  it("ignores a stale focus completion when browser Back changes the target during a transition", async () => {
-    await mount();
-    await selectFromStage("home");
-    completeFocus("home");
-    click("View Projects");
-    expect(window.location.hash).toBe("#/portfolio");
-    expect(overlayChannel()).toBe("overview");
-
-    completeOverlayExit();
-    completeOverview();
+  it("ignores a stale focus completion when the target changes during a transition", async () => {
+    await mount("#/portfolio");
     expect(latestStage?.requestedChannel).toBe("portfolio");
 
-    await traverse("back");
-    expect(window.location.hash).toBe("#/profile");
+    await navigateHistory(() => {
+      window.location.hash = "#/profile";
+    });
     expect(latestStage?.requestedChannel).toBe("home");
     completeFocus("portfolio");
     expect(overlayChannel()).toBe("overview");
 
     completeFocus("home");
     expect(overlayChannel()).toBe("home");
+  });
+
+  it("flips channels inside an open set, and browser Back flips back", async () => {
+    await mount();
+    await selectFromStage("home");
+    completeFocus("home");
+    click("View Projects");
+    expect(window.location.hash).toBe("#/portfolio");
+    expect(overlayChannel()).toBe("portfolio");
+    expect(latestStage?.requestedChannel).toBe("home");
+
+    await traverse("back");
+    expect(window.location.hash).toBe("#/profile");
+    expect(overlayChannel()).toBe("home");
+
+    await navigateHistory(() => click("Close TV"));
+    expect(window.location.hash).toBe("#/");
+    expect(overlayChannel()).toBe("overview");
+    completeOverlayExit();
+    expect(latestStage?.requestedChannel).toBeNull();
   });
 });
