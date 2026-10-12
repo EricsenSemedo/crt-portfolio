@@ -7,13 +7,14 @@ interface ChannelFlipProps {
   flipKey: string;
   number: string;
   title: string;
+  osdClassName?: string;
 }
 
 /**
  * ChannelFlip - The set losing and regaining the picture when the channel changes:
  * a burst of snow, a vertical-hold roll, and the channel number on screen for a moment.
  */
-export default function ChannelFlip({ flipKey, number, title }: ChannelFlipProps) {
+export default function ChannelFlip({ flipKey, number, title, osdClassName = "right-6 top-20 md:right-10" }: ChannelFlipProps) {
   const [flip, setFlip] = useState({ key: flipKey, count: 0 });
   const [settledFlip, setSettledFlip] = useState(0);
   if (flip.key !== flipKey) setFlip({ key: flipKey, count: flip.count + 1 });
@@ -33,7 +34,7 @@ export default function ChannelFlip({ flipKey, number, title }: ChannelFlipProps
           </motion.div>
           <div className="channel-flip__roll absolute inset-x-0" />
           <motion.p
-            className="channel-osd absolute right-6 top-20 font-mono text-3xl font-bold md:right-10 md:text-4xl"
+            className={"channel-osd absolute font-mono text-3xl font-bold md:text-4xl " + osdClassName}
             initial={{ opacity: 1 }}
             animate={{ opacity: 0 }}
             transition={{ delay: 1.1, duration: 0.25 }}

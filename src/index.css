@@ -500,7 +500,8 @@ body {
   transition:
     --crt-enter-opacity .6s cubic-bezier(.16, 1, .3, 1) var(--crt-enter-delay, 0ms),
     translate .75s cubic-bezier(.16, 1, .3, 1) var(--crt-enter-delay, 0ms),
-    clip-path .8s cubic-bezier(.16, 1, .3, 1) var(--crt-enter-delay, 0ms);
+    clip-path .8s cubic-bezier(.16, 1, .3, 1) var(--crt-enter-delay, 0ms),
+    scale 1s cubic-bezier(.65, 0, .35, 1) var(--crt-enter-delay, 0ms);
 }
 
 /* Copy and cards: a quiet fade up. */
@@ -548,6 +549,21 @@ body {
 .crt-enter-ready [data-enter].is-entered-instant::after {
   transition: none;
   animation: none;
+}
+
+/* Dividers: drawn outward from the centre like a horizontal sync line. */
+.crt-rule {
+  position: absolute;
+  inset-inline: 0;
+  top: 0;
+  height: 1px;
+  background: rgb(var(--crt-border-subtle));
+}
+.crt-enter-ready .crt-rule:not(.is-entered) { scale: 0 1; }
+
+/* The whole demo fits on the first screen of a project, header included. */
+.project-channel__media {
+  max-width: min(100%, max(22rem, calc((100svh - 17rem) * 16 / 9)));
 }
 
 /* Pictures drift slightly inside their screens as the page scrolls. */
