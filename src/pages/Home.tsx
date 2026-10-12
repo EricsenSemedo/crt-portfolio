@@ -58,7 +58,7 @@ export default function Home({ onNavigate }: HomeProps) {
               Ericsen Semedo
             </ScrambleHeading>
             <h2 className="text-xl md:text-2xl text-crt-accent-text font-light tracking-wide">
-              Computer Science Graduate | Software Developer
+              Computer Science Graduate | Software &amp; Game Developer
             </h2>
           </div>
         </section>
