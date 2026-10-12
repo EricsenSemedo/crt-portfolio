@@ -227,6 +227,7 @@ export const projects: Project[] = [
       src: "/crt-portfolio/projects/edgewood-demo-v2.webm",
       alt: "Edgewood Remodeling website homepage and approach section",
     },
+    sources: [{ label: "Visit site", href: "https://edgewood-preview-940siwnb.ericsen-semedo.workers.dev/" }],
     detailedDescription: {
       contribution: "Redesigned and implemented the responsive site, reusable service and project layouts, optimized media pipeline, navigation, and inquiry paths.",
       problem: "The client's existing website needed a current, professional replacement that represented the business clearly and helped Rhode Island homeowners evaluate its services and work.",
@@ -253,15 +254,20 @@ export const projects: Project[] = [
       src: "/crt-portfolio/projects/btb-tour.mp4",
       alt: "Tour of the BTB Creative Vision site",
     },
+    media: [
+      { type: "video", src: "/crt-portfolio/projects/btb-tour.mp4", alt: "Tour of the BTB Creative Vision site" },
+      { type: "video", src: "/crt-portfolio/projects/btb-logo.webm", alt: "Dragging the 3D BTB logo to spin it in the About section" },
+    ],
+    sources: [{ label: "Visit site", href: "https://btb-creative-vision-preview.ericsen-semedo.workers.dev/?key=h_as_yC_TroF4XhnitebCBxZ" }],
     detailedDescription: {
-      contribution: "Redesigned and rebuilt the client's existing site, keeping his colour scheme and copy while adding interactive motion, a draggable hero filmstrip and a 3D logo.",
+      contribution: "Redesigned and rebuilt the client's existing site, keeping his colour scheme and copy while adding interactive motion, a draggable hero filmstrip and a 3D logo visitors can spin.",
       problem: "His work lives in video, but the old site presented it as static pages, so visitors read about the films instead of seeing them move.",
       solution: "Made the videography the interactive focal point: a hero filmstrip you can drag and fling, clips that play as you reach them, and animations modelled on the edits he uses in his own films, carried through every page.",
       impact: "A client-review preview that presents his reels the way he cuts them, ready for his approval before a public launch.",
       highlights: [
         "Hero filmstrip with drag, momentum and keyboard nudges",
         "Animations that echo the client's own editing style",
-        "Three.js chrome logo rebuilt from his artwork in Blender",
+        "Interactive Three.js chrome logo, rebuilt in Blender from his artwork, that turns with a drag or the arrow keys",
         "Reduced-motion fallbacks throughout",
       ],
     },
