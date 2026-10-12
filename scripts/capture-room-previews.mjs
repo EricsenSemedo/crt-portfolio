@@ -3,11 +3,12 @@
 //   PLAYWRIGHT_CORE=/path/to/node_modules/playwright-core CHROMIUM=/usr/bin/chromium \
 //     node scripts/capture-room-previews.mjs http://localhost:4173/crt-portfolio/
 import { createRequire } from "node:module";
+import { fileURLToPath } from "node:url";
 
 const require = createRequire(import.meta.url);
 const { chromium } = require(process.env.PLAYWRIGHT_CORE ?? "playwright-core");
 const base = process.argv[2] ?? "http://localhost:4173/crt-portfolio/";
-const out = new URL("../public/room/", import.meta.url).pathname;
+const out = fileURLToPath(new URL("../public/room/", import.meta.url));
 // 960 wide keeps the desktop layout and shrinks cleanly onto the 768-wide screen texture.
 const WIDTH = 960;
 
