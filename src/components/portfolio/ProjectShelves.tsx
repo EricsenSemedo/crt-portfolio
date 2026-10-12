@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useRef, useState, type Dispatch, type SetStateAction } from "react";
 import { browseMedia, channelNumber, type BrowseGroup } from "../../data/browse";
 import { usePosterColor } from "../../hooks/usePosterColor";
 import { useSpotlight, useTouchOnly } from "../../hooks/useSpotlight";
@@ -60,7 +60,7 @@ function ShelfCard({ project, active, onActive, onOpen, spotlightRef }: {
 function Shelf({ group, activeId, setActiveId, onOpen, register }: {
   group: BrowseGroup;
   activeId: string | null;
-  setActiveId: (id: string | null) => void;
+  setActiveId: Dispatch<SetStateAction<string | null>>;
   onOpen: (project: Project) => void;
   register: (id: string) => (element: Element | null) => void;
 }) {
@@ -102,7 +102,9 @@ function Shelf({ group, activeId, setActiveId, onOpen, register }: {
             key={project.id}
             project={project}
             active={activeId === project.id}
-            onActive={(active) => setActiveId(active ? project.id : null)}
+            // A card only clears the highlight it still holds, so passing the pointer over one card
+            // never dims another that has keyboard focus.
+            onActive={(active) => setActiveId((current) => (active ? project.id : current === project.id ? null : current))}
             onOpen={onOpen}
             spotlightRef={register(project.id)}
           />
