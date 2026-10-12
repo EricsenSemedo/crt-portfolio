@@ -577,3 +577,7 @@ body {
   [data-enter],
   [data-enter]::after { animation: none !important; transition: none !important; }
 }
+
+.screen-carry__lines {
+  background: repeating-linear-gradient(180deg, rgb(0 0 0 / .22) 0 1px, transparent 1px 3px);
+}

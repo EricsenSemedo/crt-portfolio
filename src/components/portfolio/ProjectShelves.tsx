@@ -7,14 +7,15 @@ import ShelfScreen from "./ShelfScreen";
 
 interface ProjectShelvesProps {
   groups: BrowseGroup[];
-  onOpen: (project: Project) => void;
+  /** Gets the card's screen too, so the picture can be carried into the project page. */
+  onOpen: (project: Project, screen: Element | null) => void;
 }
 
 function ShelfCard({ project, active, onActive, onOpen, spotlightRef }: {
   project: Project;
   active: boolean;
   onActive: (active: boolean) => void;
-  onOpen: (project: Project) => void;
+  onOpen: ProjectShelvesProps["onOpen"];
   spotlightRef: (element: Element | null) => void;
 }) {
   const glow = usePosterColor(browseMedia(project)?.poster);
@@ -23,7 +24,7 @@ function ShelfCard({ project, active, onActive, onOpen, spotlightRef }: {
     <li ref={spotlightRef} data-enter="media" className="w-[78%] shrink-0 snap-start sm:w-[44%] lg:w-[31%]">
       <button
         type="button"
-        onClick={() => onOpen(project)}
+        onClick={(event) => onOpen(project, event.currentTarget.querySelector("[data-crt-screen]"))}
         onPointerEnter={() => onActive(true)}
         onPointerLeave={() => onActive(false)}
         onFocus={() => onActive(true)}
@@ -61,7 +62,7 @@ function Shelf({ group, activeId, setActiveId, onOpen, register }: {
   group: BrowseGroup;
   activeId: string | null;
   setActiveId: Dispatch<SetStateAction<string | null>>;
-  onOpen: (project: Project) => void;
+  onOpen: ProjectShelvesProps["onOpen"];
   register: (id: string) => (element: Element | null) => void;
 }) {
   const trackRef = useRef<HTMLUListElement>(null);

@@ -34,7 +34,7 @@ export default function ShelfScreen({ project, active, className = "", style, ch
   }, [shouldPlay]);
 
   return (
-    <div className={"relative overflow-hidden bg-crt-shell-screen " + className} style={style}>
+    <div data-crt-screen={project.id} className={"relative overflow-hidden bg-crt-shell-screen " + className} style={style}>
       {media ? (
         <>
           <img src={media.poster} alt="" loading="lazy" className="crt-parallax absolute inset-0 h-full w-full object-cover object-top" />
