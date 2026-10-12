@@ -83,7 +83,22 @@ When using a complete source scene, extract only the architecture needed by the 
 
 `createGarageRoom.ts` provides the immediate fallback garage shell and shelf. `loadGarageStructure.ts` replaces it asynchronously with a project-authored modern residential garage. The finished walls use Poly Haven Painted Plaster Wall maps. The flat ceiling, sealed floor, cabinets, sectional door, curved tracks, hinges and opener are modeled offline, fitted to `GARAGE_BOUNDS`, and merged by material. Color/roughness maps are 1K and the normal map is 512px. The former distressed Shed asset is no longer shipped. The walnut media console loads separately with the same decoder. It is built offline to `TABLE_LAYOUT`, so it needs no runtime fitting; the procedural console remains its download fallback, and one collider box covers it because its legs are shorter than the basketball. `createGarageExterior.ts` asynchronously adds an asphalt driveway and road, open lawn, and a ranch house. Material maps are 512px JPEG; static architectural boxes are merged by material. Sources and licenses are recorded alongside the assets.
 
-The lawn has a green material tint to retain its color under sunset lighting. `createGarageTrees.ts` adds a staggered tree line and smaller understory behind the house, plus three nearer trees. All 35 trees share one simplified, Meshopt-compressed [Poly Haven Jacaranda](https://polyhaven.com/a/jacaranda_tree) model (19,508 triangles) in three instanced draws, without extra shadow passes. Placement preserves the source transforms and seats each base slightly below the lawn. Geometry, materials, textures, and instance buffers are released with the exterior.
+The lawn has a green material tint to retain its color under sunset lighting. `createGarageTrees.ts` plants a staggered tree line, a smaller understory and four yard trees. Each is a cutout quad from one 1024px WebP atlas rendered from full-detail Poly Haven trees and shrubs (jacaranda, tree_small_02, island_tree_01, searsia_lucida): alpha-tested with alpha-to-coverage, one instanced draw per variant, no shadow pass. At this distance a cutout keeps the real lacy canopy that a decimated mesh loses; a faint emissive trace of the leaves' colour keeps the backlit trees from reading as black. Mirrored trees are turned around rather than negatively scaled, so every quad keeps its lit side toward the street.
+
+### Rebuilding the street trees
+
+Download each tree's 1K glTF from Poly Haven into its own directory, then render and pack the cutouts:
+
+```bash
+blender --background --factory-startup --disable-autoexec \
+  --python scripts/render-tree-impostors.py -- --gltf /path/to/island_tree_01_1k.gltf --output-dir /tmp/impostors
+# repeat for jacaranda_tree and tree_small_02; searsia_lucida with --size 512
+python3 scripts/pack-tree-atlas.py --output public/models/garage-sunset/street-trees.webp \
+  /tmp/impostors/jacaranda_tree.png:508 /tmp/impostors/tree_small_02.png:508 \
+  /tmp/impostors/island_tree_01.png:508 /tmp/impostors/searsia_lucida_a.png:254 /tmp/impostors/searsia_lucida_c.png:254
+```
+
+Copy the printed rectangles into `TREE_ATLAS`.
 
 The sky follows [Three.js's equirectangular background setup](https://threejs.org/manual/en/backgrounds.html). Industrial Sunset 02 (Pure Sky) supplies a 4K WebP background at infinity and a matching HDR for reflections, box-filtered from 1K to 256 x 128 by `scripts/resize-hdr.py` (at 0.12 environment intensity the smaller map lights the room the same and saves about 1 MB). Both use the same rotation; the directional light follows the source sun's measured direction. This avoids a landscape horizon on a nearby sphere. The global CRT filter covers both the garage and expanded content; the TVs also retain their own screen effects.
 

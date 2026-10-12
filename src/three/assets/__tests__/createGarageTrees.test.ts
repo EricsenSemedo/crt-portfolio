@@ -1,39 +1,35 @@
 import { afterEach, expect, it, vi } from "vitest";
-import { Box3, BoxGeometry, Group, InstancedMesh, Matrix4, Mesh, MeshStandardMaterial, Texture, Vector3 } from "three";
-import { GLTFLoader, type GLTF } from "three/examples/jsm/loaders/GLTFLoader.js";
+import { Box3, InstancedMesh, Matrix4, Texture, TextureLoader, Vector3 } from "three";
 import { createGarageTrees } from "../createGarageTrees";
 
 afterEach(() => vi.restoreAllMocks());
 
-it("grounds every rotated instance and releases shared model resources once", async () => {
-  const texture = new Texture();
-  const material = new MeshStandardMaterial({ map: texture, normalMap: texture });
-  const geometry = new BoxGeometry(2, 6, 2).translate(5, 1, -3);
-  const source = new Group();
-  source.position.set(2, 3, -1);
-  source.scale.setScalar(0.4);
-  source.add(new Mesh(geometry, material), new Mesh(geometry, material));
-  vi.spyOn(GLTFLoader.prototype, "loadAsync").mockResolvedValue({ scene: source } as GLTF);
-  const resourceDisposals = [texture, material, geometry].map(resource => vi.spyOn(resource, "dispose"));
-  const trees = await createGarageTrees("test.glb", -1.19);
+it("grounds every cutout at its height, faces the street and releases the atlas once", async () => {
+  const texture = new Texture<HTMLImageElement>();
+  vi.spyOn(TextureLoader.prototype, "loadAsync").mockResolvedValue(texture);
+  const trees = await createGarageTrees("test.webp", -1.19, [
+    [-7, -22, 7, "broad"], [11, -29, -9, "broad"], [2, -24, 1.2, "shrub"],
+  ]);
   const batches = trees.group.children as InstancedMesh[];
-  const instanceDisposals = batches.map(batch => vi.spyOn(batch, "dispose"));
+  expect(batches.map(batch => [batch.name, batch.count])).toEqual([["GarageTrees-broad", 2], ["GarageTrees-shrub", 1]]);
+  const [broad] = batches;
+  broad.geometry.computeBoundingBox();
   const matrix = new Matrix4();
-  geometry.computeBoundingBox();
-  for (const batch of batches) {
-    expect(batch.geometry).toBe(geometry);
-    for (let index = 0; index < batch.count; index++) {
-      batch.getMatrixAt(index, matrix);
-      const bounds = new Box3().copy(geometry.boundingBox!).applyMatrix4(matrix);
-      expect(bounds.min.y).toBeCloseTo(-1.23, 5);
-      if (index === 0) {
-        const center = bounds.getCenter(new Vector3());
-        expect(center.x).toBeCloseTo(-7);
-        expect(center.z).toBeCloseTo(-22);
-        expect(bounds.max.y - bounds.min.y).toBeCloseTo(7);
-      }
-    }
+  for (const [index, x, z, height] of [[0, -7, -22, 7], [1, 11, -29, 9]]) {
+    broad.getMatrixAt(index, matrix);
+    const bounds = new Box3().copy(broad.geometry.boundingBox!).applyMatrix4(matrix);
+    expect(bounds.min.y).toBeCloseTo(-1.23, 5);
+    expect(bounds.max.y - bounds.min.y).toBeCloseTo(height);
+    const center = bounds.getCenter(new Vector3());
+    expect(center.x).toBeCloseTo(x);
+    expect(center.z).toBeCloseTo(z);
+    // Mirrored trees turn around instead of flipping scale, so lighting stays consistent.
+    expect(matrix.determinant()).toBeGreaterThan(0);
   }
+
+  const material = broad.material as unknown as { dispose: () => void };
+  const disposals = [texture, material, ...batches.map(batch => batch.geometry), ...batches]
+    .map(resource => vi.spyOn(resource, "dispose"));
   trees.dispose();
-  for (const dispose of [...resourceDisposals, ...instanceDisposals]) expect(dispose).toHaveBeenCalledTimes(1);
+  for (const dispose of disposals) expect(dispose).toHaveBeenCalledTimes(1);
 });

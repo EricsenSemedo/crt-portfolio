@@ -118,7 +118,7 @@ export async function createGarageExterior() {
       parts.forEach(g => g.dispose());
       mesh(merged, m).castShadow = true;
     }
-    trees = await createGarageTrees(root + "jacaranda.glb", -1.19);
+    trees = await createGarageTrees(root + "street-trees.webp", -1.19);
     group.add(trees.group);
     return { group, dispose };
   } catch {
