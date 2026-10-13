@@ -24,6 +24,8 @@ for (const [file, width, height] of STILLS) {
   await page.goto(`${base}?room-still#/`);
   await page.locator(".crt-loading-screen").waitFor({ state: "detached", timeout: 60_000 });
   await page.waitForTimeout(2500);
+  // Without WebGL the stage shows its plain fallback; never save that as the room.
+  if (await page.locator(".three-stage.is-unavailable").count()) throw new Error("WebGL fallback is showing; room stills not updated");
   await page.addStyleTag({ content: ".global-crt-overlay { display: none !important; }" });
   await page.waitForTimeout(500);
   await page.screenshot({ path: out + file, type: "jpeg", quality: 72 });
