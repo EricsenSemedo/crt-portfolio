@@ -41,7 +41,7 @@ export default function ThreeCRTStage({
   const selectChannelRef = useRef<(id: PortfolioChannelId) => void>(() => {});
   const focusRequestRef = useRef(0);
   const focusedRef = useRef<PortfolioChannelId | null>(null);
-  const pointerGestureRef = useRef<{ id: number; x: number; y: number; moved: boolean } | null>(null);
+  const pointerGestureRef = useRef<{ id: number; x: number; y: number; lastX: number; lastY: number; moved: boolean } | null>(null);
   const suppressClickRef = useRef(false);
   const pausedRef = useRef(paused);
   const syncLoopRef = useRef<(() => void) | null>(null);
@@ -252,14 +252,23 @@ export default function ThreeCRTStage({
 
   function handlePointerMove(event: React.PointerEvent<HTMLDivElement>) {
     const gesture = pointerGestureRef.current;
-    if (gesture?.id === event.pointerId && Math.hypot(event.clientX - gesture.x, event.clientY - gesture.y) > 10) {
-      gesture.moved = true;
+    if (gesture?.id === event.pointerId) {
+      if (Math.hypot(event.clientX - gesture.x, event.clientY - gesture.y) > 10) gesture.moved = true;
+      // Touch looks around by dragging. So does the mouse for reduced motion, where it no longer leads.
+      const drags = event.pointerType !== "mouse" || window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      if (gesture.moved && drags && !selectingRef.current) {
+        sceneRef.current?.lookBy(event.clientX - gesture.lastX, event.clientY - gesture.lastY);
+      }
+      gesture.lastX = event.clientX;
+      gesture.lastY = event.clientY;
     }
-    const bounds = event.currentTarget.getBoundingClientRect();
-    sceneRef.current?.setParallax(
-      ((event.clientX - bounds.left) / bounds.width) * 2 - 1,
-      1 - ((event.clientY - bounds.top) / bounds.height) * 2,
-    );
+    if (event.pointerType === "mouse" && !selectingRef.current) {
+      const bounds = event.currentTarget.getBoundingClientRect();
+      sceneRef.current?.lookToward(
+        ((event.clientX - bounds.left) / bounds.width) * 2 - 1,
+        1 - ((event.clientY - bounds.top) / bounds.height) * 2,
+      );
+    }
     if (!window.matchMedia("(hover: hover) and (pointer: fine)").matches) return;
     if (selectingRef.current) return;
     const next = sceneRef.current?.pick(event.clientX, event.clientY) ?? null;
@@ -275,7 +284,9 @@ export default function ThreeCRTStage({
         ref={mountRef}
         className={"three-stage__canvas " + (hovered ? "is-hovering" : "")}
         onPointerDown={(event) => {
-          pointerGestureRef.current = { id: event.pointerId, x: event.clientX, y: event.clientY, moved: false };
+          pointerGestureRef.current = {
+            id: event.pointerId, x: event.clientX, y: event.clientY, lastX: event.clientX, lastY: event.clientY, moved: false,
+          };
         }}
         onPointerMove={handlePointerMove}
         onPointerUp={(event) => {
@@ -287,8 +298,9 @@ export default function ThreeCRTStage({
         onPointerCancel={() => {
           pointerGestureRef.current = null;
         }}
-        onPointerLeave={() => {
-          sceneRef.current?.setParallax(0, 0);
+        onPointerLeave={(event) => {
+          // A finger lifting leaves the view where it was turned; a mouse leaving lets it settle back.
+          if (event.pointerType === "mouse") sceneRef.current?.lookToward(0, 0);
           setHovered(null);
           sceneRef.current?.setHovered(null);
         }}

@@ -19,7 +19,7 @@ beforeEach(() => {
   controller = {
     ready: Promise.resolve(),
     canvas: document.createElement("canvas"), resize: vi.fn(), render: vi.fn(),
-    pick: vi.fn(), activateAt: vi.fn(), setParallax: vi.fn(), setHovered: vi.fn(),
+    pick: vi.fn(), activateAt: vi.fn(), lookToward: vi.fn(), lookBy: vi.fn(), setHovered: vi.fn(),
     focus: vi.fn().mockResolvedValue(undefined), reset: vi.fn().mockResolvedValue(undefined),
     transitionScreen: vi.fn().mockResolvedValue("completed"), setScreenEffectActive: vi.fn(), dispose: vi.fn(),
   };
@@ -178,4 +178,38 @@ it("does not replay the zoom when the App re-renders between a click and its req
   expect(controller.focus).toHaveBeenCalledOnce();
   expect(controller.transitionScreen).toHaveBeenCalledOnce();
   expect(complete).toHaveBeenCalledWith("home");
+});
+
+function pointer(type: string, pointerType: string, x: number, y: number) {
+  const event = new MouseEvent(type, { bubbles: true, clientX: x, clientY: y });
+  Object.assign(event, { pointerId: 1, pointerType });
+  return event;
+}
+
+it("turns the view toward the mouse and settles it when the mouse leaves", async () => {
+  await act(async () => root.render(<ThreeCRTStage onSelect={vi.fn()} />));
+  const canvas = host.querySelector(".three-stage__canvas")!;
+  vi.spyOn(canvas, "getBoundingClientRect").mockReturnValue({ left: 0, top: 0, width: 200, height: 100 } as DOMRect);
+  act(() => canvas.dispatchEvent(pointer("pointermove", "mouse", 200, 0)));
+  expect(controller.lookToward).toHaveBeenLastCalledWith(1, 1);
+  act(() => canvas.dispatchEvent(pointer("pointerout", "mouse", 300, 0)));
+  expect(controller.lookToward).toHaveBeenLastCalledWith(0, 0);
+  expect(controller.lookBy).not.toHaveBeenCalled();
+});
+
+it("turns the view with a touch drag without opening the TV under the finger", async () => {
+  vi.mocked(controller.activateAt).mockReturnValue("home");
+  await act(async () => root.render(<ThreeCRTStage onSelect={vi.fn()} />));
+  const canvas = host.querySelector(".three-stage__canvas")!;
+  act(() => {
+    canvas.dispatchEvent(pointer("pointerdown", "touch", 100, 100));
+    canvas.dispatchEvent(pointer("pointermove", "touch", 104, 100));
+    canvas.dispatchEvent(pointer("pointermove", "touch", 140, 90));
+    canvas.dispatchEvent(pointer("pointerup", "touch", 140, 90));
+    canvas.dispatchEvent(new MouseEvent("click", { bubbles: true, clientX: 140, clientY: 90 }));
+  });
+  expect(controller.lookBy).toHaveBeenCalledOnce();
+  expect(controller.lookBy).toHaveBeenCalledWith(36, -10);
+  expect(controller.lookToward).not.toHaveBeenCalled();
+  expect(controller.focus).not.toHaveBeenCalled();
 });
