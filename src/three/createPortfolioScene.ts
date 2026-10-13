@@ -121,7 +121,10 @@ export interface PortfolioSceneController {
   render: (time: number) => void;
   pick: (clientX: number, clientY: number) => PortfolioChannelId | "basketball" | null;
   activateAt: (clientX: number, clientY: number) => PortfolioChannelId | "basketball" | null;
-  setParallax: (x: number, y: number) => void;
+  /** Turns the view toward a point on screen, each axis from -1 to 1 (mouse look). */
+  lookToward: (x: number, y: number) => void;
+  /** Turns the view by a drag of this many pixels, so the room follows the finger. */
+  lookBy: (dx: number, dy: number) => void;
   setHovered: (id: PortfolioChannelId | null) => void;
   focus: (id: PortfolioChannelId, reducedMotion?: boolean, quick?: boolean) => Promise<void>;
   transitionScreen: (id: PortfolioChannelId, reducedMotion?: boolean) => Promise<ScreenTransitionResult>;
@@ -137,14 +140,16 @@ export interface CreatePortfolioSceneOptions {
 const OVERVIEW_POSITION = new Vector3(0, 1.82, 7.55);
 const OVERVIEW_TARGET = new Vector3(0, 0.05, -0.4);
 // Each screen lights the room around it; hovering turns the set up.
-// Left alone, the viewer glances around the way a person would: mostly small looks across the
-// sets, now and then a wider one toward a wall. Radians; yaw narrows on tall screens.
-const GLANCE_IDLE_MS = 2200;
-const GLANCE_YAW = 0.03;
-const GLANCE_YAW_WIDE = 0.06;
-const GLANCE_PITCH = 0.014;
-// A critically damped spring, so each head turn eases in and settles instead of snapping.
-const GLANCE_STIFFNESS = 5;
+// The viewer looks around the room: the mouse turns the head toward it on desktop, and a drag
+// turns it on touch. Radians either side of the overview. Tall screens see a narrow slice, so
+// they may turn further, far enough to bring the poster on the side wall to the middle.
+const LOOK_YAW = 0.2;
+const LOOK_YAW_TALL = 0.44;
+const LOOK_PITCH = 0.08;
+const LOOK_PITCH_TALL = 0.12;
+// How quickly the view catches up: a slow, easy head turn after the mouse; close behind a finger.
+const LOOK_EASE_POINTER = 4;
+const LOOK_EASE_DRAG = 16;
 const SCREEN_GLOW = 5;
 const SCREEN_GLOW_HOVERED = 9;
 
@@ -187,7 +192,7 @@ export function createPortfolioScene(options: CreatePortfolioSceneOptions = {}):
   const room = createGarageRoom();
   const table = createTable();
   table.group.position.set(0, TABLE_LAYOUT.topY, TABLE_LAYOUT.centerZ);
-  // Pinned to the right-hand wall, in view of the overview and of a glance that way.
+  // Pinned to the right-hand wall, in view of the overview and of a look that way.
   const wantedPoster = createWantedPoster();
   wantedPoster.group.position.set(4.66, 1.78, 0.35);
   wantedPoster.group.rotation.set(0, -Math.PI / 2, 0.03);
@@ -342,11 +347,9 @@ export function createPortfolioScene(options: CreatePortfolioSceneOptions = {}):
   ];
   const raycaster = new Raycaster();
   const pointer = new Vector2();
-  const parallaxTarget = new Vector2();
-  const parallaxCurrent = new Vector2();
   const lookTarget = OVERVIEW_TARGET.clone();
-  const glance = { current: new Vector2(), velocity: new Vector2(), target: new Vector2(), nextAt: 0 };
-  let lastPointerAt = -Infinity;
+  // Yaw and pitch in radians; positive turns right and up.
+  const look = { current: new Vector2(), target: new Vector2(), ease: LOOK_EASE_POINTER };
   let lastFrameTime = performance.now();
   let hovered: PortfolioChannelId | null = null;
   let isOverview = true;
@@ -444,18 +447,17 @@ export function createPortfolioScene(options: CreatePortfolioSceneOptions = {}):
         resolve();
       }
     } else if (isOverview) {
-      parallaxCurrent.lerp(parallaxTarget, 0.065);
+      look.current.lerp(look.target, motionPreference.matches ? 1 : 1 - Math.exp(-look.ease * delta));
+      const limits = lookLimits();
+      // The head leans a little with the turn, so near and far things part like real depth.
       camera.position.copy(overviewPosition);
-      camera.position.x += parallaxCurrent.x * 0.2;
-      camera.position.y += parallaxCurrent.y * 0.12;
+      camera.position.x += (look.current.x / limits.yaw) * 0.16;
+      camera.position.y += (look.current.y / limits.pitch) * 0.08;
+      // Applied to the look target, so a click that starts a zoom carries on from where you look.
       lookTarget.set(...sceneLayout.target);
-      lookTarget.x += parallaxCurrent.x * 0.28;
-      lookTarget.y += parallaxCurrent.y * 0.18;
-      // Applied to the look target, so a click that starts a zoom carries on from the glance.
-      updateGlance(time, delta);
       const distance = camera.position.distanceTo(lookTarget);
-      lookTarget.x += Math.tan(glance.current.x) * distance;
-      lookTarget.y += Math.tan(glance.current.y) * distance;
+      lookTarget.x += Math.tan(look.current.x) * distance;
+      lookTarget.y += Math.tan(look.current.y) * distance;
       camera.lookAt(lookTarget);
     }
 
@@ -522,29 +524,8 @@ export function createPortfolioScene(options: CreatePortfolioSceneOptions = {}):
     renderer.render(scene, camera);
   }
 
-  function updateGlance(time: number, delta: number) {
-    const idle = !motionPreference.matches && time - lastPointerAt > GLANCE_IDLE_MS;
-    if (motionPreference.matches) {
-      // Reduced motion switched on mid-glance: stop where the room is level, not after a drift.
-      glance.current.set(0, 0);
-      glance.velocity.set(0, 0);
-      glance.target.set(0, 0);
-      return;
-    }
-    if (!idle) {
-      glance.target.set(0, 0);
-    } else if (time >= glance.nextAt) {
-      glance.nextAt = time + 2400 + Math.random() * 3200;
-      const narrow = Math.min(1, camera.aspect / 1.4);
-      const roll = Math.random();
-      if (roll < 0.2) glance.target.set(0, 0);
-      else if (roll < 0.45) glance.target.set(Math.sign(Math.random() - 0.5) * GLANCE_YAW_WIDE * narrow, -GLANCE_PITCH * 0.3);
-      else glance.target.set((Math.random() * 2 - 1) * GLANCE_YAW * narrow, (Math.random() * 2 - 1) * GLANCE_PITCH);
-    }
-    const damping = 2 * Math.sqrt(GLANCE_STIFFNESS);
-    glance.velocity.x += ((glance.target.x - glance.current.x) * GLANCE_STIFFNESS - glance.velocity.x * damping) * delta;
-    glance.velocity.y += ((glance.target.y - glance.current.y) * GLANCE_STIFFNESS - glance.velocity.y * damping) * delta;
-    glance.current.addScaledVector(glance.velocity, delta);
+  function lookLimits() {
+    return sceneLayout.portrait ? { yaw: LOOK_YAW_TALL, pitch: LOOK_PITCH_TALL } : { yaw: LOOK_YAW, pitch: LOOK_PITCH };
   }
 
   function pickHit(clientX: number, clientY: number) {
@@ -584,9 +565,28 @@ export function createPortfolioScene(options: CreatePortfolioSceneOptions = {}):
     raycaster.setFromCamera(pointer, camera);
   }
 
-  function setParallax(x: number, y: number) {
-    lastPointerAt = performance.now();
-    parallaxTarget.set(motionPreference.matches ? 0 : MathUtils.clamp(x, -1, 1), motionPreference.matches ? 0 : MathUtils.clamp(y, -1, 1));
+  function lookToward(x: number, y: number) {
+    // The room holds still for reduced motion until someone drags it themselves. Inside a set,
+    // input waits: the pull back out always starts level.
+    if (motionPreference.matches || !isOverview) return;
+    const limits = lookLimits();
+    // Calm near the middle, where the sets are, and turning more toward the edges.
+    const curve = (value: number) => Math.sign(value) * Math.abs(MathUtils.clamp(value, -1, 1)) ** 1.4;
+    look.target.set(curve(x) * limits.yaw, curve(y) * limits.pitch);
+    look.ease = LOOK_EASE_POINTER;
+  }
+
+  function lookBy(dx: number, dy: number) {
+    if (!isOverview) return;
+    // The view turns as far as the finger moves, so the room stays under it.
+    const height = Math.max(renderer.domElement.clientHeight, 1);
+    const radiansPerPixel = (2 * Math.tan(MathUtils.degToRad(camera.fov) / 2)) / height;
+    const limits = lookLimits();
+    look.target.set(
+      MathUtils.clamp(look.target.x - dx * radiansPerPixel, -limits.yaw, limits.yaw),
+      MathUtils.clamp(look.target.y + dy * radiansPerPixel, -limits.pitch, limits.pitch),
+    );
+    look.ease = LOOK_EASE_DRAG;
   }
 
   function setHovered(next: PortfolioChannelId | null) {
@@ -640,10 +640,9 @@ export function createPortfolioScene(options: CreatePortfolioSceneOptions = {}):
     }
     heldScreenEffect = null;
     focusedChannel = id;
-    // The zoom starts from the glance; coming back out, the room starts level again.
-    glance.current.set(0, 0);
-    glance.velocity.set(0, 0);
-    glance.target.set(0, 0);
+    // The zoom starts from where you look; coming back out, the room starts level again.
+    look.current.set(0, 0);
+    look.target.set(0, 0);
     interactionPrompt.sprite.visible = false;
     isOverview = false;
     return animateTo(destination.position, destination.target, reducedMotion ? 1 : quick ? 380 : 760, 0.18);
@@ -804,7 +803,8 @@ export function createPortfolioScene(options: CreatePortfolioSceneOptions = {}):
     render,
     pick,
     activateAt,
-    setParallax,
+    lookToward,
+    lookBy,
     setHovered,
     focus,
     transitionScreen,
