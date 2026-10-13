@@ -250,6 +250,10 @@ export function createPortfolioScene(options: CreatePortfolioSceneOptions = {}):
 
   const interactionPrompt = createInteractionPrompt();
   scene.add(interactionPrompt.sprite);
+  // scripts/capture-room-stills.mjs photographs the room for the loading screen, where the name
+  // sits instead of the prompt.
+  const showPrompt = !new URLSearchParams(window.location.search).has("room-still");
+  interactionPrompt.sprite.visible = showPrompt;
 
   const importedResources: Array<{ dispose: () => void }> = [];
   const roomColliders = createTableColliders();
@@ -710,7 +714,7 @@ export function createPortfolioScene(options: CreatePortfolioSceneOptions = {}):
     });
     isOverview = true;
     focusedChannel = null;
-    interactionPrompt.sprite.visible = true;
+    interactionPrompt.sprite.visible = showPrompt;
     return animateTo(
       overviewPosition,
       new Vector3(...sceneLayout.target),

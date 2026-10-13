@@ -229,6 +229,21 @@ describe("App hash navigation", () => {
     expect(overlayChannel()).toBe("overview");
   });
 
+  it("opens a channel picked on the loading screen without waiting for the room", async () => {
+    window.history.replaceState(null, "", "#/");
+    act(() => root.render(<App />));
+    await act(async () => {
+      await vi.dynamicImportSettled();
+    });
+    mounted = true;
+    expect(overlayChannel()).toBe("overview");
+
+    await selectFromStage("contact");
+    expect(window.location.hash).toBe("#/contact");
+    expect(overlayChannel()).toBe("contact");
+    expect(latestStage?.requestedChannel).toBe("contact");
+  });
+
   it("ignores a stale focus completion when the target changes during a transition", async () => {
     await mount();
     await selectFromStage("portfolio");

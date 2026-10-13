@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { PORTFOLIO_CHANNEL_LIST, type PortfolioChannelId } from "../data/channels";
 import {
   createPortfolioScene,
@@ -16,6 +16,8 @@ interface ThreeCRTStageProps {
   screenEffectActive?: boolean;
   onRequestedFocusComplete?: (id: PortfolioChannelId) => void;
   onOverviewComplete?: () => void;
+  /** The room is live (or has given way to the plain fallback). */
+  onReady?: () => void;
   paused?: boolean;
 }
 
@@ -27,6 +29,7 @@ export default function ThreeCRTStage({
   screenEffectActive = false,
   onRequestedFocusComplete,
   onOverviewComplete,
+  onReady,
   paused = false,
 }: ThreeCRTStageProps) {
   const mountRef = useRef<HTMLDivElement>(null);
@@ -46,6 +49,12 @@ export default function ThreeCRTStage({
   const [ready, setReady] = useState(false);
   const [loading, setLoading] = useState({ settled: 0, total: 0 });
   const [slowLoading, setSlowLoading] = useState(false);
+  const [loaderFaded, setLoaderFaded] = useState(false);
+  const handleLoaderFaded = useCallback(() => setLoaderFaded(true), []);
+  const onReadyRef = useRef(onReady);
+  useEffect(() => {
+    onReadyRef.current = onReady;
+  }, [onReady]);
   const showFallbackRef = useRef<(() => void) | null>(null);
   const [hovered, setHovered] = useState<PortfolioChannelId | "basketball" | null>(null);
 
@@ -132,6 +141,10 @@ export default function ThreeCRTStage({
       syncLoopRef.current = null;
     };
   }, []);
+
+  useEffect(() => {
+    if (ready) onReadyRef.current?.();
+  }, [ready]);
 
   useEffect(() => {
     pausedRef.current = paused;
@@ -313,7 +326,15 @@ export default function ThreeCRTStage({
         ))}
       </nav>
 
-      {!ready && <CRTLoadingScreen {...loading} onSkip={slowLoading ? () => showFallbackRef.current?.() : undefined} />}
+      {!loaderFaded && (
+        <CRTLoadingScreen
+          {...loading}
+          ready={ready}
+          onFaded={handleLoaderFaded}
+          onOpen={onSelect}
+          onSkip={slowLoading ? () => showFallbackRef.current?.() : undefined}
+        />
+      )}
     </main>
   );
 }
