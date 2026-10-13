@@ -13,6 +13,9 @@
     <meta name="theme-color" content="#080b0d" />
     <link rel="canonical" href="https://ericsensemedo.github.io/crt-portfolio/" />
     <link rel="icon" type="image/svg+xml" href="/crt-portfolio/favicon.svg" />
+    <!-- The room photograph is the first thing on screen; fetch it alongside the app, not after it. -->
+    <link rel="preload" as="image" href="/crt-portfolio/room/overview-wide.jpg" media="(min-aspect-ratio: 720/1000)" fetchpriority="high" />
+    <link rel="preload" as="image" href="/crt-portfolio/room/overview-tall.jpg" media="(max-aspect-ratio: 719/1000)" fetchpriority="high" />
 
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Ericsen Semedo Portfolio" />
@@ -57,7 +60,8 @@
     />
   </head>
   <body>
-    <div id="root"></div>
+    <!-- Shown before the app runs, links included; React replaces it with the same loading screen. -->
+    <div id="root"><div class="crt-loading-screen"><picture class="crt-loading-screen__still"><source media="(max-aspect-ratio: 719/1000)" srcset="/crt-portfolio/room/overview-tall.jpg" /><img src="/crt-portfolio/room/overview-wide.jpg" alt="" fetchpriority="high" /></picture><div class="crt-loading-screen__content"><p class="crt-loading-screen__name">Ericsen Semedo</p><p class="crt-loading-screen__role">Software &amp; game developer</p><nav class="crt-loading-screen__channels" aria-label="Portfolio sections"><a href="#/profile"><span>01</span>Profile</a><a href="#/portfolio"><span>02</span>Projects</a><a href="#/contact"><span>03</span>Contact</a></nav><div class="crt-loading-screen__bar is-starting"><span style="transform: scaleX(.08)"></span></div><p class="crt-loading-screen__count">Tuning in the room</p></div></div></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

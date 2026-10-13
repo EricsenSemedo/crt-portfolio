@@ -37,6 +37,7 @@ function PortfolioApp() {
   const [phase, setPhase] = useState<"overview" | "ready" | "focusing" | "open" | "exiting">(channel ? "open" : "overview");
   const [screenEffectActive, setScreenEffectActive] = useState(false);
   const [stageMounted, setStageMounted] = useState(!channel);
+  const [roomReady, setRoomReady] = useState(false);
   const backgroundRef = useRef<HTMLDivElement>(null);
 
   // Behind an open page the room waits until the page itself has loaded, so its pictures go first.
@@ -67,6 +68,11 @@ function PortfolioApp() {
       // Already inside a set: flip channels on this screen. The camera stays put behind the page,
       // so closing still pulls back to the room.
       setSelectedId(channel);
+    } else if (phase === "overview" && channel && !roomReady) {
+      // A channel picked on the loading screen opens straight away; the room catches up behind it.
+      setSelectedId(channel);
+      setSceneChannel(channel);
+      setPhase("open");
     } else if (phase === "open" && selectedId !== channel) {
       setScreenEffectActive(true);
       setSelectedId(null);
@@ -79,7 +85,7 @@ function PortfolioApp() {
       setSceneChannel(channel);
       if (!channel) setPhase("overview");
     }
-  }, [channel, phase, sceneChannel, selectedId]);
+  }, [channel, phase, roomReady, sceneChannel, selectedId]);
 
   const handleOverviewComplete = useCallback(() => {
     setPhase("ready");
@@ -89,6 +95,7 @@ function PortfolioApp() {
     setSceneChannel(null);
     setPhase("overview");
   }, []);
+  const handleRoomReady = useCallback(() => setRoomReady(true), []);
   const handleOverlayEnterComplete = useCallback(() => setScreenEffectActive(false), []);
   const handleRequestedFocusComplete = useCallback((id: PortfolioChannelId) => {
     if (id !== channel || selectedId === id) return;
@@ -108,7 +115,7 @@ function PortfolioApp() {
       {redirectTo && <Navigate to={redirectTo} replace />}
       <div ref={backgroundRef}>
         {stageMounted ? (
-          <Suspense fallback={<CRTLoadingScreen />}>
+          <Suspense fallback={<CRTLoadingScreen onOpen={navigateToTV} />}>
             <ThreeCRTStage
               onSelect={navigateToTV}
               requestedChannel={sceneChannel}
@@ -118,6 +125,7 @@ function PortfolioApp() {
               paused={Boolean(selectedId) && !screenEffectActive}
               onOverviewComplete={handleOverviewComplete}
               onRequestedFocusComplete={handleRequestedFocusComplete}
+              onReady={handleRoomReady}
             />
           </Suspense>
         ) : <CRTLoadingScreen />}
