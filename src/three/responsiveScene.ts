@@ -1,5 +1,4 @@
 import { MathUtils } from "three";
-import { GARAGE_BOUNDS } from "./assets/garageBounds";
 
 export interface SceneLayout {
   portrait: boolean;
@@ -11,11 +10,6 @@ export interface SceneLayout {
   promptY: number;
   ballStartX: number;
   pixelRatioCap: number;
-}
-
-export interface HorizontalBounds {
-  min: number;
-  max: number;
 }
 
 export function scaleCoordinateAroundPivot(value: number, pivot: number, scale: number) {
@@ -81,16 +75,3 @@ export function getSceneLayout(width: number, height: number): SceneLayout {
   };
 }
 
-export function getBasketballHorizontalBounds(
-  layout: SceneLayout,
-  aspect: number,
-  ballZ: number,
-  radius: number,
-): HorizontalBounds {
-  const depth = Math.max(layout.camera[2] - ballZ, 0.1);
-  const visibleHalfWidth = Math.tan(MathUtils.degToRad(layout.fov / 2)) * depth * aspect;
-  const worldLimit = GARAGE_BOUNDS.halfWidth - radius;
-  const viewportLimit = Math.max(radius, visibleHalfWidth - radius * 1.65 - 0.18);
-  const limit = Math.min(worldLimit, viewportLimit);
-  return { min: -limit, max: limit };
-}

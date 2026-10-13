@@ -1,6 +1,5 @@
 import { describe, expect, it } from "vitest";
 import {
-  getBasketballHorizontalBounds,
   getCameraCoverDistance,
   getCameraFitDistance,
   getSceneLayout,
@@ -15,17 +14,6 @@ describe("responsive scene layout", () => {
     expect(layout.fov).toBeGreaterThan(50);
     expect(layout.channelX[2] - layout.channelX[0]).toBeLessThan(3.5);
     expect(layout.tvScale).toBeLessThan(1);
-  });
-
-  it("keeps the basketball inside the portrait camera frustum", () => {
-    const width = 430;
-    const height = 932;
-    const layout = getSceneLayout(width, height);
-    const bounds = getBasketballHorizontalBounds(layout, width / height, 0.42, 0.41);
-
-    expect(layout.ballStartX).toBeGreaterThan(bounds.min);
-    expect(layout.ballStartX).toBeLessThan(bounds.max);
-    expect(bounds.min).toBeGreaterThan(-2);
   });
 
   it("preserves the wider desktop arrangement", () => {

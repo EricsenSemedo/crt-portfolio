@@ -32,7 +32,7 @@ import { PORTFOLIO_CHANNELS, type PortfolioChannelId } from "../data/channels";
 import projects from "../data/projects";
 import { createGarageExterior } from "./assets/createGarageExterior";
 import { loadGarageStructure } from "./assets/loadGarageStructure";
-import { containBasketball } from "./assets/garageBounds";
+import { containBasketball, createDoorJambColliders } from "./assets/garageBounds";
 import { createGarageRoom } from "./assets/createGarageRoom";
 import { createTelevisionPreview } from "./assets/createTelevisionPreview";
 import { createTable, createTableColliders, TABLE_LAYOUT } from "./assets/createTable";
@@ -47,11 +47,9 @@ import { drawTvStatic } from "../utils/tvStatic";
 import { SceneLoadingTracker, type SceneLoadingProgress } from "./sceneLoading";
 import { attachTelevisionScreen } from "./televisionScreen";
 import {
-  getBasketballHorizontalBounds,
   getCameraCoverDistance,
   getSceneLayout,
   scaleCoordinateAroundPivot,
-  type HorizontalBounds,
   type SceneLayout,
 } from "./responsiveScene";
 
@@ -93,7 +91,6 @@ interface BasketballBody {
   radius: number;
   floorY: number;
   active: boolean;
-  horizontalBounds: HorizontalBounds;
 }
 
 interface ActiveScreenTransition {
@@ -261,7 +258,7 @@ export function createPortfolioScene(options: CreatePortfolioSceneOptions = {}):
   interactionPrompt.sprite.visible = showPrompt;
 
   const importedResources: Array<{ dispose: () => void }> = [];
-  const roomColliders = createTableColliders();
+  const roomColliders = [...createTableColliders(), ...createDoorJambColliders()];
   const basketballColliders = [...roomColliders];
   const basketballHitTargets: Object3D[] = [];
   let basketballBody: BasketballBody | null = null;
@@ -333,7 +330,6 @@ export function createPortfolioScene(options: CreatePortfolioSceneOptions = {}):
         radius: 0.41,
         floorY: -0.68,
         active: false,
-        horizontalBounds: getBasketballHorizontalBounds(sceneLayout, camera.aspect, basketball.group.position.z, 0.41),
       };
       basketball.group.position.x = sceneLayout.ballStartX;
     }
@@ -392,19 +388,6 @@ export function createPortfolioScene(options: CreatePortfolioSceneOptions = {}):
         : "CLICK A TV TO VIEW",
     );
     applyResponsiveLayout(sceneLayout);
-    if (basketballBody) {
-      basketballBody.horizontalBounds = getBasketballHorizontalBounds(
-        sceneLayout,
-        camera.aspect,
-        basketballBody.group.position.z,
-        basketballBody.radius,
-      );
-      basketballBody.group.position.x = MathUtils.clamp(
-        basketballBody.group.position.x,
-        basketballBody.horizontalBounds.min,
-        basketballBody.horizontalBounds.max,
-      );
-    }
     updateCameraFraming();
   }
 
@@ -831,11 +814,6 @@ function updateBasketballPhysics(body: BasketballBody, colliders: Box3[], delta:
     body.velocity.z *= friction;
   }
 
-  const { min: xMin, max: xMax } = body.horizontalBounds;
-  if (body.group.position.x < xMin || body.group.position.x > xMax) {
-    body.group.position.x = MathUtils.clamp(body.group.position.x, xMin, xMax);
-    body.velocity.x *= -0.66;
-  }
   containBasketball(body.group.position, body.velocity, body.radius);
 
   if (body.velocity.lengthSq() < 0.0025 && body.group.position.y === body.floorY) {
