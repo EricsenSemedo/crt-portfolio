@@ -566,8 +566,9 @@ export function createPortfolioScene(options: CreatePortfolioSceneOptions = {}):
   }
 
   function lookToward(x: number, y: number) {
-    // The room holds still for reduced motion until someone drags it themselves.
-    if (motionPreference.matches) return;
+    // The room holds still for reduced motion until someone drags it themselves. Inside a set,
+    // input waits: the pull back out always starts level.
+    if (motionPreference.matches || !isOverview) return;
     const limits = lookLimits();
     // Calm near the middle, where the sets are, and turning more toward the edges.
     const curve = (value: number) => Math.sign(value) * Math.abs(MathUtils.clamp(value, -1, 1)) ** 1.4;
@@ -576,6 +577,7 @@ export function createPortfolioScene(options: CreatePortfolioSceneOptions = {}):
   }
 
   function lookBy(dx: number, dy: number) {
+    if (!isOverview) return;
     // The view turns as far as the finger moves, so the room stays under it.
     const height = Math.max(renderer.domElement.clientHeight, 1);
     const radiansPerPixel = (2 * Math.tan(MathUtils.degToRad(camera.fov) / 2)) / height;

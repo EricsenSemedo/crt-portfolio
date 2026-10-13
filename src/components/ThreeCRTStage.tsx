@@ -299,7 +299,8 @@ export default function ThreeCRTStage({
           pointerGestureRef.current = null;
         }}
         onPointerLeave={(event) => {
-          // A finger lifting leaves the view where it was turned; a mouse leaving lets it settle back.
+          // A mouse leaving lets the view it was leading settle back. A view turned by a drag (touch,
+          // or the mouse under reduced motion) stays where it was turned.
           if (event.pointerType === "mouse") sceneRef.current?.lookToward(0, 0);
           setHovered(null);
           sceneRef.current?.setHovered(null);
