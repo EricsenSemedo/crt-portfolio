@@ -4,10 +4,11 @@ import usePortfolioNavigation from "./hooks/usePortfolioNavigation";
 import crtLensMatte from "./assets/crt-lens-matte.svg";
 import CRTLoadingScreen from "./components/CRTLoadingScreen";
 import TVZoomOverlay from "./components/TVZoomOverlay";
-import type { PortfolioChannelId } from "./data/channels";
+import { roomChannel, type PortfolioChannelId, type ScreenChannelId } from "./data/channels";
 import Contact from "./pages/Contact";
 import Home from "./pages/Home";
 import Portfolio from "./pages/Portfolio";
+import Websites from "./pages/Websites";
 
 const AssetViewer = lazy(() => import("./pages/AssetViewer"));
 const ThreeCRTStage = lazy(() => import("./components/ThreeCRTStage"));
@@ -32,8 +33,8 @@ function PortfolioApp() {
   const { channel, project, redirectTo, navigateToTV, openProject, closeProject, closeTV } = usePortfolioNavigation();
   // A shared link opens its page straight away; the room loads behind it and is waiting at that
   // set, so closing the page still pulls back to the room.
-  const [selectedId, setSelectedId] = useState<PortfolioChannelId | null>(channel);
-  const [sceneChannel, setSceneChannel] = useState<PortfolioChannelId | null>(channel);
+  const [selectedId, setSelectedId] = useState<ScreenChannelId | null>(channel);
+  const [sceneChannel, setSceneChannel] = useState<PortfolioChannelId | null>(roomChannel(channel));
   const [phase, setPhase] = useState<"overview" | "ready" | "focusing" | "open" | "exiting">(channel ? "open" : "overview");
   const [screenEffectActive, setScreenEffectActive] = useState(false);
   const [stageMounted, setStageMounted] = useState(!channel);
@@ -71,19 +72,24 @@ function PortfolioApp() {
     } else if (phase === "overview" && channel && !roomReady) {
       // A channel picked on the loading screen opens straight away; the room catches up behind it.
       setSelectedId(channel);
-      setSceneChannel(channel);
+      setSceneChannel(roomChannel(channel));
       setPhase("open");
     } else if (phase === "open" && selectedId !== channel) {
       setScreenEffectActive(true);
       setSelectedId(null);
       setPhase("exiting");
+    } else if (phase === "ready" && channel === "websites") {
+      // No set to zoom into: the screen powers on over the room.
+      setSelectedId(channel);
+      setPhase("open");
     } else if (phase === "ready" && channel) {
       setScreenEffectActive(true);
-      setSceneChannel(channel);
+      setSceneChannel(roomChannel(channel));
       setPhase("focusing");
-    } else if (phase === "focusing" && sceneChannel !== channel) {
-      setSceneChannel(channel);
-      if (!channel) setPhase("overview");
+    } else if (phase === "focusing" && sceneChannel !== roomChannel(channel)) {
+      const nextScene = roomChannel(channel);
+      setSceneChannel(nextScene);
+      if (!nextScene) setPhase("overview");
     }
   }, [channel, phase, roomReady, sceneChannel, selectedId]);
 
@@ -108,6 +114,7 @@ function PortfolioApp() {
     home: <Home onNavigate={navigateToTV} />,
     portfolio: <Portfolio onNavigate={navigateToTV} selectedProject={project} onOpenProject={openProject} onCloseProject={closeProject} />,
     contact: <Contact onNavigate={navigateToTV} />,
+    websites: <Websites onNavigate={navigateToTV} />,
   };
 
   return (

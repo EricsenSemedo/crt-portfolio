@@ -81,6 +81,13 @@ describe("usePortfolioNavigation", () => {
     expect(read("redirect")).toBe("none");
   });
 
+  it("derives the Websites channel, which has no set in the room", () => {
+    window.history.replaceState(null, "", "#/websites");
+    mount();
+    expect(read("channel")).toBe("websites");
+    expect(read("redirect")).toBe("none");
+  });
+
   it("rejects inherited object properties as navigation targets", () => {
     mount();
     const historyLength = window.history.length;

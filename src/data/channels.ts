@@ -7,3 +7,16 @@ export const PORTFOLIO_CHANNELS = {
 export type PortfolioChannelId = keyof typeof PORTFOLIO_CHANNELS;
 
 export const PORTFOLIO_CHANNEL_LIST = Object.values(PORTFOLIO_CHANNELS);
+
+/** Every channel the screen can show. Websites has no set in the room: prospects arrive by link. */
+export const SCREEN_CHANNELS = {
+  ...PORTFOLIO_CHANNELS,
+  websites: { id: "websites", number: "04", title: "Websites" },
+} as const;
+
+export type ScreenChannelId = keyof typeof SCREEN_CHANNELS;
+
+/** The set the camera should face for a channel; Websites keeps the room at its overview. */
+export function roomChannel(id: ScreenChannelId | null): PortfolioChannelId | null {
+  return id === "websites" ? null : id;
+}
