@@ -77,6 +77,7 @@ describe("App hash navigation", () => {
     if (mounted) act(() => root.unmount());
     host.remove();
     mounted = false;
+    vi.unstubAllGlobals();
     (globalThis as typeof globalThis & { IS_REACT_ACT_ENVIRONMENT: boolean }).IS_REACT_ACT_ENVIRONMENT = false;
   });
 
@@ -258,6 +259,38 @@ describe("App hash navigation", () => {
 
     completeFocus("home");
     expect(overlayChannel()).toBe("home");
+  });
+
+  it("opens a shared Websites link at once and keeps the room at its overview behind it", async () => {
+    vi.stubGlobal("IntersectionObserver", class {
+      observe() {}
+      disconnect() {}
+    });
+    await mount("#/websites");
+    expect(overlayChannel()).toBe("websites");
+    expect(host.querySelector("h1")?.textContent).toContain("Websites");
+
+    await mountRoomWhenIdle();
+    expect(latestStage?.requestedChannel).toBeNull();
+
+    click("Close TV");
+    expect(window.location.hash).toBe("#/");
+    completeOverlayExit();
+    completeOverview();
+    expect(overlayChannel()).toBe("overview");
+  });
+
+  it("powers Websites on over the room without zooming into a set", async () => {
+    vi.stubGlobal("IntersectionObserver", class {
+      observe() {}
+      disconnect() {}
+    });
+    await mount();
+    await navigateHistory(() => {
+      window.location.hash = "#/websites";
+    });
+    expect(overlayChannel()).toBe("websites");
+    expect(latestStage?.requestedChannel).toBeNull();
   });
 
   it("flips channels inside an open set, and browser Back flips back", async () => {
