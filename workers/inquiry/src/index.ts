@@ -35,9 +35,14 @@ async function passesTurnstile(token: unknown, request: Request, env: Env) {
   form.append("response", token);
   const ip = request.headers.get("CF-Connecting-IP");
   if (ip) form.append("remoteip", ip);
-  const response = await fetch(TURNSTILE_VERIFY_URL, { method: "POST", body: form });
-  const result = await response.json() as { success?: boolean };
-  return result.success === true;
+  try {
+    const response = await fetch(TURNSTILE_VERIFY_URL, { method: "POST", body: form });
+    const result = await response.json() as { success?: boolean };
+    return result.success === true;
+  } catch (error) {
+    console.error("Turnstile verification failed", error);
+    return false;
+  }
 }
 
 export default {
@@ -53,6 +58,7 @@ export default {
     } catch {
       return json({ ok: false, error: "body" }, 400, cors);
     }
+    if (!body || typeof body !== "object" || Array.isArray(body)) return json({ ok: false, error: "body" }, 400, cors);
 
     // Bots fill the hidden "website" field; they get a normal answer and nothing is sent.
     if (typeof body.website === "string" && body.website) return json({ ok: true }, 200, cors);
@@ -62,19 +68,24 @@ export default {
     if (!await passesTurnstile(body.turnstileToken, request, env)) return json({ ok: false, error: "turnstile" }, 403, cors);
 
     const email = buildInquiryEmail(parsed.inquiry);
-    const sent = await fetch(RESEND_URL, {
-      method: "POST",
-      headers: { Authorization: `Bearer ${env.RESEND_API_KEY}`, "Content-Type": "application/json" },
-      body: JSON.stringify({
-        from: env.INQUIRY_FROM,
-        to: [env.INQUIRY_TO],
-        subject: email.subject,
-        text: email.text,
-        ...(email.replyTo ? { reply_to: email.replyTo } : {}),
-      }),
-    });
-    if (!sent.ok) {
-      console.error("Resend rejected the inquiry", sent.status, await sent.text());
+    try {
+      const sent = await fetch(RESEND_URL, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${env.RESEND_API_KEY}`, "Content-Type": "application/json" },
+        body: JSON.stringify({
+          from: env.INQUIRY_FROM,
+          to: [env.INQUIRY_TO],
+          subject: email.subject,
+          text: email.text,
+          ...(email.replyTo ? { reply_to: email.replyTo } : {}),
+        }),
+      });
+      if (!sent.ok) {
+        console.error("Resend rejected the inquiry", sent.status, await sent.text());
+        return json({ ok: false, error: "send" }, 502, cors);
+      }
+    } catch (error) {
+      console.error("Could not reach Resend", error);
       return json({ ok: false, error: "send" }, 502, cors);
     }
     return json({ ok: true }, 200, cors);

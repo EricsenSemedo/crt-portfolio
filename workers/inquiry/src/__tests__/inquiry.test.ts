@@ -51,11 +51,15 @@ describe("buildInquiryEmail", () => {
     expect(email.replyTo).toBe("dana@example.com");
     expect(email.text).toContain("I need a site.");
     expect(buildInquiryEmail({ ...parsed.inquiry, reply: "401-555-0100" }).replyTo).toBeUndefined();
+    expect(buildInquiryEmail({ ...parsed.inquiry, reply: "dana@example.com;" }).replyTo).toBeUndefined();
   });
 });
 
 describe("inquiry worker", () => {
-  afterEach(() => vi.unstubAllGlobals());
+  afterEach(() => {
+    vi.unstubAllGlobals();
+    vi.restoreAllMocks();
+  });
 
   it("sends a verified inquiry to the inbox", async () => {
     const fetchMock = stubFetch(true);
@@ -72,6 +76,20 @@ describe("inquiry worker", () => {
     expect((await worker.fetch(post(valid, "https://evil.example"), env)).status).toBe(403);
     expect((await worker.fetch(post({ ...valid, website: "spam.example" }), env)).status).toBe(200);
     expect(fetchMock.mock.calls.every(([url]) => !String(url).includes("resend"))).toBe(true);
+  });
+
+  it("rejects a JSON body that isn't an object", async () => {
+    stubFetch(true);
+    expect(await (await worker.fetch(post(null), env)).json()).toEqual({ ok: false, error: "body" });
+  });
+
+  it("reports an unreachable mail service as a failed send", async () => {
+    vi.stubGlobal("fetch", vi.fn(async (url: string) => {
+      if (url.includes("turnstile")) return Response.json({ success: true });
+      throw new TypeError("network down");
+    }));
+    vi.spyOn(console, "error").mockImplementation(() => {});
+    expect(await (await worker.fetch(post(valid), env)).json()).toEqual({ ok: false, error: "send" });
   });
 
   it("reports a failed send so the form can offer another way", async () => {

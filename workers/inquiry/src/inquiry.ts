@@ -15,7 +15,8 @@ export interface InquiryEmail {
 }
 
 const LIMITS = { name: 100, business: 120, reply: 200, message: 5000, page: 300 } as const;
-const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+// Strict enough that Resend accepts it as reply_to; anything else stays only in the body.
+const EMAIL_PATTERN = /^[^\s@;,<>"()]+@[A-Za-z0-9-]+(\.[A-Za-z0-9-]+)*\.[A-Za-z]{2,}$/;
 
 function field(body: Record<string, unknown>, key: keyof typeof LIMITS, singleLine: boolean) {
   const value = typeof body[key] === "string" ? (body[key] as string).trim() : "";
