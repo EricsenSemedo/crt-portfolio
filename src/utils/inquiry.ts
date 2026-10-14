@@ -41,7 +41,12 @@ export function loadTurnstile(): Promise<TurnstileApi> {
     const script = document.createElement("script");
     script.src = TURNSTILE_SCRIPT;
     script.async = true;
-    script.onload = () => window.turnstile ? resolve(window.turnstile) : reject(new Error("Turnstile missing"));
+    script.onload = () => {
+      if (window.turnstile) return resolve(window.turnstile);
+      loading = null;
+      script.remove();
+      reject(new Error("Turnstile missing"));
+    };
     script.onerror = () => {
       loading = null;
       script.remove();
@@ -58,6 +63,8 @@ export async function sendInquiry(fields: InquiryFields, turnstileToken: string)
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ ...fields, turnstileToken, page: window.location.href }),
+      // A hung Worker would leave the form stuck on "Sending…"; this turns it into a failed send.
+      signal: AbortSignal.timeout(15000),
     });
     const result = await response.json() as { ok?: boolean };
     return response.ok && result.ok === true;

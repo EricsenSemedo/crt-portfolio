@@ -94,6 +94,7 @@ function SiteGuide() {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const site = clientSites[selectedIndex];
   const reduceMotion = useReducedMotion();
+  if (!site) return null;
 
   return (
     <div className="grid grid-cols-[minmax(0,1.6fr)_minmax(16rem,1fr)] gap-8">

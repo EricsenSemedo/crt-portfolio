@@ -77,6 +77,7 @@ describe("App hash navigation", () => {
     if (mounted) act(() => root.unmount());
     host.remove();
     mounted = false;
+    vi.unstubAllGlobals();
     (globalThis as typeof globalThis & { IS_REACT_ACT_ENVIRONMENT: boolean }).IS_REACT_ACT_ENVIRONMENT = false;
   });
 
@@ -277,7 +278,6 @@ describe("App hash navigation", () => {
     completeOverlayExit();
     completeOverview();
     expect(overlayChannel()).toBe("overview");
-    vi.unstubAllGlobals();
   });
 
   it("powers Websites on over the room without zooming into a set", async () => {
@@ -291,7 +291,6 @@ describe("App hash navigation", () => {
     });
     expect(overlayChannel()).toBe("websites");
     expect(latestStage?.requestedChannel).toBeNull();
-    vi.unstubAllGlobals();
   });
 
   it("flips channels inside an open set, and browser Back flips back", async () => {
