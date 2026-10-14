@@ -18,8 +18,11 @@ export default function CRTActionLink({ href, label, description, icon, primary 
     if (fill.handlePointerEnter(event)) scramble();
   }
 
+  // Web links open in a new tab; a mailto link hands off to the mail app instead.
+  const external = /^https?:/.test(href);
+
   return (
-    <a href={href} target="_blank" rel="noopener noreferrer"
+    <a href={href} target={external ? "_blank" : undefined} rel={external ? "noopener noreferrer" : undefined}
       onPointerEnter={handlePointerEnter} onPointerLeave={fill.handlePointerLeave}
       onFocus={(event) => {
         if (!event.currentTarget.matches(":focus-visible")) return;
@@ -37,7 +40,7 @@ export default function CRTActionLink({ href, label, description, icon, primary 
           <span className={"block text-sm transition-colors " + (fill.fillVisible ? "text-[#333]" : "text-crt-text-tertiary")}>{description}</span>
         </span>
         <svg className={"h-5 w-5 shrink-0 transition-colors " + (fill.fillVisible ? "text-[#111]" : "text-crt-text-tertiary")} fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={external ? "M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" : "M9 5l7 7-7 7"} />
         </svg>
       </span>
     </a>
