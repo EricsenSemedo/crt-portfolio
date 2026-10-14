@@ -227,7 +227,7 @@ function StartProject() {
         <div ref={widgetRef} className="min-h-[65px] sm:col-span-2" />
         {(status === "failed" || checkFailed) && (
           <p role="alert" className="text-crt-text-secondary sm:col-span-2">
-            <LinkedInFallback>{status === "failed" ? "That didn't send. Try again, or" : "The spam check didn't load. Refresh the page, or"}</LinkedInFallback>
+            <LinkedInFallback>{status === "failed" ? "That didn't send. Try again, or" : "The spam check didn't pass. Refresh the page, or"}</LinkedInFallback>
           </p>
         )}
         <CRTButton type="submit" disabled={!token || status === "sending"} className="sm:col-span-2">

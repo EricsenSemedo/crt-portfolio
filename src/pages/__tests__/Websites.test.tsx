@@ -2,7 +2,7 @@ import { act } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import clientSites from "../../data/websites";
-import { INQUIRY_URL } from "../../utils/inquiry";
+import { INQUIRY_URL, type TurnstileApi } from "../../utils/inquiry";
 import Websites from "../Websites";
 
 describe("Websites", () => {
@@ -55,7 +55,7 @@ describe("Websites", () => {
       reset: vi.fn(),
       remove: vi.fn(),
     };
-    window.turnstile = turnstile;
+    window.turnstile = turnstile as unknown as TurnstileApi;
     container = document.createElement("div");
     document.body.appendChild(container);
     root = createRoot(container);
