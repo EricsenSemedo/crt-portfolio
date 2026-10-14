@@ -1,0 +1,15 @@
+// Websites form endpoint: verifies Turnstile, then emails the inquiry through Resend.
+// Deploy: bunx wrangler deploy (from this folder).
+// Secrets (set once, never committed): TURNSTILE_SECRET, RESEND_API_KEY.
+{
+  "name": "cranium-inquiry",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-10-01",
+  "workers_dev": true,
+  "observability": { "enabled": true },
+  "vars": {
+    "ALLOWED_ORIGINS": "https://ericsensemedo.github.io,http://localhost:5173,http://localhost:4173",
+    "INQUIRY_TO": "ericsen@cranium.studio",
+    "INQUIRY_FROM": "Cranium Studio website <inquiry@form.cranium.studio>"
+  }
+}
