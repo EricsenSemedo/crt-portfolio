@@ -31,7 +31,7 @@ const groupLineup = [
     id: "client-websites",
     title: "Client Websites",
     blurb: "Sites designed and built for small businesses.",
-    ids: ["edgewood-remodeling", "btb-creative-vision"],
+    ids: ["edgewood-remodeling", "btb-creative-vision", "luis-rosa"],
   },
 ];
 

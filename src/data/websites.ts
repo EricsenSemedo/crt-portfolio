@@ -13,6 +13,7 @@ export interface ClientSite {
 const BUSINESS: Record<string, string> = {
   "edgewood-remodeling": "Remodeler · Rhode Island",
   "btb-creative-vision": "Filmmaker · Providence",
+  "luis-rosa": "Illustrator · Rhode Island",
 };
 
 export const clientSites: ClientSite[] = (browseGroups.find((group) => group.id === "client-websites")?.projects ?? [])
