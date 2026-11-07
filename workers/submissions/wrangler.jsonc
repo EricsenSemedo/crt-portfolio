@@ -1,0 +1,26 @@
+// Private page for reading Websites form inquiries saved by the cranium-inquiry Worker.
+// It only answers requests that Cloudflare Access has signed in, and refuses everything until
+// ACCESS_TEAM_DOMAIN and ACCESS_AUD are set from the Access application that protects it.
+// Deploy: bunx wrangler deploy (from this folder).
+{
+  "name": "cranium-submissions",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-10-01",
+  "workers_dev": true,
+  "preview_urls": false,
+  "observability": { "enabled": true },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "cranium-inquiries",
+      "database_id": "d4141828-abe2-4a0d-8b9b-9a06fe347dba"
+    }
+  ],
+  "vars": {
+    // e.g. https://cranium.cloudflareaccess.com
+    "ACCESS_TEAM_DOMAIN": "",
+    // The Access application's Audience (AUD) tag.
+    "ACCESS_AUD": "",
+    "TIME_ZONE": "America/New_York"
+  }
+}
