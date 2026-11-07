@@ -24,7 +24,7 @@ const groupLineup = [
   {
     id: "game-development",
     title: "Game Development",
-    blurb: "Roblox games and gameplay systems built around arcade and multiplayer loops, progression, and responsive cross-platform controls.",
+    blurb: "Roblox games and systems I've built: arcade and multiplayer games, progression, and controls that work on PC, console and phone.",
     ids: ["heros-quest", "physics-grab", "dont-get-caught", "grow-your-plant", "zombies-game", "roblox-ai-system"],
   },
   {
