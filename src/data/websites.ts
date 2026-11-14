@@ -11,7 +11,7 @@ export interface ClientSite {
 }
 
 const BUSINESS: Record<string, string> = {
-  "edgewood-remodeling": "Remodeler · Rhode Island",
+  "edgewood-remodeling": "Remodeler · Cranston",
   "btb-creative-vision": "Filmmaker · Providence",
   "luis-rosa": "Illustrator · Rhode Island",
 };
