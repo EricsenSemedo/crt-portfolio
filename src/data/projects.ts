@@ -240,7 +240,7 @@ export const projects: Project[] = [
         "Responsive, art-directed project imagery",
         "Modern image formats and multiple output sizes",
         "Project form that emails leads through Resend, with optional photo attachments and a copy saved in Cloudflare D1",
-        "Phone menu with a hand-drawn button and a frosted veil over the page",
+        "Phone menu over a frosted veil, with a button that redraws itself into an X",
         "Deployed on Cloudflare Workers from GitHub, with a preview link for every branch before it goes live",
       ],
     },
