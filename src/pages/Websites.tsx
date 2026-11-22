@@ -9,6 +9,8 @@ import { loadTurnstile, sendInquiry, TURNSTILE_SITE_KEY, type TurnstileApi } fro
 
 interface WebsitesProps {
   onNavigate?: NavigateFunction;
+  /** Opens the project form on arrival, for "Hire me for a website" buttons elsewhere. */
+  startProject?: boolean;
 }
 
 const WIDE_QUERY = "(min-width: 768px)";
@@ -196,6 +198,7 @@ function StartProject() {
       business: value("business"),
       message: value("message"),
       reply: value("reply"),
+      currentSite: value("currentSite"),
       website: value("website"),
     }, token);
     // A token works once, so a failed send needs a fresh check before the next try.
@@ -220,7 +223,13 @@ function StartProject() {
           What do you need?
           <textarea required maxLength={5000} name="message" rows={3} className={fieldClass} />
         </label>
-        <label className="text-sm text-crt-text-secondary sm:col-span-2">Email or phone<input required maxLength={200} name="reply" autoComplete="email" className={fieldClass} /></label>
+        <label className="text-sm text-crt-text-secondary">Email or phone<input required maxLength={200} name="reply" autoComplete="email" className={fieldClass} /></label>
+        <label className="text-sm text-crt-text-secondary">
+          Current site <span className="text-crt-text-tertiary">(optional)</span>
+          {/* Text, not type="url", so "mybakery.com" works without https://. The Worker checks it too. */}
+          <input maxLength={300} name="currentSite" inputMode="url" autoComplete="url" placeholder="yourbusiness.com" pattern="\S+\.\S+" title="A web address, like yourbusiness.com" className={fieldClass} />
+        </label>
+        <p className="text-crt-text-secondary sm:col-span-2">I'll look at your site before I get back to you.</p>
         {/* Hidden from people; bots that fill it are dropped by the Worker. */}
         <div aria-hidden="true" className="absolute -left-[10000px] h-px w-px overflow-hidden">
           <label>Website<input name="website" tabIndex={-1} autoComplete="off" /></label>
@@ -243,15 +252,24 @@ function StartProject() {
  * Websites - Client sites for prospects. Opens straight from a shared link: a guide beside a monitor
  * on wide screens, one card per site on phones, and it ends on starting a project.
  */
-export default function Websites({ onNavigate }: WebsitesProps) {
+export default function Websites({ onNavigate, startProject = false }: WebsitesProps) {
   const isWide = useWideLayout();
-  const [formOpen, setFormOpen] = useState(false);
+  const [formOpen, setFormOpen] = useState(startProject);
+  // Stays open once opened, even if the ?start link changes while someone types.
+  if (startProject && !formOpen) setFormOpen(true);
   const formRef = useRef<HTMLElement>(null);
 
   function openForm() {
     setFormOpen(true);
     window.requestAnimationFrame(() => formRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }));
   }
+
+  // Arriving from a "Hire me for a website" button goes straight to the form.
+  useEffect(() => {
+    if (!startProject) return;
+    const frame = window.requestAnimationFrame(() => formRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }));
+    return () => window.cancelAnimationFrame(frame);
+  }, [startProject]);
 
   return (
     <div tabIndex={-1} className="crt-page bg-page-tint h-full w-full overflow-y-auto text-crt-text">

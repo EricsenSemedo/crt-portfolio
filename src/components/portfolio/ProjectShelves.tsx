@@ -1,4 +1,4 @@
-import { useRef, useState, type Dispatch, type SetStateAction } from "react";
+import { useRef, useState, type Dispatch, type ReactNode, type SetStateAction } from "react";
 import { browseMedia, channelNumber, type BrowseGroup } from "../../data/browse";
 import { usePosterColor } from "../../hooks/usePosterColor";
 import { useSpotlight, useTouchOnly } from "../../hooks/useSpotlight";
@@ -9,6 +9,8 @@ interface ProjectShelvesProps {
   groups: BrowseGroup[];
   /** Gets the card's screen too, so the picture can be carried into the project page. */
   onOpen: (project: Project, screen: Element | null) => void;
+  /** An extra button under a group's blurb, keyed by group id. */
+  groupActions?: Record<string, ReactNode>;
 }
 
 function ShelfCard({ project, active, onActive, onOpen, spotlightRef }: {
@@ -58,8 +60,9 @@ function ShelfCard({ project, active, onActive, onOpen, spotlightRef }: {
   );
 }
 
-function Shelf({ group, activeId, setActiveId, onOpen, register }: {
+function Shelf({ group, action, activeId, setActiveId, onOpen, register }: {
   group: BrowseGroup;
+  action?: ReactNode;
   activeId: string | null;
   setActiveId: Dispatch<SetStateAction<string | null>>;
   onOpen: ProjectShelvesProps["onOpen"];
@@ -80,6 +83,7 @@ function Shelf({ group, activeId, setActiveId, onOpen, register }: {
             {group.title} <span className="ml-1 font-mono text-sm font-normal text-crt-text-tertiary">{group.projects.length}</span>
           </h2>
           <p data-enter="copy" className="mt-2 max-w-2xl text-sm text-crt-text-tertiary">{group.blurb}</p>
+          {action && <div data-enter="copy" className="mt-4">{action}</div>}
         </div>
         {group.projects.length > 1 && (
           <div className="hidden shrink-0 gap-2 sm:flex">
@@ -119,7 +123,7 @@ function Shelf({ group, activeId, setActiveId, onOpen, register }: {
  * Projects as shelves, one row per group that slides sideways. Hovering a screen lifts it, glows it in
  * its artwork's colour and plays its clip; on phones the screen nearest the middle plays instead.
  */
-export default function ProjectShelves({ groups, onOpen }: ProjectShelvesProps) {
+export default function ProjectShelves({ groups, onOpen, groupActions }: ProjectShelvesProps) {
   const touchOnly = useTouchOnly();
   const { spotlightId, register } = useSpotlight(touchOnly);
   const [hoveredId, setHoveredId] = useState<string | null>(null);
@@ -128,7 +132,7 @@ export default function ProjectShelves({ groups, onOpen }: ProjectShelvesProps) 
   return (
     <div>
       {groups.map((group) => (
-        <Shelf key={group.id} group={group} activeId={activeId} setActiveId={setHoveredId} onOpen={onOpen} register={register} />
+        <Shelf key={group.id} group={group} action={groupActions?.[group.id]} activeId={activeId} setActiveId={setHoveredId} onOpen={onOpen} register={register} />
       ))}
     </div>
   );

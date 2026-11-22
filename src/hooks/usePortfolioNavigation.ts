@@ -14,6 +14,8 @@ interface PortfolioNavigation {
   channel: ScreenChannelId | null;
   project: Project | null;
   redirectTo: string | null;
+  /** True on #/websites?start: the Websites page opens its project form straight away. */
+  startProject: boolean;
   navigateToTV: (targetId: string) => void;
   openProject: (project: Project) => void;
   closeProject: () => void;
@@ -26,6 +28,9 @@ const channelPaths: Record<ScreenChannelId, string> = {
   contact: "/contact",
   websites: "/websites",
 };
+
+// Targets that aren't channels: "start-project" opens the Websites form from anywhere.
+const targetPaths: Record<string, string> = { ...channelPaths, "start-project": "/websites?start" };
 
 function getPreviousPathname(state: unknown) {
   return (state as PortfolioNavigationState | null)?.portfolioNavigation?.previousPathname;
@@ -60,14 +65,16 @@ export default function usePortfolioNavigation(): PortfolioNavigation {
     redirectTo = "/";
   }
 
+  const startProject = channel === "websites" && new URLSearchParams(location.search).has("start");
+
   const navigateToTV = useCallback((targetId: string) => {
-    if (!Object.prototype.hasOwnProperty.call(channelPaths, targetId)) return;
-    const targetPath = channelPaths[targetId as ScreenChannelId];
-    if (location.pathname === targetPath) return;
+    if (!Object.prototype.hasOwnProperty.call(targetPaths, targetId)) return;
+    const targetPath = targetPaths[targetId];
+    if (location.pathname + location.search === targetPath) return;
     navigate(targetPath, {
       state: { portfolioNavigation: { previousPathname: location.pathname } },
     });
-  }, [location.pathname, navigate]);
+  }, [location.pathname, location.search, navigate]);
 
   const openProject = useCallback((nextProject: Project) => {
     const targetPath = `/portfolio/${nextProject.id}`;
@@ -98,5 +105,5 @@ export default function usePortfolioNavigation(): PortfolioNavigation {
     navigate("/", { replace: true, state: null });
   }, [location.state, navigate]);
 
-  return { channel, project, redirectTo, navigateToTV, openProject, closeProject, closeTV };
+  return { channel, project, redirectTo, startProject, navigateToTV, openProject, closeProject, closeTV };
 }

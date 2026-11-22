@@ -29,4 +29,9 @@ export const clientSites: ClientSite[] = (browseGroups.find((group) => group.id 
     }];
   });
 
+/** Client Web projects get a "Hire me for a website" button on their page. */
+export function isClientSite(project: Project) {
+  return clientSites.some((site) => site.project.id === project.id);
+}
+
 export default clientSites;

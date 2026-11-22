@@ -10,9 +10,9 @@ describe("Websites", () => {
   let root: Root;
   let turnstile: { render: ReturnType<typeof vi.fn>; reset: ReturnType<typeof vi.fn>; remove: ReturnType<typeof vi.fn> };
 
-  function renderAt(wide: boolean, onNavigate = vi.fn()) {
+  function renderAt(wide: boolean, onNavigate = vi.fn(), startProject = false) {
     vi.stubGlobal("matchMedia", vi.fn(() => ({ matches: wide, addEventListener: vi.fn(), removeEventListener: vi.fn() })));
-    act(() => root.render(<Websites onNavigate={onNavigate} />));
+    act(() => root.render(<Websites onNavigate={onNavigate} startProject={startProject} />));
     return onNavigate;
   }
 
@@ -27,7 +27,7 @@ describe("Websites", () => {
     await act(async () => {});
     const form = container.querySelector("form");
     if (!form) throw new Error("Form not found");
-    for (const [name, value] of [["name", "Dana"], ["business", "Dana's Bakery"], ["message", "I need a site."], ["reply", "dana@example.com"]]) {
+    for (const [name, value] of [["name", "Dana"], ["business", "Dana's Bakery"], ["message", "I need a site."], ["reply", "dana@example.com"], ["currentSite", "danasbakery.com"]]) {
       (form.querySelector(`[name=${name}]`) as HTMLInputElement).value = value;
     }
     return form;
@@ -93,6 +93,13 @@ describe("Websites", () => {
     expect(onNavigate).toHaveBeenCalledWith("portfolio");
   });
 
+  it("opens the form straight away for a Hire me for a website button", async () => {
+    renderAt(false, vi.fn(), true);
+    await act(async () => {});
+    expect(container.querySelector("form [name=currentSite]")).not.toBeNull();
+    expect(container.querySelector("form")?.textContent).toContain("I'll look at your site before I get back to you.");
+  });
+
   it("sends the form with its Turnstile token and confirms it arrived", async () => {
     const fetchMock = vi.fn(async () => Response.json({ ok: true }));
     vi.stubGlobal("fetch", fetchMock);
@@ -101,7 +108,7 @@ describe("Websites", () => {
 
     const [url, init] = fetchMock.mock.calls[0] as unknown as [string, RequestInit];
     expect(url).toBe(INQUIRY_URL);
-    expect(JSON.parse(init.body as string)).toMatchObject({ name: "Dana", reply: "dana@example.com", turnstileToken: "token-1", website: "" });
+    expect(JSON.parse(init.body as string)).toMatchObject({ name: "Dana", reply: "dana@example.com", turnstileToken: "token-1", currentSite: "danasbakery.com", website: "" });
     expect(container.querySelector("[role=status]")?.textContent).toContain("in my inbox");
   });
 

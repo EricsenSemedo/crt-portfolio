@@ -1,3 +1,4 @@
+import { isClientSite } from "../../data/websites";
 import type { Project } from "../../types";
 import CRTButton from "../CRTButton";
 import ScrambleHeading from "../ScrambleHeading";
@@ -8,6 +9,8 @@ interface ProjectChannelProps {
   nextProject?: Project;
   onNextProject?: () => void;
   onContact?: () => void;
+  /** Opens the Websites form. Only client website projects show the button. */
+  onHire?: () => void;
 }
 
 interface ProjectStep {
@@ -41,12 +44,13 @@ function projectSteps(project: Project): ProjectStep[] {
  * ProjectChannel - One project as a single page: the demo leads, the story reads beneath it,
  * and a spec sheet keeps stack and links in reach. Ends on the next channel and the contact call.
  */
-export default function ProjectChannel({ project, nextProject, onNextProject, onContact }: ProjectChannelProps) {
+export default function ProjectChannel({ project, nextProject, onNextProject, onContact, onHire }: ProjectChannelProps) {
   const isHackathon = project.detailLayout === "hackathon";
   const links = [
     ...(project.sources ?? []),
     ...(project.github && !project.sources?.some((source) => source.href === project.github) ? [{ label: "GitHub", href: project.github }] : []),
   ];
+  const hire = onHire && isClientSite(project) ? onHire : undefined;
 
   return (
     <div className="h-full overflow-y-auto overscroll-y-contain" data-crt-scroll-container>
@@ -114,10 +118,12 @@ export default function ProjectChannel({ project, nextProject, onNextProject, on
                   ))}
                 </dd>
               </div>
-              {links.length > 0 && (
+              {(links.length > 0 || hire) && (
                 <div data-enter="copy">
                   <dt className="font-display text-lg font-semibold text-crt-text">See more</dt>
                   <dd className="mt-3 flex flex-col gap-2">
+                    {/* The sidebar is too narrow for two buttons side by side, so Visit site sits under it. */}
+                    {hire && <CRTButton variant="primary" className="w-full" onClick={hire}>Hire me for a website</CRTButton>}
                     {links.map((link) => (
                       <a
                         key={link.href}
