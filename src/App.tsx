@@ -30,7 +30,7 @@ export default function App() {
 }
 
 function PortfolioApp() {
-  const { channel, project, redirectTo, navigateToTV, openProject, closeProject, closeTV } = usePortfolioNavigation();
+  const { channel, project, redirectTo, startProject, navigateToTV, openProject, closeProject, closeTV } = usePortfolioNavigation();
   // A shared link opens its page straight away; the room loads behind it and is waiting at that
   // set, so closing the page still pulls back to the room.
   const [selectedId, setSelectedId] = useState<ScreenChannelId | null>(channel);
@@ -114,7 +114,7 @@ function PortfolioApp() {
     home: <Home onNavigate={navigateToTV} />,
     portfolio: <Portfolio onNavigate={navigateToTV} selectedProject={project} onOpenProject={openProject} onCloseProject={closeProject} />,
     contact: <Contact onNavigate={navigateToTV} />,
-    websites: <Websites onNavigate={navigateToTV} />,
+    websites: <Websites onNavigate={navigateToTV} startProject={startProject} />,
   };
 
   return (

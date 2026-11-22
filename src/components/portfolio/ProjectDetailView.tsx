@@ -13,6 +13,8 @@ interface ProjectDetailViewProps {
   lineup: Project[];
   onOpenProject: (project: Project) => void;
   onContact?: () => void;
+  /** Opens the Websites form; shown only on client website projects. */
+  onHire?: () => void;
   onClose?: () => void;
   /** A gallery screen is flying in, so the panel fades instead of expanding. */
   carried?: boolean;
@@ -32,6 +34,7 @@ export default function ProjectDetailView({
   lineup,
   onOpenProject,
   onContact,
+  onHire,
   onClose,
   carried = false,
   backgroundRef,
@@ -148,6 +151,7 @@ export default function ProjectDetailView({
                   nextProject={nextProject}
                   onNextProject={() => onOpenProject(nextProject)}
                   onContact={onContact}
+                  onHire={onHire}
                 />
               </motion.div>
             </AnimatePresence>

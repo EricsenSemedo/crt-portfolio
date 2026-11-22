@@ -1,4 +1,4 @@
-import type { PointerEvent, ReactNode } from "react";
+import type { MouseEvent, PointerEvent, ReactNode } from "react";
 import useDirectionalFill from "../hooks/useDirectionalFill";
 import useScrambleText from "../hooks/useScrambleText";
 
@@ -8,9 +8,11 @@ interface CRTActionLinkProps {
   description: string;
   icon: ReactNode;
   primary?: boolean;
+  /** Set for a page inside the portfolio: it opens in place, not in a new tab. */
+  onNavigate?: () => void;
 }
 
-export default function CRTActionLink({ href, label, description, icon, primary = false }: CRTActionLinkProps) {
+export default function CRTActionLink({ href, label, description, icon, primary = false, onNavigate }: CRTActionLinkProps) {
   const { visibleLabel, scramble } = useScrambleText(label);
   const fill = useDirectionalFill<HTMLAnchorElement>();
 
@@ -18,8 +20,14 @@ export default function CRTActionLink({ href, label, description, icon, primary 
     if (fill.handlePointerEnter(event)) scramble();
   }
 
+  function handleClick(event: MouseEvent<HTMLAnchorElement>) {
+    if (!onNavigate || event.metaKey || event.ctrlKey || event.shiftKey || event.button !== 0) return;
+    event.preventDefault();
+    onNavigate();
+  }
+
   return (
-    <a href={href} target="_blank" rel="noopener noreferrer"
+    <a href={href} {...(onNavigate ? {} : { target: "_blank", rel: "noopener noreferrer" })} onClick={handleClick}
       onPointerEnter={handlePointerEnter} onPointerLeave={fill.handlePointerLeave}
       onFocus={(event) => {
         if (!event.currentTarget.matches(":focus-visible")) return;
@@ -37,7 +45,7 @@ export default function CRTActionLink({ href, label, description, icon, primary 
           <span className={"block text-sm transition-colors " + (fill.fillVisible ? "text-[#333]" : "text-crt-text-tertiary")}>{description}</span>
         </span>
         <svg className={"h-5 w-5 shrink-0 transition-colors " + (fill.fillVisible ? "text-[#111]" : "text-crt-text-tertiary")} fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={onNavigate ? "M5 12h14m-6-6 6 6-6 6" : "M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"} />
         </svg>
       </span>
     </a>

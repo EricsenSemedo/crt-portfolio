@@ -14,9 +14,11 @@ function NavigationProbe() {
       <output data-testid="channel">{navigation.channel ?? "overview"}</output>
       <output data-testid="project">{navigation.project?.id ?? "none"}</output>
       <output data-testid="redirect">{navigation.redirectTo ?? "none"}</output>
+      <output data-testid="start">{String(navigation.startProject)}</output>
       <button onClick={() => navigation.navigateToTV("home")}>Open profile</button>
       <button onClick={() => navigation.navigateToTV("portfolio")}>Open portfolio</button>
       <button onClick={() => navigation.navigateToTV("contact")}>Open contact</button>
+      <button onClick={() => navigation.navigateToTV("start-project")}>Start project</button>
       <button onClick={() => navigation.navigateToTV("constructor")}>Invalid target</button>
       <button onClick={() => navigation.openProject(projects[0])}>Open project</button>
       <button onClick={navigation.closeProject}>Close project</button>
@@ -86,6 +88,16 @@ describe("usePortfolioNavigation", () => {
     mount();
     expect(read("channel")).toBe("websites");
     expect(read("redirect")).toBe("none");
+  });
+
+  it("opens the Websites form from anywhere with start-project", () => {
+    window.history.replaceState(null, "", "#/contact");
+    mount();
+    expect(read("start")).toBe("false");
+    click("Start project");
+    expect(window.location.hash).toBe("#/websites?start");
+    expect(read("channel")).toBe("websites");
+    expect(read("start")).toBe("true");
   });
 
   it("rejects inherited object properties as navigation targets", () => {

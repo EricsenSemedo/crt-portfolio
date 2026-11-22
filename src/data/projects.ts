@@ -227,8 +227,8 @@ export const projects: Project[] = [
     image: "/crt-portfolio/projects/browse/edgewood-remodeling.jpg",
     demo: {
       type: "video",
-      src: "/crt-portfolio/projects/edgewood-tour.webm",
-      alt: "Tour of the live Edgewood Remodeling site: the homepage hero, six services, About, Our work and the process steps, then the project form typing an example request and showing three attached photos",
+      src: "/crt-portfolio/projects/edgewood-tour-v2.webm",
+      alt: "The live Edgewood Remodeling site on a phone and a desktop side by side: the kitchen hero, the six services, the Space Remodeling page, About with Brian Clarke's sign-off, Our work and the kitchen gallery, then the project form",
     },
     sources: [{ label: "Visit site", href: "https://edgewoodremodelingri.com/" }],
     detailedDescription: {
@@ -240,7 +240,8 @@ export const projects: Project[] = [
         "Responsive, art-directed project imagery",
         "Modern image formats and multiple output sizes",
         "Project form that emails leads through Resend, with optional photo attachments and a copy saved in Cloudflare D1",
-        "Deployed on Cloudflare Workers from GitHub, with a staging branch that previews every change",
+        "Phone menu with a hand-drawn button and a frosted veil over the page",
+        "Deployed on Cloudflare Workers from GitHub, with a preview link for every branch before it goes live",
       ],
     },
   },

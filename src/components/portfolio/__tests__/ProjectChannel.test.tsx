@@ -74,4 +74,25 @@ describe("ProjectChannel", () => {
     expect(onNextProject).toHaveBeenCalledOnce();
     expect(onContact).toHaveBeenCalledOnce();
   });
+  it("puts Hire me for a website before Visit site on client website pages only", () => {
+    const onHire = vi.fn();
+    for (const id of ["edgewood-remodeling", "btb-creative-vision", "luis-rosa"]) {
+      const project = projects.find((candidate) => candidate.id === id);
+      if (!project) throw new Error(`Missing ${id} fixture`);
+      act(() => root.render(<ProjectChannel project={project} onHire={onHire} />));
+      const block = [...container.querySelectorAll("dt")].find((term) => term.textContent === "See more")?.nextElementSibling;
+      const hire = block?.querySelector("button");
+      const visit = [...(block?.querySelectorAll("a") ?? [])].find((link) => link.textContent?.startsWith("Visit site"));
+      expect(hire?.textContent).toBe("Hire me for a website");
+      expect(visit).toBeDefined();
+      expect(hire && visit && hire.compareDocumentPosition(visit) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+      act(() => hire?.click());
+    }
+    expect(onHire).toHaveBeenCalledTimes(3);
+
+    const other = projects.find((candidate) => candidate.id === "toonsync");
+    if (!other) throw new Error("Missing ToonSync fixture");
+    act(() => root.render(<ProjectChannel project={other} onHire={onHire} />));
+    expect(container.textContent).not.toContain("Hire me for a website");
+  });
 });

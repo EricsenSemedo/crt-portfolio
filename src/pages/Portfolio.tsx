@@ -78,7 +78,11 @@ export default function Portfolio({ onNavigate, selectedProject, onOpenProject, 
         </section>
 
         <div className="mt-10 px-2 sm:px-6">
-          <ProjectShelves groups={browseGroups} onOpen={openWithCarry} />
+          <ProjectShelves
+            groups={browseGroups}
+            onOpen={openWithCarry}
+            groupActions={{ "client-websites": <CRTButton onClick={() => onNavigate?.("start-project")}>Hire me for a website</CRTButton> }}
+          />
         </div>
 
         <footer data-enter="copy" className="px-2 py-10 text-center sm:px-6" aria-label="Project gallery navigation">
@@ -108,6 +112,7 @@ export default function Portfolio({ onNavigate, selectedProject, onOpenProject, 
             lineup={browseLineup}
             onOpenProject={onOpenProject}
             onContact={() => onNavigate?.("contact")}
+            onHire={() => onNavigate?.("start-project")}
             onClose={closeWithCarry}
             carried={flight?.direction === "open"}
             backgroundRef={backgroundRef}

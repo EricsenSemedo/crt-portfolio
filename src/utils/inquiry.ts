@@ -9,6 +9,8 @@ export interface InquiryFields {
   business: string;
   message: string;
   reply: string;
+  currentSite: string;
+  /** The hidden honeypot. Only bots fill it. */
   website: string;
 }
 
