@@ -227,8 +227,8 @@ export const projects: Project[] = [
     image: "/crt-portfolio/projects/browse/edgewood-remodeling.jpg",
     demo: {
       type: "video",
-      src: "/crt-portfolio/projects/edgewood-tour-v2.webm",
-      alt: "The live Edgewood Remodeling site on a phone and a desktop side by side: the kitchen hero, the six services, the Space Remodeling page, About with Brian Clarke's sign-off, Our work and the kitchen gallery, then the project form",
+      src: "/crt-portfolio/projects/edgewood-tour-v3.webm",
+      alt: "A tour of the live Edgewood Remodeling site on desktop: the kitchen hero, the six services, the Space Remodeling page, About with Brian Clarke's sign-off, Our work and the kitchen project, then the project form",
     },
     sources: [{ label: "Visit site", href: "https://edgewoodremodelingri.com/" }],
     detailedDescription: {
