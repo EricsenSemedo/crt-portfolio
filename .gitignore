@@ -30,3 +30,11 @@ dist-ssr
 .cursor/*
 !.cursor/rules/
 .cursorrules
+
+# Local secrets and Wrangler state (never commit)
+.env
+.env.*
+!.env.example
+.dev.vars
+.dev.vars.*
+.wrangler/
